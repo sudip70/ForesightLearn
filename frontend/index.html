@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="39a871e4-0554-4159-bb8d-2d2ced68bd07"></script>
+    <title>Foresight</title>
+    <script>
+      try {
+        const savedTheme = localStorage.getItem("foresight-theme-mode");
+        document.documentElement.dataset.theme = savedTheme === "light" ? "light" : "dark";
+      } catch {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+  </head>
+  <body class="disclaimer-pending">
+    <svg class="icon-sprite" aria-hidden="true" focusable="false">
+      <symbol id="icon-market" viewBox="0 0 24 24">
+        <path d="M4 19V9" />
+        <path d="M10 19V5" />
+        <path d="M16 19v-7" />
+        <path d="M22 19V8" />
+      </symbol>
+      <symbol id="icon-forecast" viewBox="0 0 24 24">
+        <path d="M3 17l6-6 4 4 7-8" />
+        <path d="M14 7h6v6" />
+      </symbol>
+      <symbol id="icon-simulator" viewBox="0 0 24 24">
+        <path d="M4 21h16" />
+        <path d="M9 21V9" />
+        <path d="M15 21V9" />
+        <path d="M8 3h8" />
+        <path d="M10 3v5l-4 8a4 4 0 0 0 3.6 5h4.8a4 4 0 0 0 3.6-5l-4-8V3" />
+      </symbol>
+      <symbol id="icon-project" viewBox="0 0 24 24">
+        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z" />
+        <path d="M4 5.5v16" />
+        <path d="M8 7h8" />
+        <path d="M8 11h6" />
+      </symbol>
+      <symbol id="icon-github" viewBox="0 0 24 24">
+        <path d="M15 22v-4a4.8 4.8 0 0 0-1.3-3.5c4.3-.5 8.8-2.1 8.8-9.5A7.4 7.4 0 0 0 20.5 0 6.9 6.9 0 0 0 20 5.1 19 19 0 0 0 12 3a19 19 0 0 0-8 2.1A6.9 6.9 0 0 0 3.5 0a7.4 7.4 0 0 0-2 5c0 7.4 4.5 9 8.8 9.5A4.8 4.8 0 0 0 9 18v4" />
+        <path d="M9 18c-4.5 2-5-2-7-2" />
+      </symbol>
+      <symbol id="icon-linkedin" viewBox="0 0 24 24">
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" />
+        <rect x="2" y="9" width="4" height="12" />
+        <circle cx="4" cy="4" r="2" />
+      </symbol>
+      <symbol id="icon-globe" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18" />
+        <path d="M12 3a14 14 0 0 1 0 18" />
+        <path d="M12 3a14 14 0 0 0 0 18" />
+      </symbol>
+      <symbol id="icon-mail" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m3 7 9 6 9-6" />
+      </symbol>
+      <symbol id="icon-learn" viewBox="0 0 24 24">
+        <path d="M22 10L12 5 2 10l10 5z" />
+        <path d="M6 12.5V17c2 1.7 10 1.7 12 0v-4.5" />
+      </symbol>
+      <symbol id="icon-moon" viewBox="0 0 24 24">
+        <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 7 7 0 1 0 20.5 14.5z" />
+      </symbol>
+      <symbol id="icon-settings" viewBox="0 0 24 24">
+        <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
+        <path d="M19.4 15a1.8 1.8 0 0 0 .4 2l.1.1a2.1 2.1 0 0 1-3 3l-.1-.1a1.8 1.8 0 0 0-2-.4 1.8 1.8 0 0 0-1 1.6V21a2.1 2.1 0 0 1-4.2 0v-.2a1.8 1.8 0 0 0-1-1.6 1.8 1.8 0 0 0-2 .4l-.1.1a2.1 2.1 0 0 1-3-3l.1-.1a1.8 1.8 0 0 0 .4-2 1.8 1.8 0 0 0-1.6-1H2a2.1 2.1 0 0 1 0-4.2h.2a1.8 1.8 0 0 0 1.6-1 1.8 1.8 0 0 0-.4-2l-.1-.1a2.1 2.1 0 0 1 3-3l.1.1a1.8 1.8 0 0 0 2 .4 1.8 1.8 0 0 0 1-1.6V2a2.1 2.1 0 0 1 4.2 0v.2a1.8 1.8 0 0 0 1 1.6 1.8 1.8 0 0 0 2-.4l.1-.1a2.1 2.1 0 0 1 3 3l-.1.1a1.8 1.8 0 0 0-.4 2 1.8 1.8 0 0 0 1.6 1h.2a2.1 2.1 0 0 1 0 4.2h-.2a1.8 1.8 0 0 0-1.4 1.4z" />
+      </symbol>
+      <symbol id="icon-server" viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="7" rx="2" />
+        <rect x="3" y="13" width="18" height="7" rx="2" />
+        <path d="M7 8h.01" />
+        <path d="M7 17h.01" />
+      </symbol>
+      <symbol id="icon-info-circle" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v5" />
+        <path d="M12 8h.01" />
+      </symbol>
+      <symbol id="icon-check-circle" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M8 12.5l2.5 2.5L16 9" />
+      </symbol>
+      <symbol id="icon-x-circle" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M9 9l6 6" />
+        <path d="M15 9l-6 6" />
+      </symbol>
+    </svg>
+
+    <div
+      id="legalDisclaimer"
+      class="legal-disclaimer-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="legalDisclaimerTitle"
+      aria-describedby="legalDisclaimerBody"
+    >
+      <section class="legal-disclaimer-card" tabindex="-1">
+        <div class="legal-disclaimer-mark" aria-hidden="true">
+          <svg class="ui-icon" aria-hidden="true"><use href="#icon-info-circle"></use></svg>
+        </div>
+        <div>
+          <span class="eyebrow">Important notice</span>
+          <h1 id="legalDisclaimerTitle">Educational simulation only</h1>
+          <div id="legalDisclaimerBody" class="legal-disclaimer-body">
+            <p>
+              Foresight is an educational market simulation and analytics tool. The information,
+              forecasts, portfolio outputs, benchmark comparisons, and model-generated explanations
+              are provided for learning, research, and demonstration purposes only.
+            </p>
+            <p>
+              Nothing in this app is financial, investment, trading, tax, accounting, legal, or
+              fiduciary advice. The app does not recommend that you buy, sell, hold, or avoid any
+              security, asset, or strategy.
+            </p>
+            <p>
+              Forecasts are hypothetical model estimates based on available data and assumptions.
+              Markets are uncertain, results may be inaccurate or incomplete, and past performance
+              does not guarantee future results. You are responsible for your own decisions and
+              should consult a qualified professional before making financial decisions.
+            </p>
+          </div>
+          <button id="acceptDisclaimer" class="legal-disclaimer-accept" type="button">
+            I understand and accept
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Command Palette Overlay -->
+    <div id="commandPalette" class="cmd-palette-overlay" aria-hidden="true">
+      <div class="cmd-palette">
+        <div class="cmd-input-wrap">
+          <span class="cmd-icon">⌘</span>
+          <input id="cmdInput" type="text" placeholder="Search tickers, tabs, glossary..." autocomplete="off" />
+          <kbd class="cmd-kbd">ESC</kbd>
+        </div>
+        <div id="cmdResults" class="cmd-results"></div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <!-- App Layout: Sidebar + Content -->
+    <div class="app-layout">
+
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <span class="brand-name">Foresight</span>
+          <span class="brand-kicker">Market Intelligence</span>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Dashboard sections">
+          <button class="nav-item is-active" data-tab="market">
+            <svg class="nav-icon" aria-hidden="true"><use href="#icon-market"></use></svg>
+            <span class="nav-label">Market</span>
+          </button>
+          <button class="nav-item" data-tab="forecast">
+            <svg class="nav-icon" aria-hidden="true"><use href="#icon-forecast"></use></svg>
+            <span class="nav-label">Forecast</span>
+          </button>
+          <button class="nav-item" data-tab="simulator">
+            <svg class="nav-icon" aria-hidden="true"><use href="#icon-simulator"></use></svg>
+            <span class="nav-label">Simulator</span>
+          </button>
+          <button class="nav-item" data-tab="project">
+            <svg class="nav-icon" aria-hidden="true"><use href="#icon-project"></use></svg>
+            <span class="nav-label">About</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-search">
+          <button id="openCmdPalette" class="cmd-trigger">
+            <span>Search...</span>
+            <kbd>⌘K</kbd>
+          </button>
+        </div>
+
+        <div class="sidebar-bottom">
+          <div class="sidebar-toggles">
+            <button id="learnModeToggle" class="sidebar-toggle-btn" type="button" aria-pressed="false">
+              <svg class="nav-icon" aria-hidden="true"><use href="#icon-learn"></use></svg>
+              <span class="nav-label">Learn Mode</span>
+              <span class="toggle-badge">Off</span>
+            </button>
+            <button id="themeModeToggle" class="sidebar-toggle-btn" type="button" aria-pressed="false">
+              <svg class="nav-icon" aria-hidden="true"><use href="#icon-moon"></use></svg>
+              <span class="nav-label">Theme</span>
+              <span class="toggle-badge">Dark</span>
+            </button>
+          </div>
+          <details class="settings-menu">
+            <summary class="sidebar-settings-btn" aria-label="Settings">
+              <svg class="nav-icon" aria-hidden="true"><use href="#icon-settings"></use></svg>
+              <span class="nav-label">Settings</span>
+            </summary>
+            <div class="settings-panel">
+              <button class="settings-close" type="button" aria-label="Close settings" data-close-details>&times;</button>
+              <div class="why-container">
+                <label for="apiBase">Backend URL <button class="why-btn" type="button" data-why="The URL of the Foresight backend API. Use the default Render address or enter http://localhost:8000 when running locally. Click Use Backend to connect.">?</button></label>
+                <div class="why-popover-slot"></div>
+                <input id="apiBase" type="url" placeholder="https://foresight-backend-a5qx.onrender.com" />
+              </div>
+              <div class="why-container">
+                <label for="windowSize">Estimator window <button class="why-btn" type="button" data-why="Number of historical trading days used to build each forecast scenario. Smaller values (e.g. 30) react faster to recent price changes; larger values (e.g. 120) smooth out short-term noise. Default: 60 days.">?</button></label>
+                <div class="why-popover-slot"></div>
+                <input id="windowSize" type="number" min="2" max="756" value="60" step="1" />
+              </div>
+              <button id="saveApiBase">Use Backend</button>
+              <p id="apiStatus" class="muted">Waiting for connection.</p>
+              <button id="restartTour" class="sidebar-toggle-btn" type="button">
+                <svg class="nav-icon" aria-hidden="true"><use href="#icon-info-circle"></use></svg>
+                <span class="nav-label">Restart tour</span>
+              </button>
+            </div>
+          </details>
+        </div>
+      </aside>
+
+      <!-- Mobile Top Bar -->
+      <header class="mobile-topbar">
+        <span class="brand-name">Foresight</span>
+        <button id="mobileMenuToggle" class="mobile-menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
+      </header>
+
+      <!-- Main Content Area -->
+      <main class="app-shell">
+
+        <!-- Keyboard shortcuts hint -->
+        <div class="keyboard-hint" id="keyboardHint">
+          Press <kbd>1</kbd>-<kbd>4</kbd> to switch tabs · <kbd>⌘K</kbd> to search · <kbd>L</kbd> learn mode · <kbd>D</kbd> dark mode
+        </div>
+
+        <section id="market" class="workspace view is-active">
+          <div class="section-head sticky-head">
+            <div>
+              <h1>Market overview</h1>
+              <p id="marketAsOf" class="muted">
+                Live index performance and ranked opportunity scan.
+              </p>
+            </div>
+          </div>
+
+          <div id="freshnessBar" class="freshness-bar" role="status" aria-live="polite">
+            <div>
+              <span id="freshnessStatus" class="freshness-dot pending"></span>
+              <strong>Data freshness</strong>
+              <span id="freshnessLatest">Waiting for backend</span>
+            </div>
+            <div class="freshness-meta">
+              <span id="freshnessSource">Source pending</span>
+              <span id="freshnessStale">Coverage pending</span>
+            </div>
+          </div>
+
+          <!-- Empty state (shown when no backend is connected) -->
+          <div id="marketEmptyState" class="empty-state">
+            <svg class="empty-state-icon" aria-hidden="true"><use href="#icon-server"></use></svg>
+            <h2>Connect your backend</h2>
+            <p>Configure your backend URL in Settings to start exploring market data, forecasts, and portfolio simulations.</p>
+            <button class="empty-state-btn" onclick="document.querySelector('.settings-menu').open = true; setTimeout(() => document.getElementById('apiBase').focus(), 50)">Configure Backend →</button>
+          </div>
+
+          <div class="market-index-layout">
+            <div id="marketIndices" class="index-strip"></div>
+            <article class="surface market-index-history">
+              <div class="chart-toolbar market-index-toolbar">
+                <div>
+                  <h2>Index history</h2>
+                  <p id="marketIndexDateRange" class="muted">Waiting for index history.</p>
+                </div>
+                <div class="market-index-controls">
+                  <select id="marketIndexSelect" aria-label="Market index"></select>
+                  <div class="range-tabs" aria-label="Market index chart range">
+                    <button class="range-button" data-index-range="1m">1M</button>
+                    <button class="range-button" data-index-range="3m">3M</button>
+                    <button class="range-button" data-index-range="6m">6M</button>
+                    <button class="range-button is-active" data-index-range="1y">1Y</button>
+                    <button class="range-button" data-index-range="5y">5Y</button>
+                  </div>
+                </div>
+              </div>
+              <div id="marketIndexSummary" class="metric-grid compact market-index-summary"></div>
+              <div class="chart-legend" aria-hidden="true">
+                <span class="legend-item historical">Close</span>
+                <span class="legend-item moving-average">20-day average</span>
+              </div>
+              <div class="chart-frame market-index-chart-frame">
+                <canvas id="marketIndexChart" aria-label="Market index history chart"></canvas>
+              </div>
+              <div id="marketIndexChartFallback" class="muted"></div>
+            </article>
+          </div>
+          <div id="marketHighlights" class="metric-grid highlights"></div>
+
+          <article id="marketLearnPanel" class="surface learn-panel">
+            <div>
+              <span class="eyebrow">Learn mode</span>
+              <h2>Reading the market overview</h2>
+              <p>
+                This page teaches how a model turns market data into scenarios. The ranking is not a
+                buy list; it is a way to compare upside, downside, and confidence side by side.
+              </p>
+            </div>
+            <div id="marketLessonCards" class="lesson-grid"></div>
+          </article>
+
+          <div class="market-grid">
+            <article class="surface macro-card">
+              <h2>Macro snapshot</h2>
+              <div id="macroSnapshot" class="stack"></div>
+            </article>
+            <article class="surface opportunity-card">
+              <h2>Opportunity ranking</h2>
+              <div id="marketTable" class="data-table wide-table"></div>
+              <div class="info-note">
+                Base is the expected return under normal conditions. Bear and bull are downside
+                and upside scenario projections. Confidence reflects model certainty.
+              </div>
+            </article>
+            <article class="surface sentiment-card">
+              <h2>Market sentiment</h2>
+              <div class="sentiment-gauge" aria-label="Market sentiment score">
+                <div id="sentimentGaugeArc" class="gauge-arc"></div>
+                <div class="gauge-value">
+                  <strong id="sentimentScore" class="animate-number">--</strong>
+                  <span>/100</span>
+                </div>
+                <p id="sentimentLabel">Waiting for market data</p>
+              </div>
+              <div id="sentimentReasons" class="sentiment-list"></div>
+            </article>
+          </div>
+
+          <div class="lower-grid">
+            <article class="surface">
+              <h2>Key insights</h2>
+              <div id="marketInsightList" class="insight-list"></div>
+            </article>
+            <article class="surface">
+              <div class="card-title-row">
+                <h2>Top opportunities <span>(by base return)</span></h2>
+              </div>
+              <div id="topOpportunities" class="data-table"></div>
+            </article>
+          </div>
+
+          <article class="surface diagnostics-card">
+            <h2>Diagnostics and data health</h2>
+            <div id="dataHealthCards" class="health-grid"></div>
+            <details class="diagnostics">
+              <summary>View raw diagnostics</summary>
+              <div class="diagnostics-grid">
+                <article class="json-panel">
+                  <h3>Health</h3>
+                  <pre id="healthBlock" class="json-block"></pre>
+                </article>
+                <article class="json-panel">
+                  <h3>Models</h3>
+                  <pre id="modelsBlock" class="json-block"></pre>
+                </article>
+                <article class="json-panel">
+                  <h3>Refresh status</h3>
+                  <pre id="refreshStatusBlock" class="json-block"></pre>
+                </article>
+              </div>
+            </details>
+          </article>
+        </section>
+
+        <section id="forecast" class="workspace view">
+          <div class="section-head with-actions">
+            <div>
+              <h1>Ticker forecast</h1>
+              <p class="muted">
+                Historical price with bear, base, and bull scenario paths projected forward.
+              </p>
+            </div>
+            <div class="ticker-actions">
+              <select id="tickerSelect" aria-label="Ticker"></select>
+              <div class="forecast-horizon-field">
+                <label for="forecastHorizon">Horizon (Days)</label>
+                <input id="forecastHorizon" type="number" min="1" max="730" value="300" step="1" />
+              </div>
+              <button id="runTickerForecast">Run forecast</button>
+            </div>
+          </div>
+
+          <div class="forecast-layout">
+            <div class="forecast-main">
+              <article class="surface chart-surface">
+                <div class="chart-toolbar">
+                  <div class="range-tabs" aria-label="Chart history range">
+                    <button class="range-button" data-range="1m">1M</button>
+                    <button class="range-button" data-range="3m">3M</button>
+                    <button class="range-button is-active" data-range="6m">6M</button>
+                    <button class="range-button" data-range="1y">1Y</button>
+                    <button class="range-button" data-range="all">ALL</button>
+                  </div>
+                  <p id="forecastDateRange" class="muted">Projection</p>
+                </div>
+                <div class="chart-legend" aria-hidden="true">
+                  <span class="legend-item historical">Historical / Base</span>
+                  <span class="legend-item bull">Bull scenario</span>
+                  <span class="legend-item base">Base scenario</span>
+                  <span class="legend-item bear">Bear scenario</span>
+                </div>
+                <div class="chart-frame">
+                  <canvas id="forecastChart" aria-label="Ticker forecast chart"></canvas>
+                </div>
+                <div id="chartFallback" class="muted"></div>
+                <div class="info-note">
+                  <strong>Understanding scenario paths</strong>
+                  <span>
+                    These are model-generated probability-weighted projections, not guarantees.
+                    The base path reflects the central estimate while bear and bull paths show
+                    downside and upside ranges.
+                  </span>
+                </div>
+              </article>
+
+              <article class="surface scenario-card">
+                <h2>Scenario path summary <span id="scenarioHorizonLabel"></span></h2>
+                <div id="scenarioPathSummary" class="scenario-grid"></div>
+                <h2>Key insights</h2>
+                <div id="tickerInsights" class="insight-list"></div>
+              </article>
+
+              <article class="surface ticker-about-card">
+                <h2 id="tickerAboutTitle">About ticker</h2>
+                <div id="tickerNarrative" class="narrative"></div>
+              </article>
+            </div>
+
+            <aside class="forecast-side">
+              <article id="forecastLearnPanel" class="surface learn-panel lesson-card">
+                <span class="eyebrow">Forecast classroom</span>
+                <h2>How to read this forecast</h2>
+                <div id="forecastLessonContent" class="lesson-stack"></div>
+              </article>
+              <article class="surface">
+                <h2 id="tickerMetricTitle">Scenario metrics</h2>
+                <div id="tickerMetrics" class="metric-grid compact"></div>
+                <div class="info-note compact-note">
+                  <strong>What is max drawdown?</strong>
+                  <span>
+                    The largest peak-to-trough decline observed in the simulation window.
+                  </span>
+                </div>
+              </article>
+              <article class="surface">
+                <h2>Data confidence</h2>
+                <div id="tickerDataBadges" class="badge-row"></div>
+                <div id="forecastChange" class="change-panel"></div>
+              </article>
+              <article class="surface">
+                <h2>Company data</h2>
+                <div id="tickerProfile" class="profile-grid"></div>
+              </article>
+            </aside>
+          </div>
+        </section>
+
+        <section id="simulator" class="workspace view">
+          <div class="section-head with-actions">
+            <div>
+              <h1>Portfolio simulator</h1>
+              <p class="muted">
+                Forecast-ranked asset allocation with bear, base, and bull portfolio values.
+              </p>
+            </div>
+            <div class="simulator-actions">
+              <button id="runSimulation">Run simulation</button>
+              <details class="selection-menu">
+                <summary class="icon-button dots" aria-label="Optional ticker selection"></summary>
+                <div class="settings-panel selection-panel">
+                  <button class="settings-close" type="button" aria-label="Close ticker selection" data-close-details>&times;</button>
+                  <label for="simulationTickers">Optional ticker selection</label>
+                  <select id="simulationTickers" multiple size="8"></select>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <article class="surface simulation-settings">
+            <div class="simulation-settings-head">
+              <span class="eyebrow">Allocation settings</span>
+              <h2>Portfolio inputs</h2>
+              <p class="muted">
+                Set the amount, risk appetite, and horizon used by the portfolio classroom.
+              </p>
+            </div>
+            <div class="control-bar" aria-label="Portfolio allocation settings">
+              <div class="control-field amount-field">
+                <label for="amount">Investment</label>
+                <input id="amount" type="number" min="1000" value="10000" step="500" />
+              </div>
+              <span class="control-divider" aria-hidden="true"></span>
+              <div class="control-field risk-field">
+                <label for="risk">Risk</label>
+                <input id="risk" type="range" min="0" max="1" step="0.01" value="0.5" />
+                <span id="riskValue">0.50</span>
+              </div>
+              <span class="control-divider" aria-hidden="true"></span>
+              <div class="control-field horizon-field">
+                <label for="horizon">Horizon (days)</label>
+                <input id="horizon" type="number" min="1" max="730" value="300" step="1" />
+              </div>
+              <span class="control-divider" aria-hidden="true"></span>
+              <div class="control-field window-field why-container">
+                <label for="windowSizeInline">Window <button class="why-btn" type="button" data-why="Number of historical trading days used to build each forecast scenario. Smaller values (e.g. 30) react faster to recent price changes; larger values (e.g. 120) smooth out short-term noise. Default: 60 days.">?</button></label>
+                <div class="why-popover-slot"></div>
+                <input id="windowSizeInline" type="number" min="2" max="756" value="60" step="1" />
+              </div>
+              <button id="refreshDashboard" class="secondary-button">Refresh data</button>
+            </div>
+
+            <div class="constraint-section">
+              <div class="constraint-section-head">
+                <div>
+                  <span class="eyebrow">Portfolio constraints</span>
+                  <h2>Allocation guardrails</h2>
+                </div>
+              </div>
+              <div class="constraint-grid" aria-label="Portfolio constraints">
+                <div class="constraint-field">
+                  <label for="maxSinglePosition">Max single position</label>
+                  <div class="percent-input">
+                    <input id="maxSinglePosition" type="number" min="1" max="100" value="25" step="1" />
+                    <span>%</span>
+                  </div>
+                </div>
+                <div class="constraint-field">
+                  <label for="maxCryptoWeight">Max crypto</label>
+                  <div class="percent-input">
+                    <input id="maxCryptoWeight" type="number" min="0" max="100" value="35" step="1" />
+                    <span>%</span>
+                  </div>
+                </div>
+                <div class="constraint-field">
+                  <label for="minCashWeight">Min cash</label>
+                  <div class="percent-input">
+                    <input id="minCashWeight" type="number" min="0" max="100" value="2" step="1" />
+                    <span>%</span>
+                  </div>
+                </div>
+                <fieldset class="constraint-field class-preferences">
+                  <legend>Preferred classes</legend>
+                  <label><input id="preferStock" type="checkbox" value="stock" /> Stocks</label>
+                  <label><input id="preferEtf" type="checkbox" value="etf" /> ETFs</label>
+                  <label><input id="preferCrypto" type="checkbox" value="crypto" /> Crypto</label>
+                </fieldset>
+              </div>
+            </div>
+          </article>
+
+          <div id="simulationSummary" class="portfolio-summary"></div>
+
+          <article id="simulatorLearnPanel" class="surface learn-panel">
+            <div>
+              <span class="eyebrow">Portfolio classroom</span>
+              <h2>How risk settings change the simulation</h2>
+              <p>
+                The simulator shows how asset mix, cash buffer, downside value, and confidence move
+                when you change risk appetite or horizon. It is an educational sandbox, not a trade
+                instruction.
+              </p>
+            </div>
+            <div id="portfolioClassroom" class="lesson-grid"></div>
+          </article>
+
+          <div class="portfolio-grid">
+            <article class="surface allocation-card">
+              <h2>Class allocation</h2>
+              <div id="simulationClasses"></div>
+              <div class="info-note">
+                <strong>Why hold cash?</strong>
+                <span>
+                  The model reserves a cash buffer based on risk appetite and scenario balance.
+                </span>
+              </div>
+            </article>
+            <article class="surface">
+              <h2>Asset allocation <span>(base scenario)</span></h2>
+              <div id="simulationAssets" class="data-table"></div>
+            </article>
+            <article class="surface">
+              <h2>Simulation example trades <span>(base scenario)</span></h2>
+              <div id="simulationTrades" class="data-table"></div>
+            </article>
+          </div>
+
+          <div class="portfolio-detail-grid">
+            <article class="surface">
+              <h2>Benchmark comparison</h2>
+              <div id="benchmarkComparison" class="data-table"></div>
+            </article>
+            <article class="surface">
+              <h2>Why this allocation?</h2>
+              <div id="allocationWhy" class="allocation-explanations"></div>
+            </article>
+          </div>
+
+          <article class="surface">
+            <h2>Key insights</h2>
+            <div id="simulationWarnings" class="insight-list"></div>
+          </article>
+
+          <details class="advanced-diagnostics">
+            <summary>Advanced diagnostics and backtest metrics</summary>
+            <div class="diagnostic-actions">
+              <button id="runRlAllocation">Run RL allocation snapshot</button>
+              <button id="runBacktest">Run RL backtest</button>
+            </div>
+            <div class="diagnostics-grid">
+              <article>
+                <h2>RL allocation summary</h2>
+                <div id="rlSummary" class="metric-grid compact"></div>
+                <div id="rlClasses" class="data-table"></div>
+              </article>
+              <article>
+                <h2>Backtest metrics</h2>
+                <div id="backtestSummary" class="metric-grid compact"></div>
+                <div id="backtestWarnings" class="stack"></div>
+              </article>
+            </div>
+          </details>
+        </section>
+
+        <section id="project" class="workspace view">
+          <div class="section-head sticky-head">
+            <div>
+              <h1>About</h1>
+              <p class="muted">
+                App context, system numbers, and builder profile.
+              </p>
+            </div>
+          </div>
+
+          <div class="about-layout">
+            <article class="surface about-project-card">
+              <div>
+                <h2>Foresight is a modular market intelligence and financial literacy platform.</h2>
+                <p>
+                  The app combines Supabase-backed market data, historical index charts, FastAPI
+                  route modules, scenario forecasting, portfolio simulation, compact allocation
+                  explanations, optional RL diagnostics, and a polished static frontend into one
+                  learning-oriented product.
+                </p>
+              </div>
+              <div id="projectStats" class="project-stats"></div>
+            </article>
+
+            <article class="surface about-profile-card">
+              <div class="about-profile-head">
+                <div class="about-avatar">
+                  <img
+                    src="https://github.com/sudip70.png?size=160"
+                    alt="Sudip Shrestha"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div>
+                  <h2>Sudip Shrestha</h2>
+                  <p>AI/ML Engineer &amp; Data Analyst</p>
+                </div>
+              </div>
+              <p class="about-profile-copy">
+                AI/ML Engineer with a software engineering foundation, specializing in reinforcement learning and production ML systems. I build end-to-end ML applications from training pipelines to deployed APIs and turn complex datasets into compelling visual stories.
+              </p>
+              <div class="about-links" aria-label="Sudip Shrestha links">
+                <a href="https://github.com/sudip70" target="_blank" rel="noreferrer">
+                  <svg class="ui-icon" aria-hidden="true"><use href="#icon-github"></use></svg>
+                  <span>GitHub</span>
+                </a>
+                <a href="https://www.linkedin.com/in/sudipshrestha-58/" target="_blank" rel="noreferrer">
+                  <svg class="ui-icon" aria-hidden="true"><use href="#icon-linkedin"></use></svg>
+                  <span>LinkedIn</span>
+                </a>
+                <a href="https://sudip70.github.io/" target="_blank" rel="noreferrer">
+                  <svg class="ui-icon" aria-hidden="true"><use href="#icon-globe"></use></svg>
+                  <span>Portfolio</span>
+                </a>
+                <a href="mailto:sudipshrestha.ca@gmail.com">
+                  <svg class="ui-icon" aria-hidden="true"><use href="#icon-mail"></use></svg>
+                  <span>Mail</span>
+                </a>
+              </div>
+            </article>
+          </div>
+
+          <div class="project-grid">
+            <article class="surface architecture-card">
+              <h2>System architecture</h2>
+              <div class="architecture-map" aria-label="Foresight system architecture">
+                <section class="architecture-node">
+                  <span class="architecture-step">01</span>
+                  <h3>Data ingestion</h3>
+                  <ul>
+                    <li>yfinance OHLCV for equities, ETFs, crypto, and market indices</li>
+                    <li>Configured universes from <code>config/asset_universe.v1.json</code> and <code>config/market_indices.v1.json</code></li>
+                    <li>Macro CSV inputs and stored forecast snapshots for model context</li>
+                  </ul>
+                </section>
+                <section class="architecture-node">
+                  <span class="architecture-step">02</span>
+                  <h3>Refresh and storage</h3>
+                  <ul>
+                    <li>GitHub Actions runs <code>scripts/refresh_supabase_daily.sh</code> for scheduled Supabase updates</li>
+                    <li>Supabase stores market history, profiles, macro context, index snapshots, and forecasts</li>
+                    <li>Market index snapshots can refresh on demand when the first cards are missing</li>
+                  </ul>
+                </section>
+                <section class="architecture-node">
+                  <span class="architecture-step">03</span>
+                  <h3>FastAPI model layer</h3>
+                  <ul>
+                    <li>Routers split health, market, forecast, portfolio, inference, and diagnostic routes</li>
+                    <li>Supabase forecast engine serves market overview, ticker profiles, forecasts, and simulations</li>
+                    <li>Local artifact engine remains available for optional RL diagnostics and backtests</li>
+                  </ul>
+                </section>
+                <section class="architecture-node">
+                  <span class="architecture-step">04</span>
+                  <h3>Learning frontend</h3>
+                  <ul>
+                    <li>JavaScript is split into API, state, chart, render, and utility modules</li>
+                    <li>CSS is split by base, layout, forms, components, charts, responsive, and themes</li>
+                    <li>Learn Mode, settings controls, and simulator rationale make outputs explainable</li>
+                  </ul>
+                </section>
+              </div>
+              <div class="architecture-details">
+                <div>
+                  <span class="eyebrow">Runtime contract</span>
+                  <p>
+                    Render runs with Supabase required through <code>SUPABASE_URL</code> and
+                    <code>SUPABASE_SERVICE_ROLE_KEY</code>. Local development can still enable artifact
+                    fallback for offline diagnostics, RL allocation checks, and backtests.
+                  </p>
+                </div>
+                <div>
+                  <span class="eyebrow">User-facing APIs</span>
+                  <p>
+                    <code>/api/market/indices</code>, <code>/api/market/indices/{symbol}/history</code>,
+                    <code>/api/forecasts/ticker</code>, <code>/api/forecasts/market</code>, and portfolio simulation
+                    routes power the visible workflows. Artifact-backed inference and backtests stay behind
+                    the diagnostics panel.
+                  </p>
+                </div>
+              </div>
+            </article>
+            <article class="surface">
+              <h2>What this demonstrates</h2>
+              <div id="projectHighlights" class="lesson-stack"></div>
+            </article>
+            <article class="surface">
+              <h2>Model transparency</h2>
+              <div id="projectTransparency" class="lesson-stack"></div>
+            </article>
+          </div>
+
+          <div class="project-grid">
+            <article class="surface glossary-card">
+              <h2>Learning glossary</h2>
+              <div id="glossaryList" class="glossary-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <footer class="app-footer">
+          <span>Educational simulations only. Forecasts are model estimates, not investment advice, and past performance does not guarantee future results.</span>
+          <span id="footerDataAsOf">Data pending</span>
+        </footer>
+      </main>
+    </div>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+      <button class="mobile-nav-item is-active" data-tab="market">
+        <svg class="mobile-nav-icon" aria-hidden="true"><use href="#icon-market"></use></svg><span>Market</span>
+      </button>
+      <button class="mobile-nav-item" data-tab="forecast">
+        <svg class="mobile-nav-icon" aria-hidden="true"><use href="#icon-forecast"></use></svg><span>Forecast</span>
+      </button>
+      <button class="mobile-nav-item" data-tab="simulator">
+        <svg class="mobile-nav-icon" aria-hidden="true"><use href="#icon-simulator"></use></svg><span>Simulator</span>
+      </button>
+      <button class="mobile-nav-item" data-tab="project">
+        <svg class="mobile-nav-icon" aria-hidden="true"><use href="#icon-project"></use></svg><span>About</span>
+      </button>
+    </nav>
+
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+# Environment
+.venv/
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Test / lint caches
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# ML artifacts and datasets (deprecated in ForesightLearn pivot)
+artifacts/
+datasets/
+
+# Supabase local
+supabase/.temp/
+
+# Tools
+.DS_Store
+.claude/
+.vscode/
