@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>ForesightLearn — North Star prototype</title>
+<style>
+:root{
+  --bg:#f4f1fa; --card:#ffffff; --ink:#2c2740; --muted:#7d7694; --faint:#aaa3c0;
+  --lav:#9084b4; --lav2:#a89ccc; --lavd:#565072; --lavbg:#efe9fb;
+  --grad1:#c4b5fd; --grad2:#a78bfa; --deep:#5546b0;
+  --green:#4f9c7e; --greenbg:#e7f3ee; --red:#cf5a40; --redbg:#fbeae6; --blue:#5b8def;
+  --gold:#d9a93e; --line:#ece7f6; --shadow:0 8px 28px rgba(70,55,130,.10);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:#181528;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);
+  display:flex;justify-content:center;min-height:100vh}
+.phone{width:100%;max-width:430px;background:var(--bg);min-height:100vh;position:relative;display:flex;flex-direction:column;
+  box-shadow:0 0 60px rgba(0,0,0,.4)}
+/* header */
+.hdr{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg) 70%,rgba(244,241,250,0));
+  padding:14px 18px 8px;display:flex;align-items:center;gap:11px}
+.hdr .ava{width:40px;height:40px;border-radius:50%;overflow:hidden;flex:0 0 auto;box-shadow:0 2px 8px rgba(80,60,140,.18)}
+.hdr-greet{font-size:12px;color:var(--muted);font-weight:600;line-height:1.1}
+.hdr-name{font-size:16px;font-weight:800;letter-spacing:-.2px}
+.hdr-lv{margin-left:auto;display:flex;align-items:center;gap:6px;background:var(--lavbg);color:var(--lavd);
+  font-size:12px;font-weight:800;padding:7px 11px;border-radius:30px}
+.streak{font-size:12px;font-weight:800;color:#c8761f;background:#fdf0dc;padding:7px 10px;border-radius:30px}
+/* screen */
+main{flex:1;overflow-y:auto;padding:6px 16px 96px;scroll-behavior:smooth}
+.sec-h{font-size:13px;font-weight:800;letter-spacing:.3px;color:var(--lavd);margin:20px 4px 9px;text-transform:uppercase}
+.subtle{font-size:13px;color:var(--muted);margin:0 4px 12px;line-height:1.5}
+.card{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:13px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.k{font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase}
+.big{font-size:30px;font-weight:850;letter-spacing:-1px}
+.big2{font-size:21px;font-weight:850;letter-spacing:-.4px}
+.tnum{font-variant-numeric:tabular-nums}
+.up{color:var(--green)} .down{color:var(--red)}
+/* hero */
+.hero{background:linear-gradient(135deg,var(--grad2),var(--deep));color:#fff;border-radius:24px;padding:18px;
+  box-shadow:0 12px 30px rgba(85,70,176,.34);margin:8px 0 4px}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.hero-k{font-size:11px;font-weight:800;letter-spacing:.5px;opacity:.85;text-transform:uppercase}
+.hero-lv{font-size:20px;font-weight:850;letter-spacing:-.3px;margin-top:2px}
+.hero .streak{background:rgba(255,255,255,.18);color:#fff}
+.xpbar{height:9px;background:rgba(255,255,255,.25);border-radius:20px;overflow:hidden}
+.xpbar.sm{height:6px;background:var(--line)}
+.xpfill{height:100%;background:#fff;border-radius:20px;transition:width .5s}
+.xpbar.sm .xpfill{background:var(--lav2)}
+.hero-sub{font-size:12px;font-weight:600;opacity:.9;margin-top:8px}
+/* mini stats */
+.mini-row{display:flex;gap:11px;margin:12px 0 2px}
+.mini{flex:1;background:var(--card);border-radius:16px;padding:13px 14px;box-shadow:var(--shadow)}
+.mini-k{font-size:11px;color:var(--faint);font-weight:800;text-transform:uppercase;letter-spacing:.3px}
+.mini-v{font-size:18px;font-weight:850;margin-top:3px}
+.mini-s{font-size:12px;font-weight:700;margin-top:1px}
+/* mia card */
+.mia-card{display:flex;gap:12px;background:var(--card);border:1.5px solid var(--lavbg);border-radius:20px;padding:15px;box-shadow:var(--shadow);margin-bottom:13px}
+.mia-face{width:42px;height:42px;border-radius:50%;overflow:hidden;flex:0 0 auto;background:var(--lavbg)}
+.mia-body{min-width:0;flex:1}
+.mia-msg{font-size:15px;font-weight:800;line-height:1.35;letter-spacing:-.2px}
+.mia-num{display:flex;align-items:baseline;gap:7px;margin:9px 0 3px}
+.num-v{font-size:24px;font-weight:850;color:var(--deep);letter-spacing:-.5px}
+.num-n{font-size:12px;font-weight:700;color:var(--muted)}
+.mia-plain{font-size:13.5px;color:var(--muted);line-height:1.55}
+.mia-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn-mia{background:var(--deep);color:#fff;border:none;font-weight:800;font-size:13px;padding:9px 14px;border-radius:30px;cursor:pointer}
+.whats{display:inline-flex;align-items:center;gap:5px;background:var(--lavbg);color:var(--lavd);border:none;font-weight:800;font-size:12.5px;padding:9px 12px;border-radius:30px;cursor:pointer}
+.whats.inline{padding:3px 9px;font-size:11.5px;margin-left:4px}
+.wq{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--lav);color:#fff;font-size:10px;font-weight:900}
+/* continue / lesson */
+.cont{display:flex;align-items:center;gap:13px;background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow);cursor:pointer;margin-bottom:13px}
+.cont-ic{width:42px;height:42px;border-radius:13px;background:var(--lavbg);display:flex;align-items:center;justify-content:center;font-size:21px;flex:0 0 auto}
+.cont-b{flex:1;min-width:0}
+.cont-t{font-size:14.5px;font-weight:800;letter-spacing:-.2px}
+.cont-s{font-size:12px;color:var(--muted);font-weight:600;margin:2px 0 7px}
+.cont-go{font-size:26px;color:var(--faint);font-weight:300}
+/* tracks */
+.track{display:flex;align-items:center;gap:13px;background:var(--card);border-radius:16px;padding:13px 15px;box-shadow:var(--shadow);margin-bottom:10px;cursor:pointer}
+.track.locked{opacity:.55;cursor:default}
+.track-ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 auto;background:var(--lavbg)}
+.track.done .track-ic{background:var(--greenbg)}
+.track-b{flex:1;min-width:0}
+.track-t{font-size:14px;font-weight:800;letter-spacing:-.2px}
+.track-meta{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
+.track-pill{font-size:11px;font-weight:800;padding:4px 9px;border-radius:20px}
+.tp-done{background:var(--greenbg);color:var(--green)}
+.tp-go{background:var(--lavbg);color:var(--lavd)}
+.tp-lock{background:#efeef3;color:var(--faint)}
+.tbar{height:5px;background:var(--line);border-radius:10px;overflow:hidden;margin-top:8px}
+.tbar i{display:block;height:100%;background:var(--lav2);border-radius:10px}
+/* skills */
+.skills{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.skill{background:var(--card);border-radius:16px;padding:13px;box-shadow:var(--shadow);position:relative;border:1.5px solid transparent}
+.skill.got{border-color:var(--green)}
+.skill-ic{font-size:23px;filter:grayscale(1);opacity:.45}
+.skill.got .skill-ic{filter:none;opacity:1}
+.skill-n{font-size:13.5px;font-weight:800;margin:7px 0 3px;letter-spacing:-.2px}
+.skill-h{font-size:11.5px;color:var(--muted);font-weight:600;line-height:1.4}
+.skill-badge{position:absolute;top:11px;right:11px;font-size:11px;font-weight:800;color:var(--green)}
+.skill.locked .skill-badge{color:var(--faint)}
+/* health read */
+.health{font-size:12px;font-weight:800;padding:8px 12px;border-radius:14px;text-align:right;max-width:48%;line-height:1.3}
+.health.warn{background:var(--redbg);color:var(--red)}
+.health.mid{background:#fdf2dc;color:#b9842a}
+.health.good{background:var(--greenbg);color:var(--green)}
+.ph-sub{font-size:13px;color:var(--muted);font-weight:600;margin:9px 0 2px}
+/* disclosure */
+.disc{width:100%;background:var(--lavbg);color:var(--lavd);border:none;font-weight:800;font-size:13px;padding:11px;border-radius:13px;cursor:pointer;margin-top:13px}
+.disc-body{margin-top:11px}
+.htable{border-top:1px solid var(--line)}
+.hrow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.hl{min-width:0}
+.ht{font-size:14px;font-weight:800}
+.acct{font-size:10px;font-weight:800;background:var(--lavbg);color:var(--lavd);padding:2px 6px;border-radius:6px;margin-left:5px;vertical-align:middle}
+.hs{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
+.hr{text-align:right}
+.hv{font-size:14px;font-weight:850}
+.hw{font-size:12px;color:var(--muted);font-weight:700;margin-top:2px}
+.mininote{font-size:11.5px;color:var(--faint);font-weight:600;line-height:1.5;margin-top:10px}
+/* number rows */
+.nrow{padding:12px 0;border-bottom:1px solid var(--line)}
+.nn{font-size:13.5px;font-weight:800}
+.nv{font-size:14.5px;font-weight:850;color:var(--deep)}
+.np{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:4px}
+/* buy grid */
+.buy-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.tile{background:var(--card);border-radius:16px;padding:14px;box-shadow:var(--shadow);cursor:pointer;border:1.5px solid transparent}
+.tile:active{border-color:var(--lav2)}
+.tile-t{font-size:15px;font-weight:850}
+.tile-n{font-size:11.5px;color:var(--muted);font-weight:600;margin:2px 0 8px;min-height:30px}
+.tile-tag{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:8px;background:var(--greenbg);color:var(--green)}
+/* understand chips */
+.uchips{display:flex;gap:8px;overflow-x:auto;padding:2px 4px 10px;scrollbar-width:none}
+.uchips::-webkit-scrollbar{display:none}
+.uchip{flex:0 0 auto;background:var(--card);border:1.5px solid var(--line);color:var(--muted);font-weight:800;font-size:13px;padding:9px 15px;border-radius:30px;cursor:pointer}
+.uchip.on{background:var(--deep);color:#fff;border-color:var(--deep)}
+.chart{margin:6px -2px 2px}
+.legend{display:flex;flex-wrap:wrap;gap:11px;font-size:11px;color:var(--muted);font-weight:700;margin-top:8px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.px{font-size:20px;font-weight:850}
+/* scenario range */
+.scn3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.scn3 .c{border-radius:15px;padding:12px 8px;text-align:center}
+.scn3 .bear{background:var(--redbg)} .scn3 .base{background:var(--lavbg)} .scn3 .bull{background:var(--greenbg)}
+.scn3 .l{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.2px;color:var(--muted)}
+.scn3 .v{font-size:17px;font-weight:850;margin:5px 0 2px}
+.scn3 .bear .v{color:var(--red)} .scn3 .base .v{color:var(--deep)} .scn3 .bull .v{color:var(--green)}
+.scn3 .p{font-size:12px;font-weight:800;color:var(--muted)}
+/* teach + nudge */
+.teach,.nudge{display:flex;gap:11px;background:#fbf8ef;border:1.5px solid #f1e6c9;border-radius:16px;padding:14px;font-size:13px;color:#6b5d33;line-height:1.5;font-weight:600;margin-bottom:13px}
+.nudge{background:var(--lavbg);border-color:#e0d6f3;color:var(--lavd)}
+.teach .ti,.nudge .ni{font-size:20px;flex:0 0 auto}
+.good-i{color:var(--green);font-weight:800}
+.driver{font-size:13.5px;font-weight:700;color:var(--ink);padding:7px 0;border-bottom:1px solid var(--line)}
+/* buttons */
+.btn-pur{width:100%;background:linear-gradient(135deg,var(--grad2),var(--deep));color:#fff;border:none;font-weight:850;font-size:15px;padding:15px;border-radius:16px;cursor:pointer;box-shadow:0 8px 20px rgba(85,70,176,.3)}
+.big-btn{margin-top:6px}
+.btn-ghost{width:100%;background:transparent;color:var(--muted);border:none;font-weight:800;font-size:14px;padding:13px;cursor:pointer;margin-top:4px}
+.amtrow{display:flex;gap:9px;margin:14px 0 8px}
+.amt{flex:1;background:var(--card);border:1.5px solid var(--line);color:var(--ink);font-weight:850;font-size:15px;padding:13px;border-radius:13px;cursor:pointer}
+.amt.on{background:var(--deep);color:#fff;border-color:var(--deep)}
+.ucard{background:var(--lavbg);border-radius:16px;padding:14px;margin-bottom:13px}
+.ucard .mia-msg{font-size:14px;color:var(--lavd)}
+.ucard .mia-plain{color:var(--lavd);margin-top:6px}
+.ucard .whats{background:#fff;margin-top:11px}
+.lesson-tag{font-size:11px;font-weight:800;color:var(--lav);text-transform:uppercase;letter-spacing:.4px}
+.sheet-h{font-size:21px;font-weight:850;letter-spacing:-.4px;margin:4px 0 12px}
+.lp{font-size:14.5px;line-height:1.6;color:var(--ink);margin:0 0 13px}
+/* nav */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(255,255,255,.92);
+  backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:9px 8px 22px;z-index:30}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--faint);font-size:10.5px;font-weight:800}
+.nav-item svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2.1}
+.nav-item.on{color:var(--deep)}
+.nav-item.on svg{fill:var(--lavbg)}
+/* sheet */
+.sheet-ov{position:fixed;inset:0;background:rgba(40,30,70,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet-ov.open{opacity:1;pointer-events:auto}
+.sheet{width:100%;max-width:430px;background:var(--bg);border-radius:26px 26px 0 0;padding:10px 18px 30px;max-height:88vh;overflow-y:auto;transform:translateY(100%);transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+.sheet-ov.open .sheet{transform:translateY(0)}
+.grab{width:40px;height:5px;background:#d8d2e6;border-radius:10px;margin:4px auto 14px}
+/* toast */
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;
+  font-size:13.5px;font-weight:800;padding:13px 20px;border-radius:30px;z-index:60;opacity:0;transition:.3s;max-width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.note{font-size:11px;color:var(--faint);text-align:center;font-weight:600;margin:18px 0 4px;line-height:1.5}
+/* daily strip */
+.dstrip{display:flex;gap:9px;margin:8px 0 4px}
+.dstat{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border-radius:15px;padding:11px 10px;box-shadow:var(--shadow);font-size:18px}
+.ds-v{font-size:15px;font-weight:850;line-height:1}
+.ds-k{font-size:9.5px;color:var(--muted);font-weight:800;margin-top:2px;text-transform:uppercase;letter-spacing:.2px}
+/* goal hero */
+.goal-hero{background:var(--card);border-radius:18px;padding:15px;box-shadow:var(--shadow);margin:11px 0 4px;cursor:pointer;border:1.5px solid var(--lavbg)}
+.gh-top{display:flex;justify-content:space-between;align-items:center}
+.gh-t{font-size:15px;font-weight:850;letter-spacing:-.2px}
+.gh-pct{font-size:12px;font-weight:850;color:#fff;background:var(--lav);padding:4px 10px;border-radius:20px}
+.gh-bar{height:9px;background:var(--line);border-radius:20px;overflow:hidden;margin:11px 0 8px}
+.gh-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--grad2),var(--deep));border-radius:20px}
+.gh-sub{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:700}
+/* unit head + winding path */
+.unit-head{display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,var(--grad2),var(--deep));color:#fff;border-radius:16px;padding:13px 16px;margin:22px 0 4px;box-shadow:var(--shadow)}
+.unit-head.locked{background:#c3bbd9;box-shadow:none}
+.unit-ic{font-size:16px;width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}
+.unit-k{font-size:10.5px;font-weight:800;opacity:.85;text-transform:uppercase;letter-spacing:.4px}
+.unit-t{font-size:15px;font-weight:850;letter-spacing:-.2px}
+.path{padding:16px 0 4px}
+.node-row{display:flex;justify-content:center;margin:9px 0}
+.node{position:relative;display:flex;flex-direction:column;align-items:center}
+.node-btn{width:66px;height:66px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:27px;cursor:pointer;transition:transform .08s}
+.node-btn.done{background:linear-gradient(135deg,#a78bfa,#7a5cae);color:#fff;box-shadow:0 5px 0 #4d3f86}
+.node-btn.active{background:#fff;color:var(--deep);box-shadow:0 5px 0 #d6ccef}
+.node-btn.lock{background:#e6e2f0;color:#b3aac8;box-shadow:0 5px 0 #d6cfe4;cursor:default}
+.node-btn.mile{background:linear-gradient(135deg,#f3c34c,#dca02a);color:#fff;box-shadow:0 5px 0 #b9842a}
+.node-btn.milelock{background:#ece3cf;color:#cbb98c;box-shadow:0 5px 0 #ddd1b4}
+.node-btn:not(.lock):active{transform:translateY(3px)}
+.node-ring{position:absolute;top:-7px;width:80px;height:80px;border-radius:50%;border:3px solid var(--lav2);opacity:.6;animation:npulse 1.7s infinite}
+@keyframes npulse{0%{transform:scale(.84);opacity:.7}80%{transform:scale(1.12);opacity:0}100%{opacity:0}}
+.start-bubble{position:absolute;top:-33px;background:#fff;color:var(--deep);font-weight:850;font-size:11px;padding:6px 12px;border-radius:11px;box-shadow:0 5px 14px rgba(80,60,140,.22);animation:bob 1.4s ease-in-out infinite;letter-spacing:.6px}
+.start-bubble:after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#fff}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.node-label{font-size:11px;font-weight:800;color:var(--muted);text-align:center;margin-top:8px;max-width:106px;line-height:1.25}
+.node-btn.lock+.node-label,.node-btn.milelock+.node-label{color:var(--faint)}
+/* goal sheet */
+.gs-q{font-size:12.5px;font-weight:850;color:var(--lavd);margin:20px 0 9px;text-transform:uppercase;letter-spacing:.3px}
+.ob-p2{font-size:13px;color:var(--muted);margin:-4px 0 10px;font-weight:600}
+.f-label{display:block;font-size:12.5px;font-weight:800;color:var(--muted);margin:11px 0 5px}
+.f-in{width:100%;border:1.5px solid var(--line);border-radius:13px;padding:13px 14px;font-size:15px;font-weight:700;color:var(--ink);background:var(--card);outline:none}
+.f-in:focus{border-color:var(--lav2)}
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.why{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;line-height:1.3}
+.why.sel{border-color:var(--deep);background:var(--lavbg);color:var(--lavd);font-weight:800}
+.donut-wrap{position:relative;width:120px;height:120px;margin:8px auto 2px}
+.donut-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-amt{font-size:19px;font-weight:850;color:var(--deep)}
+.donut-k{font-size:11px;color:var(--muted);font-weight:700}
+.gs-slider{width:100%;margin:8px 0 2px;accent-color:var(--deep)}
+.acct-list{display:flex;flex-direction:column;gap:9px}
+.acct-opt{display:flex;align-items:center;gap:12px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer}
+.acct-opt.sel{border-color:var(--deep);background:var(--lavbg)}
+.ao-ic{width:34px;height:34px;border-radius:10px;background:var(--deep);color:#fff;font-weight:850;display:flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 auto}
+.ao-b{flex:1}.ao-t{font-size:14px;font-weight:850}.ao-d{font-size:11.5px;color:var(--muted);font-weight:600}
+.ao-chk{color:var(--deep);font-weight:850;font-size:16px;visibility:hidden}
+.acct-opt.sel .ao-chk{visibility:visible}
+.milestone{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:13px;padding:12px;box-shadow:var(--shadow);margin-bottom:9px}
+.ms-n{width:28px;height:28px;border-radius:50%;background:var(--lavbg);color:var(--lavd);font-weight:850;font-size:13px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.ms-t{font-size:13.5px;font-weight:700;line-height:1.35}
+/* quick check */
+.check{background:var(--lavbg);border-radius:16px;padding:15px;margin:4px 0 14px}
+.check-q{font-size:11px;font-weight:850;color:var(--lav);text-transform:uppercase;letter-spacing:.4px}
+.check-qt{font-size:14.5px;font-weight:800;margin:7px 0 12px;line-height:1.4}
+.check-opts{display:flex;flex-direction:column;gap:8px}
+.check-opt{background:var(--card);border:1.5px solid var(--line);border-radius:13px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;text-align:left}
+.check-opt.right{border-color:var(--green);background:var(--greenbg);color:var(--green)}
+.check-opt.wrong{border-color:var(--red);background:var(--redbg);color:var(--red)}
+.check-fb .fb{font-size:13px;font-weight:700;line-height:1.5;margin-top:11px;color:var(--muted)}
+.check-fb .fb.ok{color:var(--green)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="hdr">
+    <div class="ava" id="hdrAva"></div>
+    <div><div class="hdr-greet">Good evening</div><div class="hdr-name">Let's learn money</div></div>
+    <div class="hdr-lv" id="hdrLv">Lv 3</div>
+  </div>
+  <main id="screen"></main>
+  <nav class="nav" id="nav">
+    <button class="nav-item" data-tab="home" onclick="goTab('home')"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button>
+    <button class="nav-item" data-tab="learn" onclick="goTab('learn')"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M12 5v14"/></svg>Learn</button>
+    <button class="nav-item" data-tab="trade" onclick="goTab('trade')"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>Trade</button>
+    <button class="nav-item" data-tab="understand" onclick="goTab('understand')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>Understand</button>
+  </nav>
+</div>
+<div class="sheet-ov" id="sheet" onclick="if(event.target===this)closeSheet()"><div class="sheet"><div class="grab"></div><div id="sheetInner"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ───────────────────────── State ───────────────────────── */
+var LEVELS={1:'Getting Started',2:'Finding Your Feet',3:'Building Confidence',4:'Steady Hand',5:'Investor'};
+var state={tab:'home',level:3,levelName:'Building Confidence',xp:340,xpToNext:500,streak:5,
+  usel:'NVDA',driversShown:false,open:{},concepts:7,
+  dailyXP:30,gems:120,checked:{},goalDraft:null,
+  goal:{what:'a car',amt:10000,years:5,saved:4700,pct:10,account:'TFSA',why:'So my money can grow safely',income:2500}};
+var WHYS=['To save for a big expense','So my money can grow safely','To save for the future','As a way to make money'];
+var ACCTS=[{k:'TFSA',d:'Tax-free growth · recommended'},{k:'RRSP',d:'Retirement plan'},{k:'ETFs',d:'Bundled funds'}];
+
+/* Practice portfolio — deliberately tech-heavy + only 2 asset types, so the coach has something true to say */
+var PF={cash:1180,positions:[
+  {t:'NVDA',name:'NVIDIA',cls:'stock',sector:'Tech',shares:8,avg:280,last:332,acct:'TFSA',chased:true},
+  {t:'AAPL',name:'Apple',cls:'stock',sector:'Tech',shares:6,avg:300,last:311,acct:'TFSA'},
+  {t:'MSFT',name:'Microsoft',cls:'stock',sector:'Tech',shares:3,avg:405,last:421,acct:'RRSP'},
+  {t:'BTC',name:'Bitcoin',cls:'crypto',sector:'Crypto',shares:0.04,avg:60000,last:64200,acct:'TFSA'}
+]};
+
+var SKILLS=[
+  {id:'first',icon:'🌱',name:'First Step',how:'Made your first practice trade',got:true},
+  {id:'uncertainty',icon:'🔭',name:'Reads Uncertainty',how:'Explore what moves a price',got:false},
+  {id:'diversify',icon:'🧺',name:'Diversification',how:'Hold 3+ asset types at once',got:false},
+  {id:'rightsize',icon:'⚖️',name:'Right-Sizing',how:'Keep every holding under 25%',got:false},
+  {id:'patience',icon:'🧘',name:'Patience',how:'Hold through a 5%+ dip',got:false}
+];
+function skill(id){return SKILLS.filter(function(s){return s.id===id;})[0];}
+
+var TRACKS=[
+  {ic:'🪙',name:'Money basics',done:5,total:5,state:'done'},
+  {ic:'📈',name:'Investing basics',done:6,total:6,state:'done'},
+  {ic:'🛡️',name:'Risk & diversification',done:2,total:5,state:'active',lesson:'risk_div'},
+  {ic:'🍁',name:'Canadian accounts — TFSA & RRSP',done:0,total:4,state:'go',lesson:'canada'},
+  {ic:'📰',name:'Reading the market',done:0,total:5,state:'lock'}
+];
+
+var GLOSS={
+  concentration:{t:'Concentration',d:'How much of your money sits in one place — one stock, or one sector like tech. High concentration means one bad move hits you hard.'},
+  diversification:{t:'Diversification',d:'Spreading money across different kinds of investments so no single drop sinks you. It\'s the closest thing investing has to a free lunch.'},
+  chasing:{t:'Chasing',d:'Buying something right after it has jumped a lot, hoping it keeps climbing. You often end up paying near the top. Slow and steady usually beats it.'},
+  position_sizing:{t:'Position sizing',d:'Deciding how much to put into one holding. A common guardrail: keep any single position under about 25% of your money.'},
+  uncertainty:{t:'Why a range, not a number',d:'Nobody can predict a price. A range shows the outcomes that are realistically plausible — and honestly reminds you the future isn\'t knowable.'},
+  volatility:{t:'Bounciness (volatility)',d:'How much a price swings around. Bouncier investments can grow faster, but they can also drop harder.'}
+};
+
+var LESSONS={
+  risk_div:{track:'Risk & diversification · Lesson 3 of 5',title:'Why spreading out matters',
+    body:function(p){return [
+      {type:'p',html:'Here\'s the thing about keeping most of your money in one area:'},
+      {type:'n',name:'Your money in tech',val:Math.round(p.techPct*100)+'%',plain:'Right now about '+Math.round(p.techPct*100)+'% of your invested money is in tech stocks.'},
+      {type:'p',html:'If tech fell <b>20%</b>, your whole portfolio would drop roughly <b>'+Math.round(p.techPct*20)+'%</b> — even though you own other things too.'},
+      {type:'p',html:'Spreading into other areas — bonds, broad ETFs, other sectors — softens those swings. You give up a sliver of the best case to avoid a lot of the worst case. That trade is usually worth it.'}
+    ];},
+    prove:{label:'Prove it — add something outside tech',fn:"closeSheet();goTab('trade')"},
+    check:{q:'If 69% of your money is in tech and tech falls 20%, roughly how much does your whole portfolio drop?',opts:['About 2%','About 14%','About 50%'],correct:1,why:'69% × 20% ≈ 14%. When you\'re concentrated, one sector\'s drop becomes most of your loss.'}},
+  canada:{track:'Canadian accounts · Lesson 1 of 4',title:'TFSA vs RRSP, in plain words',
+    body:function(p){return [
+      {type:'p',html:'In Canada, <b>where</b> you hold an investment changes your taxes as much as <b>what</b> you hold.'},
+      {type:'n',name:'Your practice accounts',val:'TFSA + RRSP',plain:'Your practice holdings are split across a TFSA and an RRSP — just like a real Canadian investor.'},
+      {type:'p',html:'A <b>TFSA</b> grows and comes out completely tax-free — great for most goals. An <b>RRSP</b> lowers your taxable income now, and you pay tax later when you withdraw in retirement.'},
+      {type:'p',html:'Rule of thumb: TFSA for flexibility, RRSP for retirement once your income is higher.'}
+    ];},
+    prove:{label:'Got it',fn:"closeSheet()"}}
+};
+
+/* Assets you can practice-buy — all non-tech, so buying any one lowers concentration AND adds the ETF asset type */
+var BUYABLE=[
+  {t:'BND',name:'Total Bond ETF',cls:'etf',sector:'Bonds',last:72.4,fbase:.015,fbull:.03,fbear:-.02,tag:'Diversifier',why:'Bonds barely bounce — the classic shock-absorber for a stock-heavy portfolio.'},
+  {t:'VTI',name:'Total US Market ETF',cls:'etf',sector:'Broad',last:268.1,fbase:.05,fbull:.14,fbear:-.07,tag:'Broad spread',why:'Thousands of companies in a single buy — instant spread across the whole market.'},
+  {t:'XLE',name:'Energy Sector ETF',cls:'etf',sector:'Energy',last:91.2,fbase:.04,fbull:.16,fbear:-.12,tag:'New sector',why:'A different sector than tech, so it tends to move on its own schedule.'},
+  {t:'GLD',name:'Gold ETF',cls:'etf',sector:'Gold',last:240.5,fbase:.03,fbull:.12,fbear:-.08,tag:'Zigs vs stocks',why:'Gold often zigs when stocks zag — a genuinely different kind of holding.'}
+];
+
+/* Assets you can explore in Understand */
+var UASSETS=[
+  {t:'NVDA',name:'NVIDIA',cls:'stock',last:332,base:.07,bull:.23,bear:-.09,vol:46,drivers:['AI & data-center demand','Interest rates','Overall tech-sector mood'],blurb:'A chip maker at the center of the AI boom — a fast grower with big swings.'},
+  {t:'AAPL',name:'Apple',cls:'stock',last:311,base:.06,bull:.18,bear:-.08,vol:24,drivers:['iPhone & services sales','Consumer spending','Interest rates'],blurb:'One of the world\'s largest companies — steadier than most single stocks.'},
+  {t:'VTI',name:'Total US Market ETF',cls:'etf',last:268,base:.05,bull:.14,bear:-.07,vol:16,drivers:['The US economy as a whole','Corporate earnings','Interest rates'],blurb:'Thousands of US companies in one holding — the whole market in a single buy.'},
+  {t:'BND',name:'Total Bond ETF',cls:'etf',last:72,base:.015,bull:.03,bear:-.02,vol:6,drivers:['Interest rates','Inflation'],blurb:'A basket of bonds — it barely bounces, a classic shock-absorber.'},
+  {t:'BTC',name:'Bitcoin',cls:'crypto',last:64200,base:.12,bull:.55,bear:-.35,vol:72,drivers:['Crowd sentiment','Big-money (institutional) flows','Regulation news'],blurb:'A digital currency — huge swings are completely normal here.'}
+];
+
+/* ───────────────────────── Helpers ───────────────────────── */
+function money(v){return '$'+Math.round(v).toLocaleString();}
+function money2(v){return v>=1000?'$'+Math.round(v).toLocaleString():'$'+v.toFixed(2);}
+function pct(v){return (v>=0?'+':'')+(v*100).toFixed(1)+'%';}
+function wq(){return '<span class="wq">?</span>';}
+function bounce(v){return v<12?'fairly steady':(v<30?'moderately bouncy':(v<55?'quite bouncy':'very bouncy'));}
+function avatar(){return '<svg viewBox="0 0 40 40" width="100%" height="100%">'
+  +'<rect width="40" height="40" fill="#efe7fb"/>'
+  +'<path d="M8 40c0-9 4-15 12-15s12 6 12 15z" fill="#7a5cae"/>'
+  +'<circle cx="20" cy="20" r="9.6" fill="#f0b896"/>'
+  +'<path d="M9.5 18C9.5 9 13.5 5 20 5s10.5 4 10.5 13c0-4-2-7-4.5-7-1.5 0-2 1-6 1s-4.5-1-6-1c-2.5 0-4.5 3-4.5 7z" fill="#43301f"/>'
+  +'<circle cx="16.6" cy="20.5" r="1.25" fill="#3a2a1a"/><circle cx="23.4" cy="20.5" r="1.25" fill="#3a2a1a"/>'
+  +'<path d="M16.8 24.5q3.2 2.4 6.4 0" stroke="#c06a45" stroke-width="1.3" fill="none" stroke-linecap="round"/>'
+  +'</svg>';}
+function nrow(name,val,plain){return '<div class="nrow"><div class="row"><span class="nn">'+name+'</span><span class="nv tnum">'+val+'</span></div><div class="np">'+plain+'</div></div>';}
+
+/* The component contract: a number NEVER ships without its sentence */
+function miaCardHTML(ins){
+  return '<div class="mia-card"><div class="mia-face">'+avatar()+'</div><div class="mia-body">'
+    +'<div class="mia-msg">'+ins.icon+' '+ins.msg+'</div>'
+    +'<div class="mia-num"><span class="num-v tnum">'+ins.number.val+'</span><span class="num-n">'+ins.number.name+'</span></div>'
+    +'<div class="mia-plain">'+ins.number.plain+'</div>'
+    +'<div class="mia-actions">'
+      +(ins.action?'<button class="btn-mia" onclick="'+ins.action.fn+'">'+ins.action.label+'</button>':'')
+      +(ins.whats?'<button class="whats" onclick="openWhats(\''+ins.whats+'\')">'+wq()+'What\'s that?</button>':'')
+    +'</div></div></div>';
+}
+
+/* The progressive-disclosure contract: verdict first, numbers one tap deeper */
+function disclosure(id,numbersHTML){
+  var open=!!state.open[id];
+  return '<button class="disc" onclick="toggleDisc(\''+id+'\')">'+(open?'Hide the numbers ▴':'See the numbers ▾')+'</button>'
+    +'<div class="disc-body" style="display:'+(open?'block':'none')+'">'+numbersHTML+'</div>';
+}
+function toggleDisc(id){state.open[id]=!state.open[id];paint();}
+
+/* ───────────────────────── Coach engine (deterministic, reads YOUR portfolio) ───────────────────────── */
+function computePF(){
+  var invested=0,bySector={},byClass={},largest={t:'',v:0},cost=0;
+  PF.positions.forEach(function(x){
+    var v=x.shares*x.last;invested+=v;cost+=x.shares*x.avg;
+    bySector[x.sector]=(bySector[x.sector]||0)+v;
+    byClass[x.cls]=(byClass[x.cls]||0)+v;
+    if(v>largest.v)largest={t:x.t,v:v};
+  });
+  var total=invested+PF.cash;
+  return {invested:invested,cash:PF.cash,total:total,
+    classes:Object.keys(byClass).length,
+    techPct:invested?(bySector['Tech']||0)/invested:0,
+    largest:{t:largest.t,pct:invested?largest.v/invested:0},
+    cashPct:total?PF.cash/total:0,
+    totalPL:invested-cost,totalPLpct:cost?(invested-cost)/cost:0};
+}
+function coachInsights(p){
+  var out=[];
+  if(p.techPct>=0.6)out.push({sev:3,icon:'⚠️',msg:'Your money leans heavily into tech.',
+    number:{name:'is in tech',val:Math.round(p.techPct*100)+'%',plain:'About '+Math.round(p.techPct*100)+'% of your invested money is tech stocks. If tech dips, most of your portfolio dips with it.'},
+    whats:'concentration',action:{label:'Show me why that\'s risky',fn:"openLesson('risk_div')"}});
+  if(p.classes<3)out.push({sev:2,icon:'🧺',msg:'You\'re holding only '+p.classes+' of the main asset types.',
+    number:{name:'asset types',val:p.classes+' of 4',plain:'You hold '+p.classes+' types so far (stocks, ETFs, bonds, crypto). Spreading across more softens the bumps without giving up much.'},
+    whats:'diversification',action:{label:'Add something different',fn:"goTab('trade')"}});
+  var chase=PF.positions.filter(function(x){return x.chased;})[0];
+  if(chase)out.push({sev:2,icon:'🏃',msg:'You bought '+chase.t+' right after a big run-up.',
+    number:{name:chase.t+' since you bought',val:pct((chase.last-chase.avg)/chase.avg),plain:'Buying just after a sharp climb is "chasing" — you often pay near the top. It worked out here, but the pattern is the lesson, not the result.'},
+    whats:'chasing',action:{label:'What is chasing?',fn:"openWhats('chasing')"}});
+  if(p.largest.pct>=0.3)out.push({sev:1,icon:'⚖️',msg:p.largest.t+' is a big slice of your money.',
+    number:{name:p.largest.t+' weight',val:Math.round(p.largest.pct*100)+'%',plain:p.largest.t+' is '+Math.round(p.largest.pct*100)+'% of your invested money. Many investors keep any single holding under about 25%.'},
+    whats:'position_sizing',action:{label:'See your holdings',fn:"goTab('trade')"}});
+  if(!out.length)out.push({sev:0,icon:'✅',msg:'Your portfolio looks nicely balanced.',
+    number:{name:'asset types',val:p.classes+' of 4',plain:'You\'re spread across '+p.classes+' asset types with no single holding dominating. That\'s the goal — well done.'},
+    action:{label:'Keep learning',fn:"goTab('learn')"}});
+  out.sort(function(a,b){return b.sev-a.sev;});
+  return out;
+}
+
+/* ───────────────────────── Progress ───────────────────────── */
+function gotSkills(){return SKILLS.filter(function(s){return s.got;}).length;}
+function unlockSkill(id,xp){var s=skill(id);if(!s||s.got)return;s.got=true;addXP(xp||60);
+  toast('🏅 Skill unlocked: '+s.name+'  ·  +'+(xp||60)+' XP');}
+function addXP(n){state.xp+=n;if(state.xp>=state.xpToNext){state.xp-=state.xpToNext;state.level++;
+  state.levelName=LEVELS[state.level]||'Investor';state.xpToNext=Math.round(state.xpToNext*1.25);
+  setTimeout(function(){toast('🎉 Level up! You\'re now Level '+state.level+' · '+state.levelName);},2400);}
+  syncHeader();}
+function syncHeader(){document.getElementById('hdrLv').textContent='Lv '+state.level;}
+
+/* ───────────────────────── Screens ───────────────────────── */
+function renderHome(){
+  var p=computePF();var top=coachInsights(p)[0];
+  var h='';
+  h+='<div class="hero"><div class="hero-top"><div><div class="hero-k">Your level</div><div class="hero-lv">Level '+state.level+' · '+state.levelName+'</div></div><div class="streak">🔥 '+state.streak+' days</div></div>'
+    +'<div class="xpbar"><div class="xpfill" style="width:'+Math.round(state.xp/state.xpToNext*100)+'%"></div></div>'
+    +'<div class="hero-sub">'+(state.xpToNext-state.xp)+' XP to Level '+(state.level+1)+' · '+gotSkills()+' of '+SKILLS.length+' skills earned</div></div>';
+  h+='<div class="mini-row">'
+    +'<div class="mini"><div class="mini-k">Practice portfolio</div><div class="mini-v tnum">'+money(p.total)+'</div><div class="mini-s '+(p.totalPL>=0?'up':'down')+'">'+pct(p.totalPLpct)+' all-time</div></div>'
+    +'<div class="mini"><div class="mini-k">Concepts explored</div><div class="mini-v tnum">'+state.concepts+'</div><div class="mini-s" style="color:var(--muted)">keep it up</div></div></div>';
+  h+='<div class="sec-h">Today with Mia</div>'+miaCardHTML(top);
+  h+='<div class="sec-h">Pick up where you left off</div>'
+    +'<div class="cont" onclick="openLesson(\'risk_div\')"><div class="cont-ic">📘</div><div class="cont-b"><div class="cont-t">Why spreading out matters</div><div class="cont-s">Risk &amp; diversification · Lesson 3 of 5</div><div class="xpbar sm"><div class="xpfill" style="width:55%"></div></div></div><div class="cont-go">›</div></div>';
+  h+='<div class="note">A prototype of the north-star direction: Mia coaches your real decisions, every number comes with a sentence, and forecasts show a range — never a prediction.</div>';
+  return h;
+}
+
+function renderLearn(){
+  var g=state.goal,gpct=Math.min(100,Math.round(g.saved/g.amt*100)),daily=Math.min(state.dailyXP,50);
+  var h='<div class="dstrip">'
+    +'<div class="dstat"><span>🔥</span><div><div class="ds-v">'+state.streak+'</div><div class="ds-k">day streak</div></div></div>'
+    +'<div class="dstat">'+ringSVG(daily,50)+'<div><div class="ds-v">'+daily+'/50</div><div class="ds-k">daily goal</div></div></div>'
+    +'<div class="dstat"><span>💎</span><div><div class="ds-v">'+state.gems+'</div><div class="ds-k">gems</div></div></div></div>';
+  h+='<div class="goal-hero" onclick="openGoalSetup()"><div class="gh-top"><div class="gh-t">🎯 '+goalTitle(g)+'</div><span class="gh-pct">'+gpct+'%</span></div><div class="gh-bar"><i style="width:'+gpct+'%"></i></div><div class="gh-sub"><span>'+money(g.saved)+' of '+money(g.amt)+'</span><span>'+g.years+'-yr plan · ✏️ adjust</span></div></div>';
+  learnPath().forEach(function(u){
+    h+='<div class="unit-head'+(u.state==='lock'?' locked':'')+'"><div class="unit-ic">'+(u.state==='done'?'✓':(u.state==='lock'?'🔒':'▶'))+'</div><div><div class="unit-k">'+u.k+'</div><div class="unit-t">'+u.t+'</div></div></div>';
+    h+='<div class="path">'+u.nodes.map(function(n,i){return nodeHTML(n,i);}).join('')+'</div>';
+  });
+  h+='<div class="sec-h">Skills you\'ve shown</div><div class="subtle">These unlock by <b>doing</b> in your practice account — never by a quiz.</div>';
+  h+='<div class="skills">'+SKILLS.map(function(s){
+    return '<div class="skill '+(s.got?'got':'locked')+'"><div class="skill-ic">'+s.icon+'</div><div class="skill-badge">'+(s.got?'✓':'🔒')+'</div><div class="skill-n">'+s.name+'</div><div class="skill-h">'+s.how+'</div></div>';
+  }).join('')+'</div>';
+  return h;
+}
+function learnPath(){
+  var dv=skill('diversify').got;
+  return [
+    {k:'Unit 1',t:'Money basics',state:'done',nodes:[
+      {ic:'💵',label:'What money is for',st:'done'},{ic:'🐷',label:'Saving vs investing',st:'done'},{ic:'⭐',label:'Unit complete',st:'done'}]},
+    {k:'Unit 2',t:'Investing basics',state:'done',nodes:[
+      {ic:'📈',label:'What a stock is',st:'done'},{ic:'🧩',label:'Stocks, ETFs & bonds',st:'done'},{ic:'⭐',label:'Unit complete',st:'done'}]},
+    {k:'Unit 3',t:'Risk & diversification',state:'active',nodes:[
+      {ic:'🛡️',label:'Why risk matters',st:'done'},{ic:'🎢',label:'Bounciness & drops',st:'done'},
+      {ic:'📘',label:'Why spreading out matters',st:'active',lesson:'risk_div'},
+      {ic:'🧺',label:'Hold 3+ asset types',st:dv?'done':'lock',mile:true,behavior:'diversify'},
+      {ic:'🏁',label:'Unit review',st:'lock'}]},
+    {k:'Unit 4',t:'Canadian accounts · TFSA & RRSP',state:'lock',nodes:[
+      {ic:'🍁',label:'TFSA vs RRSP',st:'lock'},{ic:'🏦',label:'Which to use when',st:'lock'}]}
+  ];
+}
+function nodeHTML(n,i){
+  var OFF=[0,44,62,44,0,-44,-62,-44],off=OFF[i%8],locked=n.st==='lock';
+  var cls=n.mile?('mile'+(locked?' milelock':'')):n.st;
+  var icon=(locked&&!n.mile)?'🔒':n.ic,click='';
+  if(n.mile)click='onclick="openMilestone(\''+(n.st==='done'?'done':(n.behavior||''))+'\')"';
+  else if(n.lesson&&!locked)click='onclick="openLesson(\''+n.lesson+'\')"';
+  else if(!locked)click='onclick="toast(\'Lesson complete ✓\')"';
+  var ring=n.st==='active'?'<div class="node-ring"></div>':'';
+  var bubble=n.st==='active'?'<div class="start-bubble">START</div>':'';
+  return '<div class="node-row" style="transform:translateX('+off+'px)"><div class="node">'+bubble+ring+'<button class="node-btn '+cls+'" '+click+'>'+icon+'</button><div class="node-label">'+n.label+'</div></div></div>';
+}
+
+function renderTrade(){
+  var p=computePF();
+  var health=p.classes>=3?{cls:'good',txt:'Nicely spread · '+p.classes+' asset types'}:(p.techPct>=0.6?{cls:'warn',txt:'Very concentrated · '+Math.round(p.techPct*100)+'% in tech'}:{cls:'mid',txt:'Getting there · '+p.classes+' asset types'});
+  var rows=PF.positions.map(function(x){
+    var v=x.shares*x.last,w=v/p.invested,pl=(x.last-x.avg)/x.avg;
+    return '<div class="hrow"><div class="hl"><div class="ht">'+x.t+'<span class="acct">'+x.acct+'</span></div><div class="hs">'+x.name+' · '+x.sector+'</div></div><div class="hr"><div class="hv tnum">'+money2(v)+'</div><div class="hw tnum">'+Math.round(w*100)+'% · <span class="'+(pl>=0?'up':'down')+'">'+pct(pl)+'</span></div></div></div>';
+  }).join('');
+  var numbers='<div class="htable">'+rows+'</div><div class="mininote">Each holding shows its <b>weight</b> (share of your invested money) and how it\'s done since you bought. TFSA/RRSP tags show which account it sits in.</div>';
+  var h='<div class="card"><div class="row"><div><div class="k">Practice portfolio</div><div class="big tnum">'+money(p.total)+'</div></div><div class="health '+health.cls+'">'+health.txt+'</div></div>'
+    +'<div class="ph-sub">'+(p.totalPL>=0?'Up ':'Down ')+money2(Math.abs(p.totalPL))+' ('+pct(p.totalPLpct)+') · '+money(p.cash)+' cash to invest</div>'
+    +disclosure('hold',numbers)+'</div>';
+  var rel=coachInsights(p).filter(function(i){return i.sev>=2;});
+  if(rel.length){h+='<div class="sec-h">Mia\'s read on your moves</div>'+miaCardHTML(rel[0]);}
+  h+='<div class="sec-h">Practice a trade</div><div class="subtle">Pick something to see its <b>range of outcomes</b> and how it changes your balance — before you commit.</div>';
+  h+='<div class="buy-grid">'+BUYABLE.map(function(a){
+    return '<div class="tile" onclick="openBuy(\''+a.t+'\')"><div class="tile-t">'+a.t+'</div><div class="tile-n">'+a.name+'</div><span class="tile-tag">'+a.tag+'</span></div>';
+  }).join('')+'</div>';
+  return h;
+}
+
+function renderUnderstand(){
+  var sel=UASSETS.filter(function(a){return a.t===state.usel;})[0]||UASSETS[0];
+  var chips=UASSETS.map(function(a){return '<button class="uchip '+(a.t===sel.t?'on':'')+'" onclick="exploreAsset(\''+a.t+'\')">'+a.t+'</button>';}).join('');
+  return '<div class="sec-h">Understand any asset</div><div class="subtle">Pick one to see its <b>range of outcomes</b> — and what actually drives it.</div><div class="uchips">'+chips+'</div>'+understandDetail(sel);
+}
+function understandDetail(a){
+  var f=genForecast(a);
+  var lo=a.last*(1+a.bear),hi=a.last*(1+a.bull),mid=a.last*(1+a.base);
+  var h='<div class="card"><div class="row" style="margin-bottom:11px"><div><div class="big2">'+a.t+'</div><div class="hs">'+a.name+'</div></div><div class="px tnum">'+money2(a.last)+'</div></div>'
+    +'<div class="chart">'+fanChart(f.hist,f.bear,f.base,f.bull,300,150)+'</div>'
+    +'<div class="legend"><span><i style="background:#4f9c7e"></i>Past &amp; the middle path</span><span><i style="background:#5b8def"></i>If it goes well</span><span><i style="background:#cf5a40"></i>If it goes poorly</span></div></div>';
+  h+='<div class="mia-card"><div class="mia-face">'+avatar()+'</div><div class="mia-body"><div class="mia-msg">🔭 Nobody can predict this — so here\'s the <b>range</b>, not a guess.</div>'
+    +'<div class="mia-plain">Over the next 3 months, '+a.t+' could realistically land anywhere from about <b>'+money2(lo)+'</b> to <b>'+money2(hi)+'</b>, with the middle near '+money2(mid)+'. '+a.blurb+' The wider the range, the less certain things are.</div>'
+    +'<div class="mia-actions"><button class="btn-mia" onclick="whatMoves(\''+a.t+'\')">What moves it?</button><button class="whats" onclick="openWhats(\'uncertainty\')">'+wq()+'Why a range?</button></div></div></div>';
+  if(state.driversShown){
+    h+='<div class="card"><div class="k">What moves '+a.t+'</div><div style="margin-top:9px">'+a.drivers.map(function(d){return '<div class="driver">• '+d+'</div>';}).join('')+'</div><div class="mininote">These are the forces that push the price around. None are predictable — which is exactly why we show a range instead of a number.</div></div>';
+  }
+  h+='<div class="sec-h">The range, in plain terms</div>'
+    +'<div class="scn3"><div class="c bear"><div class="l">If it goes poorly</div><div class="v tnum">'+money2(lo)+'</div><div class="p">'+pct(a.bear)+'</div></div>'
+    +'<div class="c base"><div class="l">Middle of range</div><div class="v tnum">'+money2(mid)+'</div><div class="p">'+pct(a.base)+'</div></div>'
+    +'<div class="c bull"><div class="l">If it goes well</div><div class="v tnum">'+money2(hi)+'</div><div class="p">'+pct(a.bull)+'</div></div></div>';
+  h+='<div class="teach" style="margin-top:13px"><div class="ti">💡</div><div><b>'+a.t+'</b> is '+bounce(a.vol)+' — its price can swing about <b>'+a.vol+'%</b> in a year. '+(a.cls==='crypto'?'Big swings are normal for crypto.':(a.cls==='etf'?'ETFs usually move more gently than single stocks.':'That\'s typical for a single stock.'))+'<button class="whats inline" onclick="openWhats(\'volatility\')">'+wq()+'What\'s bounciness?</button></div></div>';
+  h+='<div class="card">'+disclosure('unum','<div class="htable">'
+    +nrow('Middle of range',money2(mid)+' ('+pct(a.base)+')','The centre of what\'s plausible over 3 months — a midpoint, not a prediction.')
+    +nrow('Bounciness',a.vol+'%','How much it swings in a typical year. Higher means bigger ups and downs.')
+    +nrow('Range width',Math.round((a.bull-a.bear)*100)+' points','The gap from the poor case to the good case. Wider means more uncertainty.')
+    +'</div>')+'</div>';
+  return h;
+}
+function whatMoves(t){state.driversShown=true;unlockSkill('uncertainty',60);state.concepts++;paint();}
+function exploreAsset(t){state.usel=t;state.driversShown=false;state.open.unum=false;paint();}
+
+/* fan chart: solid history → uncertainty cone with dashed bear/base/bull */
+function fanChart(hist,bear,base,bull,w,h){
+  var pad=8,nH=hist.length,nF=base.length,all=hist.concat(bear,base,bull);
+  var mn=Math.min.apply(null,all),mx=Math.max.apply(null,all),rg=(mx-mn)||1;
+  var stepX=(w-pad*2)/(nH+nF-1);
+  function X(i){return pad+i*stepX;}function Y(v){return pad+(h-pad*2)*(1-(v-mn)/rg);}
+  function path(arr,s){return arr.map(function(v,i){return (i?'L':'M')+X(s+i).toFixed(1)+' '+Y(v).toFixed(1);}).join(' ');}
+  var s=nH-1;
+  var band='M'+X(s).toFixed(1)+' '+Y(bull[0]).toFixed(1);
+  for(var i=1;i<bull.length;i++)band+=' L'+X(s+i).toFixed(1)+' '+Y(bull[i]).toFixed(1);
+  for(var j=bear.length-1;j>=0;j--)band+=' L'+X(s+j).toFixed(1)+' '+Y(bear[j]).toFixed(1);
+  band+=' Z';
+  var tx=X(s).toFixed(1);
+  return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" style="display:block">'
+    +'<path d="'+band+'" fill="rgba(110,143,214,.13)"/>'
+    +'<line x1="'+tx+'" y1="'+pad+'" x2="'+tx+'" y2="'+(h-pad)+'" stroke="#cdc4e4" stroke-width="1" stroke-dasharray="3 3"/>'
+    +'<path d="'+path(hist,0)+'" fill="none" stroke="#4f9c7e" stroke-width="2.4" stroke-linejoin="round"/>'
+    +'<path d="'+path(base,s)+'" fill="none" stroke="#4f9c7e" stroke-width="1.9" stroke-dasharray="5 4"/>'
+    +'<path d="'+path(bull,s)+'" fill="none" stroke="#5b8def" stroke-width="1.9" stroke-dasharray="5 4"/>'
+    +'<path d="'+path(bear,s)+'" fill="none" stroke="#cf5a40" stroke-width="1.9" stroke-dasharray="5 4"/>'
+    +'<text x="'+(tx-3)+'" y="'+(h-1)+'" font-size="9" fill="#aaa3c0" text-anchor="end" font-weight="700">today</text></svg>';
+}
+function genForecast(a){
+  var n=40,hist=[],v=a.last*0.83;
+  for(var i=0;i<n;i++){v+=a.last*0.0055*Math.sin(i/3.2)+a.last*0.0046;hist.push(v);}
+  hist[n-1]=a.last;
+  var m=12,base=[],bull=[],bear=[];
+  for(var j=0;j<m;j++){var f=j/(m-1);base.push(a.last*(1+a.base*f));bull.push(a.last*(1+a.bull*f));bear.push(a.last*(1+a.bear*f));}
+  return {hist:hist,base:base,bull:bull,bear:bear};
+}
+
+/* ───────────────────────── Buy flow (uncertainty + position sizing) ───────────────────────── */
+function openBuy(t){state.buy={t:t,amt:600};renderSheet(buySheet());openSheet();}
+function setBuyAmt(a){state.buy.amt=a;document.getElementById('sheetInner').innerHTML=buySheet();}
+function buySheet(){
+  var a=BUYABLE.filter(function(x){return x.t===state.buy.t;})[0];
+  var p=computePF();var amt=Math.min(state.buy.amt,p.cash);
+  var newInvested=p.invested+amt;var newWeight=amt/newInvested;
+  var techAbs=p.techPct*p.invested;var newTechPct=techAbs/newInvested;
+  var addsType=!PF.positions.some(function(x){return x.cls===a.cls;});
+  var lo=a.last*(1+a.fbear),hi=a.last*(1+a.fbull);
+  var h='<div class="lesson-tag">Practice trade</div><div class="sheet-h">Buy '+a.name+'</div>';
+  h+='<div class="ucard"><div class="mia-msg">🔭 A range, not a prediction</div><div class="mia-plain">Over 3 months, '+a.t+' could realistically sit between <b>'+money2(lo)+'</b> and <b>'+money2(hi)+'</b>. '+a.why+'</div><button class="whats" onclick="openWhats(\'uncertainty\')">'+wq()+'Why a range?</button></div>';
+  h+='<div class="nudge"><div class="ni">⚖️</div><div>Putting in <b>'+money(amt)+'</b> makes '+a.t+' about <b>'+Math.round(newWeight*100)+'%</b> of your money'+(techAbs>0?' — and lowers your tech share from <b>'+Math.round(p.techPct*100)+'%</b> to <b>'+Math.round(newTechPct*100)+'%</b>':'')+'.'+(addsType?' <span class="good-i">This adds a new asset type 🧺</span>':'')+'</div></div>';
+  h+='<div class="amtrow">'+[300,600,1200].map(function(v){return '<button class="amt '+(state.buy.amt===v?'on':'')+'" onclick="setBuyAmt('+v+')">'+money(v)+'</button>';}).join('')+'</div>';
+  h+='<div class="mininote">You have '+money(p.cash)+' in practice cash. This is virtual money — there\'s no real risk.</div>';
+  h+='<button class="btn-pur big-btn" onclick="confirmBuy()">Buy '+money(amt)+' of '+a.t+'</button><button class="btn-ghost" onclick="closeSheet()">Cancel</button>';
+  return h;
+}
+function confirmBuy(){
+  var a=BUYABLE.filter(function(x){return x.t===state.buy.t;})[0];
+  var before=computePF();var amt=Math.min(state.buy.amt,before.cash);var shares=amt/a.last;
+  var ex=PF.positions.filter(function(x){return x.t===a.t;})[0];
+  if(ex){ex.avg=(ex.avg*ex.shares+a.last*shares)/(ex.shares+shares);ex.shares+=shares;}
+  else PF.positions.push({t:a.t,name:a.name,cls:a.cls,sector:a.sector,shares:shares,avg:a.last,last:a.last,acct:'TFSA'});
+  PF.cash-=amt;
+  closeSheet();addXP(40);toast('✅ Bought '+money(amt)+' of '+a.t+' · +40 XP');
+  goTab('trade');
+  var after=computePF();
+  if(after.classes>=3)setTimeout(function(){unlockSkill('diversify',80);},900);
+  if(after.largest.pct<0.25)unlockSkill('rightsize',60);
+  if(after.techPct<before.techPct-0.015)setTimeout(function(){toast('📉 Tech concentration dropped '+Math.round(before.techPct*100)+'% → '+Math.round(after.techPct*100)+'%');},1700);
+}
+
+/* ───────────────────────── Lessons & glossary ───────────────────────── */
+function openLesson(id){
+  var L=LESSONS[id];if(!L)return;var p=computePF();
+  var h='<div class="lesson-tag">'+L.track+'</div><div class="sheet-h">'+L.title+'</div>';
+  L.body(p).forEach(function(b){h+=(b.type==='p')?'<p class="lp">'+b.html+'</p>':nrow(b.name,b.val,b.plain);});
+  if(L.check)h+=checkHTML(id,L.check);
+  h+='<button class="btn-pur big-btn" onclick="'+L.prove.fn+'">'+L.prove.label+'</button><button class="btn-ghost" onclick="closeSheet()">Close</button>';
+  renderSheet(h);openSheet();state.concepts++;
+}
+function checkHTML(id,c){
+  return '<div class="check"><div class="check-q">⚡ Quick check</div><div class="check-qt">'+c.q+'</div><div class="check-opts" id="ckO_'+id+'">'
+    +c.opts.map(function(o,i){return '<button class="check-opt" onclick="answerCheck(\''+id+'\','+i+')">'+o+'</button>';}).join('')
+    +'</div><div class="check-fb" id="ckF_'+id+'"></div></div>';
+}
+function answerCheck(id,i){
+  var c=LESSONS[id].check,ok=(i===c.correct),opts=document.getElementById('ckO_'+id).children;
+  for(var k=0;k<opts.length;k++){opts[k].disabled=true;if(k===c.correct)opts[k].classList.add('right');if(k===i&&!ok)opts[k].classList.add('wrong');}
+  document.getElementById('ckF_'+id).innerHTML='<div class="fb '+(ok?'ok':'no')+'">'+(ok?'✓ Exactly! ':'Not quite — ')+c.why+'</div>';
+  if(ok&&!state.checked[id]){state.checked[id]=true;state.dailyXP=Math.min(99,state.dailyXP+15);addXP(15);toast('✓ +15 XP');}
+}
+
+/* ── Goal setting (carried over from the old prototype) ── */
+function goalTitle(g){return 'Save '+money(g.amt)+' for '+g.what;}
+function ringSVG(val,max){var r=11,c=2*Math.PI*r,off=c*(1-Math.min(1,val/max));return '<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#e9e4f3" stroke-width="4"/><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#f3c34c" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 15 15)"/></svg>';}
+function donutSVG(pct){var r=34,c=2*Math.PI*r,off=c*(1-Math.min(1,pct/20));return '<svg width="120" height="120" viewBox="0 0 90 90"><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#efe9fb" stroke-width="11"/><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#7a5cae" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 45 45)"/></svg>';}
+function donutInner(pct,monthly){return donutSVG(pct)+'<div class="donut-c"><div class="donut-amt">'+money(monthly)+'</div><div class="donut-k">/month · '+pct+'%</div></div>';}
+function goalMilestones(d){return ['Open a Fiscally '+d.account+' Journey','Learn about levels of risk','Contribute '+d.pct+'% of your earnings monthly','Open a real '+d.account+' & apply what you\'ve learned!'];}
+function openGoalSetup(){state.goalDraft=JSON.parse(JSON.stringify(state.goal));renderSheet(goalSheet());openSheet();}
+function goalSheet(){
+  var d=state.goalDraft,monthly=Math.round((d.income||2500)*d.pct/100);
+  var h='<div class="lesson-tag">Your goal · the "why"</div><div class="sheet-h">Set your goal</div>';
+  h+='<div class="gs-q">Why are you investing?</div><div class="why-grid">'+WHYS.map(function(w,i){return '<div class="why '+(d.why===w?'sel':'')+'" onclick="pickWhyG(this,'+i+')">'+w+'</div>';}).join('')+'</div>';
+  h+='<div class="gs-q">Make it specific</div>';
+  h+='<label class="f-label">What are you saving for?</label><input class="f-in" value="'+d.what+'" oninput="state.goalDraft.what=this.value"/>';
+  h+='<label class="f-label">How much will it cost?</label><input class="f-in" inputmode="numeric" value="'+money(d.amt)+'" oninput="setGoalAmt(this.value)"/>';
+  h+='<label class="f-label">Over how many years?</label><input class="f-in" inputmode="numeric" value="'+d.years+'" oninput="state.goalDraft.years=parseInt(this.value)||1"/>';
+  h+='<div class="gs-q">How much to invest?</div><div class="ob-p2">We suggest 5–10% of your earnings to start.</div>';
+  h+='<div class="donut-wrap" id="donutWrap">'+donutInner(d.pct,monthly)+'</div>';
+  h+='<input type="range" min="3" max="20" value="'+d.pct+'" class="gs-slider" oninput="setGoalPct(+this.value)"/>';
+  h+='<div class="mininote" style="text-align:center">Drag to set how much of your earnings you invest each month.</div>';
+  h+='<div class="gs-q">Which account?</div><div class="acct-list">'+ACCTS.map(function(a,i){return '<div class="acct-opt '+(d.account===a.k?'sel':'')+'" onclick="pickAcct(this,'+i+')"><div class="ao-ic">'+a.k[0]+'</div><div class="ao-b"><div class="ao-t">'+a.k+'</div><div class="ao-d">'+a.d+'</div></div><span class="ao-chk">✓</span></div>';}).join('')+'</div>';
+  h+='<div class="gs-q">Your milestones</div>'+goalMilestones(d).map(function(m,i){return '<div class="milestone"><div class="ms-n">'+(i+1)+'</div><div class="ms-t">'+m+'</div></div>';}).join('');
+  h+='<button class="btn-pur big-btn" onclick="saveGoal()">Save my goal</button><button class="btn-ghost" onclick="closeSheet()">Cancel</button>';
+  return h;
+}
+function pickWhyG(el,i){state.goalDraft.why=WHYS[i];var w=el.parentNode.children;for(var k=0;k<w.length;k++)w[k].classList.remove('sel');el.classList.add('sel');}
+function pickAcct(el,i){state.goalDraft.account=ACCTS[i].k;var o=el.parentNode.children;for(var k=0;k<o.length;k++)o[k].classList.remove('sel');el.classList.add('sel');}
+function setGoalAmt(v){state.goalDraft.amt=parseInt((''+v).replace(/[^0-9]/g,''))||0;}
+function setGoalPct(v){state.goalDraft.pct=v;var el=document.getElementById('donutWrap');if(el)el.innerHTML=donutInner(v,Math.round((state.goalDraft.income||2500)*v/100));}
+function saveGoal(){state.goal=Object.assign(state.goal,state.goalDraft);closeSheet();addXP(20);toast('🎯 Goal saved · +20 XP');paint();}
+function openMilestone(b){
+  if(b==='done'){renderSheet('<div class="lesson-tag">Milestone · done</div><div class="sheet-h">🧺 Spread across 3+ types</div><p class="lp">You\'re holding <b>3+ asset types</b> in your practice account — a real risk milestone, earned by <b>doing</b>, not reading. It moved your goal forward too.</p><button class="btn-ghost" onclick="closeSheet()">Nice</button>');openSheet();return;}
+  renderSheet('<div class="lesson-tag">Milestone · do it to unlock</div><div class="sheet-h">🧺 Hold 3+ asset types</div><p class="lp">This one unlocks by <b>doing</b>: hold at least 3 different asset types (e.g. stocks, an ETF, and crypto) in your practice account at once.</p><p class="lp">It\'s the heart of this unit — spreading out is what lowers your risk.</p><button class="btn-pur big-btn" onclick="closeSheet();goTab(\'trade\')">Practice a trade</button><button class="btn-ghost" onclick="closeSheet()">Later</button>');openSheet();
+}
+function openWhats(k){var g=GLOSS[k];if(!g)return;
+  renderSheet('<div class="lesson-tag">What\'s that?</div><div class="sheet-h">'+g.t+'</div><p class="lp">'+g.d+'</p><button class="btn-ghost" onclick="closeSheet()">Got it</button>');
+  openSheet();state.concepts++;}
+
+/* ───────────────────────── Sheet / toast / nav ───────────────────────── */
+function renderSheet(html){document.getElementById('sheetInner').innerHTML=html;}
+function openSheet(){document.getElementById('sheet').classList.add('open');}
+function closeSheet(){document.getElementById('sheet').classList.remove('open');}
+var _toast;
+function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(_toast);_toast=setTimeout(function(){e.classList.remove('show');},2900);}
+function paint(){
+  var el=document.getElementById('screen');
+  el.innerHTML=state.tab==='home'?renderHome():state.tab==='learn'?renderLearn():state.tab==='trade'?renderTrade():renderUnderstand();
+  var nav=document.getElementById('nav').children;
+  for(var i=0;i<nav.length;i++)nav[i].classList.toggle('on',nav[i].getAttribute('data-tab')===state.tab);
+  el.scrollTop=0;
+}
+function goTab(t){state.tab=t;paint();}
+
+/* ───────────────────────── Init (runs last — everything above is defined) ───────────────────────── */
+document.getElementById('hdrAva').innerHTML=avatar();
+syncHeader();
+paint();
+</script>
+</body>
+</html>
