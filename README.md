@@ -1,22 +1,44 @@
-# Foresight
+# Fiscally
 
-![Deploy Frontend](https://github.com/sudip70/foresight/actions/workflows/gh-pages.yml/badge.svg)
-![Market Data Refresh](https://github.com/sudip70/foresight/actions/workflows/daily-market-refresh.yml/badge.svg)
-![Tests](https://img.shields.io/badge/tests-85_passed-brightgreen)
+*Formerly **Foresight** — see the pivot in [`PIVOT_PLAN.md`](PIVOT_PLAN.md).*
+
 ![Python](https://img.shields.io/badge/python-3.11-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-Foresight is a full-stack web application for market intelligence, scenario-based forecasting, portfolio simulation, and financial literacy.
+**Fiscally** is a financial-literacy + paper-trading app — *learn investing by doing it, on real market data, with no real risk.* It teaches money & investing, then lets you practice everything in a risk-free paper account — wrapped in a soft, calm, deliberately **un-overwhelming** design so beginners and young learners don't bounce off an intimidating topic.
 
-**Live:** [sudip70.github.io/foresight](https://sudip70.github.io/foresight/)
+> **Status — prototype.** The active product is the **Fiscally mobile prototype** ([`fiscally-prototype.html`](fiscally-prototype.html)). The original "Foresight" web app + FastAPI/Supabase backend (documented further below) are the live **data & forecasting foundation** it builds on.
 
-**Demo:**
-<p align="center">
-  <img src="foresight_demo.gif" width="100%"/>
-</p>
+## Fiscally prototype
+
+A self-contained, single-file mobile prototype (no build step). Serve the repo and open it at a phone-sized viewport:
+
+```bash
+python3 -m http.server 3333
+# then open http://localhost:3333/fiscally-prototype.html
+```
+
+**Five tabs, one job each:** **Home** (hub) · **Learn** · **Practice** · **Explore** · **Profile**.
+
+- **Learn** — a Duolingo-style lesson journey guided by **Mia**, with **Penny** (a fox companion that follows the trail), step-by-step interactive lessons + quizzes, skills that unlock by *doing*, goal-setting, and a streak / XP / gems strip.
+- **Practice** — a paper-trading engine on **live market prices** for all 56 assets (search → buy/sell, holdings, realized/unrealized P&L), plus a **Scenarios** what-if mode.
+- **Home** — a daily **Question of the Day** and a **"plan to invest for real"** milestone tracker (practice → graduation).
+- **Explore** — Stock Finder (56 assets, uncertainty-framed live forecasts), Market Today, calculators.
+- **Live data** from the deployed backend, with cold-start-aware retries. *(Paper trading isn't persisted yet — see [`PIVOT_PLAN.md`](PIVOT_PLAN.md) for the auth + DB plan.)*
+
+## Documentation
+
+| Doc | What it covers |
+|---|---|
+| [`FISCALLY_BRAND.md`](FISCALLY_BRAND.md) | **Brand & design system** — identity, voice, color tokens, components, and the per-screen coherence map. Source of truth. |
+| [`NORTH_STAR_PLAN.md`](NORTH_STAR_PLAN.md) | Product strategy — learning-app-on-real-data; behavioral coach + learning spine. |
+| [`PIVOT_PLAN.md`](PIVOT_PLAN.md) | Foresight → Fiscally pivot: Supabase Auth, paper-trading tables, quests. |
+| [`FISCALLY_DOCS.md`](FISCALLY_DOCS.md) · `260602-Fiscally-Invest-screens.pdf` | The original Fiscally design deck + notes. |
 
 ---
+
+> The sections below document the **Foresight data & forecasting backend** (FastAPI + Supabase, deployed on Render) — the live foundation the prototype reads from. The static `frontend/` web app is the legacy Foresight UI.
 
 ## Architecture
 
