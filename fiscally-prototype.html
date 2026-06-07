@@ -301,7 +301,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 /* ── Bottom sheet ───────────────────────────── */
 .sheet-ov{position:fixed;inset:0;background:rgba(40,30,70,.45);z-index:50;display:none;align-items:flex-end;justify-content:center}
 .sheet-ov.open{display:flex}
-.sheet{background:var(--surface);border-radius:24px 24px 0 0;padding:22px 20px calc(30px + env(safe-area-inset-bottom));width:100%;max-width:430px;animation:up .28s cubic-bezier(.2,.8,.2,1)}
+.sheet{background:var(--surface);border-radius:24px 24px 0 0;padding:22px 20px calc(30px + env(safe-area-inset-bottom));width:100%;max-width:430px;max-height:88vh;overflow-y:auto;animation:up .28s cubic-bezier(.2,.8,.2,1)}
 @keyframes up{from{transform:translateY(100%)}to{transform:none}}
 .sheet-grip{width:38px;height:4px;background:var(--line);border-radius:2px;margin:0 auto 18px}
 .sheet-mia{display:flex;gap:11px;align-items:center;margin-bottom:14px}
@@ -355,9 +355,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .node-btn.mile{background:linear-gradient(135deg,#f3c34c,#dca02a);color:#fff;box-shadow:0 5px 0 #b9842a}
 .node-btn.milelock{background:#ece3cf;color:#cbb98c;box-shadow:0 5px 0 #ddd1b4}
 .node-btn:not(.lock):active{transform:translateY(3px)}
-.node-ring{position:absolute;top:-7px;width:78px;height:78px;border-radius:50%;border:3px solid var(--purple-soft2);opacity:.6;animation:npulse 1.7s infinite}
+.node-ring{position:absolute;top:-7px;width:78px;height:78px;border-radius:50%;border:3px solid var(--purple-soft2);opacity:.6;animation:npulse 1.7s infinite;pointer-events:none}
 @keyframes npulse{0%{transform:scale(.84);opacity:.7}80%{transform:scale(1.12);opacity:0}100%{opacity:0}}
-.start-bubble{position:absolute;top:-33px;background:#fff;color:var(--purple-deep);font-weight:800;font-size:11px;padding:6px 12px;border-radius:11px;box-shadow:var(--shadow-lg);animation:bob 1.4s ease-in-out infinite;letter-spacing:.6px}
+.start-bubble{position:absolute;top:-33px;background:#fff;color:var(--purple-deep);font-weight:800;font-size:11px;padding:6px 12px;border-radius:11px;box-shadow:var(--shadow-lg);animation:bob 1.4s ease-in-out infinite;letter-spacing:.6px;pointer-events:none}
 .start-bubble:after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#fff}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 .node-label{font-size:11px;font-weight:800;color:var(--muted);text-align:center;margin-top:8px;max-width:108px;line-height:1.25}
@@ -428,6 +428,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .lp-bubble:before{content:'';position:absolute;top:-7px;left:50%;transform:translateX(-50%);border:8px solid transparent;border-bottom-color:var(--purple-soft);border-top:0}
 .viz-bar{margin:14px 0 2px;background:var(--surface-soft);border-radius:11px;height:34px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--line)}
 .viz-fill{height:100%;background:linear-gradient(135deg,var(--purple),var(--purple-deep));color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;padding-left:11px;border-radius:11px;min-width:50px;white-space:nowrap}
+.viz-split{display:flex;height:34px;border-radius:11px;overflow:hidden;margin:14px 0 2px}
+.viz-split>div{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;text-align:center;line-height:1.1;padding:0 2px}
 .lp-opts{display:flex;flex-direction:column;gap:9px;margin-top:16px}
 .lp-opt{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;text-align:left;color:var(--ink)}
 .lp-opt.right{border-color:var(--green);background:var(--green-soft);color:var(--green)}
@@ -492,6 +494,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .ta-n{font-size:12px;color:var(--muted);font-weight:600;margin-top:3px}
 .ta-px{text-align:right;font-size:19px;font-weight:850}
 .ta-px .pill{display:inline-block;margin-top:5px}
+/* Practice: dashboard hero (ref-inspired, in lavender) */
+.dash-hero{background:linear-gradient(135deg,#a78bfa,#5546b0);color:#fff;border-radius:22px;padding:18px;box-shadow:var(--shadow-lg);margin-bottom:13px}
+.dh-top{display:flex;justify-content:space-between;align-items:center}
+.dh-k{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;opacity:.85}
+.dash-hero .pill{background:rgba(255,255,255,.22)!important;color:#fff!important}
+.dh-val{font-size:34px;font-weight:850;letter-spacing:-1px;margin:7px 0 2px}
+.dh-chg{font-size:13px;font-weight:700;opacity:.92}
+.dh-bp{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.95);color:var(--purple-deep);border-radius:14px;padding:12px 15px;margin-top:15px;box-shadow:0 5px 14px -5px rgba(40,30,70,.4)}
+.dh-bp-l{font-size:13px;font-weight:800}
+.dh-bp-v{font-size:17px;font-weight:850}
+.range-tabs{display:flex;gap:6px;margin-bottom:12px}
+.rt{flex:1;background:var(--surface-soft);border:none;color:var(--muted);font-weight:800;font-size:12px;padding:8px 0;border-radius:10px;cursor:pointer}
+.rt.on{background:var(--purple-deep);color:#fff}
+.mixbar{display:flex;height:12px;border-radius:8px;overflow:hidden;background:var(--surface-soft)}
+.mixbar>div{height:100%}
 .cele{text-align:center;padding:14px 6px 6px}
 .cele-burst{font-size:46px;animation:pop .5s ease}
 @keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
@@ -624,30 +641,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 
       <div id="homeQuestion"></div>
 
-      <div class="goal-card">
-        <div class="row"><div style="font-size:14px;font-weight:800">🎯 Save $10,000 for a car</div><span class="pill pill-pur">47%</span></div>
-        <div class="bar"><div class="bar-fill" style="width:47%"></div></div>
-        <div class="row"><span style="font-size:11px;color:var(--muted)">$4,700 of $10,000</span><span style="font-size:11px;color:var(--muted)">~2.6 yrs left</span></div>
-      </div>
+      <div id="homeGoal"></div>
 
       <div id="homePlan"></div>
     </div>
 
     <!-- ─── JOURNEY (sub) ─── -->
     <div class="page" id="page-journey">
-      <div class="style-chip">
-        <div class="sc-av">__AV__</div>
-        <div class="sc-mid"><div class="sc-label">Investment Style</div><div class="sc-name">Future Planner</div></div>
-        <div class="sc-stat"><div class="d">Day 4 / 28</div><div class="v" id="scStatVal">+$249.80</div></div>
+      <div class="dash-hero">
+        <div class="dh-top"><div class="dh-k">Practice portfolio</div><span class="pill pill-grn" id="pfAllPct">+1.0%</span></div>
+        <div class="dh-val tnum" id="pfValue">$10,101.29</div>
+        <div class="dh-chg"><span id="scStatVal" class="tnum">+$101.29</span> · all time</div>
+        <div class="dh-bp"><div class="dh-bp-l">⚡ Buying power</div><div class="dh-bp-v tnum" id="pfCash">$3,346.81</div></div>
       </div>
 
       <div class="card">
-        <div class="row" style="margin-bottom:3px"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px">Portfolio Value</div><span class="pill pill-grn" id="pfAllPct">+2.5%</span></div>
-        <div style="font-size:29px;font-weight:800;letter-spacing:-.7px" class="tnum" id="pfValue">$10,249.80</div>
+        <div class="range-tabs">
+          <button class="rt" onclick="setRange('1M',this)">1M</button>
+          <button class="rt on" onclick="setRange('3M',this)">3M</button>
+          <button class="rt" onclick="setRange('6M',this)">6M</button>
+          <button class="rt" onclick="setRange('1Y',this)">1Y</button>
+          <button class="rt" onclick="setRange('All',this)">All</button>
+        </div>
         <div id="journeyChart"></div>
-        <div class="row" style="font-size:10px;color:var(--faint);font-weight:700;padding:0 4px"><span>Day 1</span><span>Day 10</span><span>Day 20</span><span>Day 30</span></div>
-        <div class="pf-stats">
-          <div class="pf-stat"><label>Cash</label><span id="pfCash" class="tnum">$3,576.90</span></div>
+        <div class="pf-stats" style="margin-top:8px">
+          <div class="pf-stat"><label>Day</label><span class="tnum">4 / 28</span></div>
           <div class="pf-stat"><label>Unrealized</label><span id="pfUnreal" class="tnum up">+$0</span></div>
           <div class="pf-stat"><label>Realized</label><span id="pfReal" class="tnum">$0.00</span></div>
         </div>
@@ -1010,7 +1028,7 @@ function genCandles(n,start){
 }
 
 /* ── Render charts ───────────────────────────── */
-document.getElementById('journeyChart').innerHTML=areaChart([100,101,100.5,102,103,102.5,104,105.2],300,120,'#9084b4');
+/* journeyChart is rendered by setRange() inside renderPortfolio (needs PF/totals) */
 var scenVals=[100,100.4,100.2,100.7,100.5,101,101.3,101.1];
 document.getElementById('scenarioChart').innerHTML=areaChart(scenVals,300,120,'#7d72a8');
 /* Stock Finder now renders a live forecast fan chart (see sfSelect) */
@@ -1126,6 +1144,49 @@ function money(n){return '$'+Number(n).toLocaleString(undefined,{minimumFraction
 function signed(n){return (n>=0?'+':'-')+'$'+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function totals(){var inv=0,val=0;PF.pos.forEach(function(p){inv+=p.sh*p.avg;val+=p.sh*curPx(p.t);});return {inv:inv,val:val,unreal:val-inv,total:val+PF.cash};}
 
+var pfRange='3M';
+var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function rangeLabels(r){
+  if(r==='1M')return ['4w','3w','2w','1w','now'];
+  if(r==='All')return ['2y','18mo','1y','6mo','now'];
+  var back={'3M':3,'6M':6,'1Y':12}[r]||3,nowM=5,out=[],ticks=(r==='3M')?4:5,i;
+  for(i=0;i<ticks;i++){var mAgo=Math.round(back*(1-i/(ticks-1)));out.push(i===ticks-1?'now':MONTHS[((nowM-mAgo)%12+12)%12]);}
+  return out;
+}
+/* seeded random walk → realistic jagged series, stable per range, pinned start→end */
+function genSeries(n,start,end,seed){
+  var a=[],v=start,vol=start*0.011,s=seed||1;
+  function rnd(){s=(s*9301+49297)%233280;return s/233280;}
+  for(var i=0;i<n;i++){v=v+(end-start)/n+(rnd()-0.5)*vol*2;a.push(v);}
+  var diff=end-a[n-1];for(var j=0;j<n;j++)a[j]+=diff*(j/(n-1));
+  a[0]=start;a[n-1]=end;return a;
+}
+function chartSeries(r){var T=totals().total,M={'1M':[22,0.985,11],'3M':[64,0.96,23],'6M':[120,0.90,37],'1Y':[240,0.80,53],'All':[300,0.72,71]}[r]||[64,0.96,23];return genSeries(M[0],T*M[1],T,M[2]);}
+function lineChart(data,w,h,color,range){
+  var padX=8,padT=10,padB=20,mn=Math.min.apply(null,data),mx=Math.max.apply(null,data),rg=(mx-mn)||1,n=data.length,sx=(w-padX*2)/(n-1);
+  function X(i){return padX+i*sx;}function Y(v){return padT+(h-padT-padB)*(1-(v-mn)/rg);}
+  /* crisp straight segments — keep every data point's nuance */
+  var line=data.map(function(v,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1);}).join(' ');
+  var ex=X(n-1).toFixed(1),ey=Y(data[n-1]).toFixed(1),gid='g'+Math.round(Math.random()*1e6);
+  var base=(h-padB).toFixed(1),area=line+' L'+ex+' '+base+' L'+X(0).toFixed(1)+' '+base+' Z';
+  /* vertical gridlines + time labels */
+  var labels=rangeLabels(range||'3M'),ticks=labels.length,grid='',xlab='';
+  for(var k=0;k<ticks;k++){var gx=(padX+(w-padX*2)*(k/(ticks-1))).toFixed(1);
+    grid+='<line x1="'+gx+'" y1="'+padT+'" x2="'+gx+'" y2="'+base+'" stroke="#efeaf7" stroke-width="1"/>';
+    xlab+='<text x="'+gx+'" y="'+(h-6)+'" font-size="9" fill="#aaa4c0" font-weight="700" text-anchor="'+(k===0?'start':(k===ticks-1?'end':'middle'))+'">'+labels[k]+'</text>';}
+  /* dashed reference line at the window's starting value */
+  var ry=Y(data[0]).toFixed(1);
+  var ref='<line x1="'+padX+'" y1="'+ry+'" x2="'+(w-padX)+'" y2="'+ry+'" stroke="'+color+'" stroke-width="1" stroke-dasharray="2 4" opacity="0.45"/>';
+  return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" style="display:block">'
+    +'<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+color+'" stop-opacity="0.13"/><stop offset="0.92" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'
+    +grid+ref
+    +'<path d="'+area+'" fill="url(#'+gid+')"/>'
+    +'<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>'
+    +xlab
+    +'<circle cx="'+ex+'" cy="'+ey+'" r="3" fill="'+color+'" stroke="#fff" stroke-width="1.5"/></svg>';
+}
+function setRange(r,el){pfRange=r;if(el){[].forEach.call(el.parentNode.children,function(b){b.classList.remove('on');});el.classList.add('on');}var c=document.getElementById('journeyChart');if(c)c.innerHTML=lineChart(chartSeries(r),300,150,'#7a5cae',r);}
+function pfMix(){var by={},inv=0;PF.pos.forEach(function(p){var v=p.sh*curPx(p.t);inv+=v;var c=lclsOf(p.t);by[c]=(by[c]||0)+v;});return {by:by,inv:inv,classes:Object.keys(by).length};}
 function renderPortfolio(){
   var T=totals();
   document.getElementById('pfValue').textContent=money(T.total);
@@ -1140,9 +1201,18 @@ function renderPortfolio(){
   if(hv){hv.textContent=money(T.total);
     document.getElementById('homeChg').textContent=(allTime>=0?'▲ ':'▼ ')+signed(allTime)+' ('+(allTime>=0?'+':'')+(allTime/START_CAPITAL*100).toFixed(1)+'%) all time';
     document.getElementById('homeGrowth').textContent=signed(allTime);}
+  setRange(pfRange);
 }
 function renderHoldings(){
   var html='';
+  var mix=pfMix();
+  if(mix.inv){
+    var COLW={stock:'#9084b4',etf:'#5b8def',crypto:'#e0a92f'};
+    var seg=Object.keys(mix.by).map(function(c){return '<div style="width:'+(mix.by[c]/mix.inv*100)+'%;background:'+(COLW[c]||'#9084b4')+'"></div>';}).join('');
+    var labels=Object.keys(mix.by).map(function(c){return Math.round(mix.by[c]/mix.inv*100)+'% '+c;}).join(' · ');
+    var read=mix.classes>=3?'Nicely spread across '+mix.classes+' asset types 🧺':'Mostly in '+mix.classes+' type'+(mix.classes>1?'s':'')+' — spreading out lowers risk';
+    html+='<div class="card"><div class="card-t" style="margin-bottom:10px">Portfolio analytics</div><div class="mixbar">'+seg+'</div><div class="mininote" style="margin-top:9px"><b style="color:var(--ink)">'+read+'</b><br>'+labels+'</div></div>';
+  }
   if(!PF.pos.length){html='<div class="card"><div class="muted-note" style="text-align:left">No holdings yet. Tap <b>Trade</b> to make your first paper investment — virtual cash, zero risk.</div></div>';}
   else{
     html+='<div class="card"><div class="row" style="margin-bottom:13px"><div class="card-t" style="margin-bottom:0">Positions</div><span class="pill pill-pur">'+PF.pos.length+' holdings</span></div>';
@@ -1522,7 +1592,7 @@ function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.c
 /* ═══════════ Learn tab: Duolingo-style path + goals (integrated) ═══════════ */
 var GOAL={what:'a car',amt:10000,years:5,saved:4700,pct:10,account:'TFSA',why:'So my money can grow safely',income:2500};
 var GOAL_DRAFT=null;
-var LEARN={level:3,levelName:'Building Confidence',xp:340,xpToNext:500,streak:5,dailyXP:30,gems:120,checked:{},flags:{},done:{m1:1,m2:1,m3:1,i1:1,i2:1,i3:1,why_risk:1}};
+var LEARN={level:3,levelName:'Building Confidence',xp:340,xpToNext:500,streak:5,dailyXP:30,gems:120,checked:{},flags:{},done:{f_budget:1,f_emergency:1,f_debt:1,f_inflation:1,v_save:1,v_compound:1,v_assets:1,v_timing:1,p_risk:1}};
 var PET={emoji:'🦊',name:'Penny'};
 var RECAP={m1:'Money is a tool for trading your time and effort — investing puts it to work. ✓',m2:'Saving keeps money safe; investing grows it over the years. ✓',m3:'Unit 1 complete — the basics are locked in! ⭐',i1:'A stock is a tiny slice of a real company. ✓',i2:'Stocks, ETFs and bonds — different tools, different risk. ✓',i3:'Unit 2 complete — you know the building blocks! ⭐',why_risk:'Every investment can swing up or down — that swing is what we call risk. ✓'};
 var SKILLS=[
@@ -1550,8 +1620,73 @@ function lring(val,max){var r=11,c=2*Math.PI*r,off=c*(1-Math.min(1,val/max));ret
 function ldonutSVG(pct){var r=34,c=2*Math.PI*r,off=c*(1-Math.min(1,pct/20));return '<svg width="120" height="120" viewBox="0 0 90 90"><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#e7e1f4" stroke-width="11"/><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#6f659a" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 45 45)"/></svg>';}
 function ldonutInner(pct,m){return ldonutSVG(pct)+'<div class="ldonut-c"><div class="ldonut-a">'+money0(m)+'</div><div class="ldonut-k">/month · '+pct+'%</div></div>';}
 function goalTitle(g){return 'Save '+money0(g.amt)+' for '+g.what;}
+function renderGoalCard(){
+  var el=document.getElementById('homeGoal');if(!el)return;
+  var g=GOAL,gpct=Math.min(100,Math.round(g.saved/g.amt*100));
+  el.innerHTML='<div class="goal-card" onclick="openGoalSetup()" style="cursor:pointer">'
+    +'<div class="row"><div style="font-size:14px;font-weight:800">🎯 '+goalTitle(g)+'</div><span class="pill pill-pur">'+gpct+'%</span></div>'
+    +'<div class="bar"><div class="bar-fill" style="width:'+gpct+'%"></div></div>'
+    +'<div class="row"><span style="font-size:11px;color:var(--muted)">'+money0(g.saved)+' of '+money0(g.amt)+'</span><span style="font-size:11px;color:var(--purple-strong);font-weight:700">'+g.years+'-yr plan · ✏️ adjust</span></div></div>';
+}
 function lrow(n,v,p){return '<div class="lz-row"><div class="row"><span class="lz-n">'+n+'</span><span class="lz-v tnum">'+v+'</span></div><div class="lz-p">'+p+'</div></div>';}
 var LESSONS_L={
+  /* ── Unit 1 · Money foundations ── */
+  f_budget:{xp:40,celeb:'You\'ve got a plan for every paycheque now.',steps:[
+    {say:'Before investing, know where your money goes. One simple split keeps it easy: <b>50 / 30 / 20</b>. 🧾'},
+    {say:'Of each paycheque: <b>50%</b> to needs, <b>30%</b> to wants, <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#7a5cae">50% needs</div><div style="width:30%;background:#5b8def">30% wants</div><div style="width:20%;background:#4f9c7e">20% save</div></div>';}},
+    {q:'You take home $2,000 a month. Using 50/30/20, how much goes to saving &amp; debt?',opts:['$100','$400','$1,000'],correct:1,yes:'Exactly!',why:'20% of $2,000 = $400. Automate it and you barely notice it leave.'},
+    {say:'Tip: <b>pay yourself first</b> — move that 20% the day you\'re paid, before it can disappear. 💪'}
+  ]},
+  f_emergency:{xp:40,celeb:'You built the foundation everything else stands on.',steps:[
+    {say:'Life happens — a car repair, a lost job. An <b>emergency fund</b> stops a surprise becoming a crisis. 🛟'},
+    {say:'Aim for <b>3–6 months</b> of essential expenses, kept in a plain savings account you can reach instantly.'},
+    {q:'Where should your emergency fund live?',opts:['Invested in stocks','A savings account you can access anytime','Locked away for 5 years'],correct:1,yes:'Right.',why:'It must be safe and instant — not invested, where it could drop right when you need it most.'},
+    {say:'Build this <b>before</b> investing seriously — it\'s what lets you stay calm when markets dip. 🧘'}
+  ]},
+  f_debt:{xp:40,celeb:'You know which dollars to attack first.',steps:[
+    {say:'Not all debt is equal. A mortgage at 4% is very different from a credit card at <b>20%</b>. 💳'},
+    {say:'Paying off a 20% card is like earning a <b>guaranteed 20% return</b> — better than almost any investment.'},
+    {q:'Spare cash: a card charges 20%, investing might earn ~8%. What wins?',opts:['Invest the cash','Pay off the card'],correct:1,yes:'Yes.',why:'Clearing 20% interest beats earning 8%. Crush high-interest debt before investing.'},
+    {say:'Rule of thumb: high-interest debt first, then invest. Low-interest debt (like a mortgage) can ride alongside. 👍'}
+  ]},
+  f_inflation:{xp:40,celeb:'Now you know the real reason to invest.',steps:[
+    {say:'Cash feels safe — but <b>inflation</b> quietly shrinks what it can buy. 🎈'},
+    {say:'At ~3% inflation, $100 today buys only about <b>$74</b> of stuff in 10 years if it just sits there.',viz:function(){return '<div class="viz-bar"><div class="viz-fill" style="width:74%">$100 → ~$74 of buying power in 10 yrs</div></div>';}},
+    {q:'Why is "safe" cash actually risky long-term?',opts:['It can be stolen','Inflation erodes its buying power','Banks always lose it'],correct:1,yes:'Exactly!',why:'Money that doesn\'t grow faster than inflation loses value every year. Investing aims to outpace it.'},
+    {say:'So investing isn\'t about getting rich quick — it\'s about <b>beating inflation</b> over time. 🌱'}
+  ]},
+  /* ── Unit 2 · Why invest ── */
+  v_save:{xp:40,celeb:'You\'ll always match the tool to the timeline now.',steps:[
+    {say:'Saving and investing are both good — but they do <b>different jobs</b>. 🐷'},
+    {say:'<b>Save</b> (safe, instant) for short-term goals &amp; emergencies. <b>Invest</b> (grows, bounces) for goals 5+ years away.'},
+    {q:'Saving for a vacation in 8 months — save or invest?',opts:['Invest it','Save it'],correct:1,yes:'Right.',why:'Short timeline = save. Investing could dip just before you need it. Long timeline = invest.'},
+    {say:'Match the tool to the timeline and you\'ll never be caught short. ⏱️'}
+  ]},
+  v_compound:{xp:50,celeb:'You just met the most powerful force in money.',steps:[
+    {say:'The closest thing to magic in money: <b>compounding</b> — earning returns on your past returns. ❄️'},
+    {say:'$100 at 8%/yr becomes about <b>$466</b> in 20 years — most of that is growth <i>on the growth</i>.',viz:function(){return '<div class="viz-bar"><div class="viz-fill" style="width:100%">$100 → ~$466 in 20 yrs at 8%/yr</div></div>';}},
+    {q:'What matters most for compounding?',opts:['Picking the perfect stock','Time — starting early','One huge deposit'],correct:1,yes:'Exactly!',why:'Time is the secret ingredient. Starting 10 years earlier often beats investing twice as much later.'},
+    {say:'The takeaway: <b>start now</b>, even small. Your future self will thank you. 🙏'}
+  ]},
+  v_assets:{xp:40,celeb:'You know the three building blocks of investing.',steps:[
+    {say:'Three building blocks you\'ll use forever: <b>stocks, ETFs and bonds</b>. 🧩'},
+    {say:'A <b>stock</b> = a slice of one company. A <b>bond</b> = a loan that pays interest. An <b>ETF</b> = a basket of many, in one buy.'},
+    {q:'You want instant diversification in one purchase. Which?',opts:['A single stock','An ETF','One company\'s bond'],correct:1,yes:'Yes!',why:'An ETF bundles hundreds of holdings — instant spread, low effort. Great for beginners.'},
+    {say:'Most beginners start with a broad, low-cost <b>ETF</b> — simple and spread out. 👌'}
+  ]},
+  v_timing:{xp:40,celeb:'You\'ll stop trying to outguess the market.',steps:[
+    {say:'Tempted to wait for the "perfect" moment to invest? Almost nobody gets it right. 🎯'},
+    {say:'Markets rise over the long run, and the best days often come right after the worst — miss a few and returns crater.'},
+    {q:'What beats trying to time the market?',opts:['Time IN the market','Checking prices hourly','Buying only at the bottom'],correct:0,yes:'Right!',why:'Staying invested through ups and downs — "time in the market beats timing the market."'},
+    {say:'So invest regularly and <b>stay in</b>. Boring beats clever here. 🧘'}
+  ]},
+  /* ── Unit 3 · Build a smart portfolio ── */
+  p_risk:{xp:45,celeb:'You can now match risk to your timeline.',steps:[
+    {say:'Risk isn\'t bad — it\'s the engine of returns. The trick is matching it to your <b>time horizon</b>. 🛡️'},
+    {say:'Money you need <b>soon</b> → keep it calm (less risk). Money for <b>years away</b> → it can ride the bumps for more growth.'},
+    {q:'Retirement is 30 years away. How much short-term bounciness can you handle?',opts:['Very little','Quite a lot'],correct:1,yes:'Exactly.',why:'A long horizon lets you ride out dips — so you can take more risk for more growth.'},
+    {say:'Right risk for the right timeline — that\'s the heart of smart investing. ⏳'}
+  ]},
   risk_div:{xp:50,celeb:'You just learned the #1 way to protect your money.',steps:[
     {say:'Quick one, friend — let\'s see what happens when most of your money sits in <b>one</b> place. 👀'},
     {say:function(s){return 'Right now your biggest holding, <b>'+s.big.t+'</b>, is <b>'+Math.round(s.big.pct*100)+'%</b> of your invested money.';},viz:function(s){var p=Math.round(s.big.pct*100);return '<div class="viz-bar"><div class="viz-fill" style="width:'+Math.max(14,p)+'%">'+s.big.t+' · '+p+'%</div></div>';}},
@@ -1559,19 +1694,104 @@ var LESSONS_L={
     {say:'Exactly — concentration turns one bad day into a big one. Spreading across more holdings <b>softens the swings</b>. 🛡️'},
     {say:'Try it for real next: add a different asset type in <b>Trade</b> and watch your risk drop. Penny\'s cheering you on! 🦊'}
   ]},
+  p_mix:{xp:45,celeb:'You can design a mix you\'ll actually stick with.',steps:[
+    {say:'Your <b>asset mix</b> — how much in stocks vs bonds — drives most of your long-run results. 🥗'},
+    {say:'A classic start: more <b>stocks</b> when young (growth), shifting to more <b>bonds</b> as your goal nears (stability).',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#7a5cae">80% stocks</div><div style="width:20%;background:#5b8def">20% bonds</div></div>';}},
+    {q:'You\'re 25, investing for retirement. A reasonable tilt?',opts:['Mostly bonds','Mostly stocks','All cash'],correct:1,yes:'Yes.',why:'Young + long horizon = lean to stocks for growth; add bonds as the goal gets closer.'},
+    {say:'Pick a mix you can <b>hold through a downturn</b> — that matters more than the perfect ratio. 🤝'}
+  ]},
+  p_fees:{xp:45,celeb:'You\'ll keep more of every dollar you earn.',steps:[
+    {say:'Fees feel tiny but quietly eat returns. <b>1%</b> vs <b>0.1%</b> a year can cost tens of thousands over decades. 🪙'},
+    {say:'<b>Index funds / ETFs</b> just track the market at very low cost — and beat most pricey "active" funds over time.'},
+    {q:'Two funds hold similar things; one charges 1%, one 0.1%. Smarter pick?',opts:['The 1% one','The 0.1% one'],correct:1,yes:'Right!',why:'Lower fees = more of the return stays yours. With index funds you rarely give up performance for the savings.'},
+    {say:'Always check the <b>MER</b> (the fee) before you buy. Low and boring wins. 👍'}
+  ]},
   uncertainty:{xp:50,celeb:'You now read forecasts like a pro — ranges, not promises.',onDone:function(){LEARN.flags.uncertainty=true;},steps:[
     {say:'Ever seen an app promise an <b>exact</b> future price? 🤨 Truth is — nobody can know it.'},
     {say:'So instead we show a <b>range</b>: a rough case, a likely middle, and a strong case. 🔭'},
     {q:'A <b>wider</b> range means…',opts:['More certainty','Less certainty','Guaranteed profit'],correct:1,yes:'Yes!',why:'Wider = more spread of possible outcomes = less certain. Narrow ranges are the confident ones.'},
-    {say:'Perfect. We never show a single "prediction" — that\'d be a lie. We show the range <b>and</b> what moves it. 🌱'}
+    {say:'We never show a single "prediction" — that\'d be a lie. We show the range <b>and</b> what moves it. 🌱'}
+  ]},
+  /* ── Unit 4 · Canadian accounts ── */
+  c_tfsa:{xp:45,celeb:'You\'ve unlocked Canada\'s friendliest account.',steps:[
+    {say:'In Canada, the <b>TFSA</b> is a beginner\'s best friend. 🍁'},
+    {say:'Everything it earns — growth, dividends, interest — is <b>completely tax-free</b>, even when you withdraw. Take money out anytime.'},
+    {q:'You make $500 of gains inside a TFSA. Tax owed on it?',opts:['$0','About $100','Depends on income'],correct:0,yes:'Exactly!',why:'Zero. That\'s the magic of a TFSA — gains are never taxed.'},
+    {say:'Flexible + tax-free makes the TFSA a great <b>first account</b> for most people. 🎉'}
+  ]},
+  c_rrsp:{xp:45,celeb:'You understand the RRSP\'s tax twist.',steps:[
+    {say:'The <b>RRSP</b> is built for retirement — with a tax twist. 🏦'},
+    {say:'Contributions <b>lower your taxable income now</b> (a refund today); you pay tax later when you withdraw — usually at a lower rate.'},
+    {q:'When does an RRSP help most?',opts:['When your income is low','When your income is high (bigger refund now)'],correct:1,yes:'Right.',why:'Higher income → bigger deduction now, and you likely withdraw at a lower rate in retirement.'},
+    {say:'Best for steady retirement saving, especially in your higher-earning years. 📈'}
+  ]},
+  c_which:{xp:45,celeb:'You can pick the right account with confidence.',steps:[
+    {say:'So — TFSA or RRSP? A simple rule of thumb based on your income. ⚖️'},
+    {say:'Lower income now → lean <b>TFSA</b> (bank the RRSP room for later). Higher income → the <b>RRSP</b> deduction is worth more.'},
+    {q:'You\'re a student earning little this year. Which usually first?',opts:['RRSP','TFSA'],correct:1,yes:'Yes!',why:'At low income the RRSP deduction is small — TFSA flexibility wins, and you save RRSP room for higher-earning years.'},
+    {say:'Plenty of people use <b>both</b> over time. Start where the rule points today. 🤝'}
+  ]},
+  c_order:{xp:45,celeb:'You know exactly where each new dollar should go.',steps:[
+    {say:'A handy priority order for where new money should go. 📊'},
+    {say:'1) Emergency fund → 2) crush high-interest debt → 3) any employer match → 4) TFSA / RRSP → 5) taxable account.'},
+    {q:'Your employer matches retirement contributions. Where does that rank?',opts:['Last','Near the top — it\'s free money','Skip it'],correct:1,yes:'Exactly!',why:'A match is an instant 100% return — grab it before most other investing.'},
+    {say:'Work down the list and your money always lands in the highest-value spot. ✅'}
+  ]},
+  /* ── Unit 5 · Plan & reach your goals ── */
+  g_smart:{xp:45,celeb:'Your goals just got real and reachable.',steps:[
+    {say:'A vague "I should save more" rarely works. A <b>SMART</b> goal does. 🎯'},
+    {say:'Specific, Measurable, Achievable, Relevant, Time-based — e.g. "Save <b>$10,000</b> for a car in <b>5 years</b>."'},
+    {q:'Which is a SMART goal?',opts:['"Get rich"','"Save $6,000 for a trip in 2 years"','"Invest someday"'],correct:1,yes:'Right!',why:'It names the amount and the deadline — so you can plan backwards and track it.'},
+    {say:'Set yours in the <b>goal card</b> on Home and we\'ll help you reach it. 🗺️'}
+  ]},
+  g_buckets:{xp:45,celeb:'Every goal now has the right home.',steps:[
+    {say:'Different goals need different homes for the money. 🪣'},
+    {say:'<b>Short-term</b> (under ~3 yrs): keep it safe in savings. <b>Long-term</b> (5+ yrs): invest it so it grows.'},
+    {q:'A down payment you need in 2 years — where?',opts:['Invested in stocks','Safe in savings'],correct:1,yes:'Yes.',why:'Too soon to risk a dip — keep near-term money safe. Long-term money can ride the market.'},
+    {say:'Sort each goal into a bucket and the "save or invest" question answers itself. 👌'}
+  ]},
+  g_howmuch:{xp:45,celeb:'You have a contribution plan that sticks.',steps:[
+    {say:'How much should you invest? Enough to matter, not so much it hurts. 💧'},
+    {say:'A common start: <b>5–10%</b> of your income, automated. Nudge it up a little whenever your income rises.'},
+    {q:'What makes investing actually stick?',opts:['Big one-time deposits','Automating a regular amount','Waiting for spare cash'],correct:1,yes:'Exactly!',why:'Automatic, regular contributions beat willpower — you invest before you can spend it.'},
+    {say:'Set it, automate it, forget it. Consistency is the whole game. 🔁'}
+  ]},
+  g_ready:{xp:60,celeb:'You\'re ready to invest for real. 🎉',steps:[
+    {say:'You\'ve learned the foundations and practised with no risk. How do you know you\'re <b>ready for real money</b>? 🎓'},
+    {say:'A quick checklist: emergency fund ✓, high-interest debt handled ✓, a clear goal ✓, and a mix you can hold calmly through a dip ✓.'},
+    {q:'The best sign you\'re ready to invest for real?',opts:['You found a hot stock tip','You have a plan and stayed calm through practice dips','The market just went up'],correct:1,yes:'That\'s it. 🎉',why:'Readiness is about your plan and temperament — not a tip or market timing.'},
+    {say:'When you can check those boxes, open a real <b>TFSA</b> and start small. You\'ve got this. 🌟'}
   ]}
 };
 /* ── lesson/path progression ── */
 function learnUnits(){return [
-  {k:'Unit 1',t:'Money basics',lessons:[{id:'m1',ic:'💵',label:'What money is for'},{id:'m2',ic:'🐷',label:'Saving vs investing'},{id:'m3',ic:'⭐',label:'Unit complete'}]},
-  {k:'Unit 2',t:'Investing basics',lessons:[{id:'i1',ic:'📈',label:'What a stock is'},{id:'i2',ic:'🧩',label:'Stocks, ETFs & bonds'},{id:'i3',ic:'⭐',label:'Unit complete'}]},
-  {k:'Unit 3',t:'Risk & diversification',lessons:[{id:'why_risk',ic:'🛡️',label:'Why risk matters'},{id:'risk_div',ic:'📘',label:'Why spreading out matters'},{id:'uncertainty',ic:'🔭',label:'Why we show a range'},{id:'MILE',ic:'🧺',label:'Hold 3+ asset types',mile:true},{id:'review',ic:'🏁',label:'Unit review'}]},
-  {k:'Unit 4',t:'Canadian accounts · TFSA & RRSP',lessons:[{id:'tfsa_l',ic:'🍁',label:'TFSA vs RRSP'},{id:'c2',ic:'🏦',label:'Which to use when'}]}
+  {k:'Unit 1',t:'Money foundations',lessons:[
+    {id:'f_budget',ic:'🧾',label:'Where your money goes'},
+    {id:'f_emergency',ic:'🛟',label:'Your safety net'},
+    {id:'f_debt',ic:'💳',label:'The cost of debt'},
+    {id:'f_inflation',ic:'🎈',label:'Inflation, the silent tax'}]},
+  {k:'Unit 2',t:'Why invest',lessons:[
+    {id:'v_save',ic:'🐷',label:'Saving vs investing'},
+    {id:'v_compound',ic:'❄️',label:'Compounding'},
+    {id:'v_assets',ic:'🧩',label:'Stocks, ETFs & bonds'},
+    {id:'v_timing',ic:'⏳',label:'Time in the market'}]},
+  {k:'Unit 3',t:'Build a smart portfolio',lessons:[
+    {id:'p_risk',ic:'🛡️',label:'Why risk matters'},
+    {id:'risk_div',ic:'📘',label:'Spread it out'},
+    {id:'p_mix',ic:'🥗',label:'Your asset mix'},
+    {id:'p_fees',ic:'🪙',label:'Index funds & fees'},
+    {id:'uncertainty',ic:'🔭',label:'Reading forecasts'},
+    {id:'MILE',ic:'🧺',label:'Hold 3+ asset types',mile:true}]},
+  {k:'Unit 4',t:'Canadian accounts · TFSA & RRSP',lessons:[
+    {id:'c_tfsa',ic:'🍁',label:'TFSA: tax-free growth'},
+    {id:'c_rrsp',ic:'🏦',label:'RRSP: retirement'},
+    {id:'c_which',ic:'⚖️',label:'TFSA vs RRSP'},
+    {id:'c_order',ic:'📊',label:'Which account first'}]},
+  {k:'Unit 5',t:'Plan & reach your goals',lessons:[
+    {id:'g_smart',ic:'🎯',label:'Set a SMART goal'},
+    {id:'g_buckets',ic:'🪣',label:'Short vs long-term'},
+    {id:'g_howmuch',ic:'💧',label:'How much to invest'},
+    {id:'g_ready',ic:'🎓',label:'Ready for real money?'}]}
 ];}
 function lessonStates(){
   var units=learnUnits(),map={},gate=true,activeId=null;
@@ -1709,7 +1929,7 @@ function pickWhyG(el,i){GOAL_DRAFT.why=WHYS[i];el.parentNode.querySelectorAll('.
 function pickAcctG(el,i){GOAL_DRAFT.account=ACCTS[i].k;el.parentNode.querySelectorAll('.acct').forEach(function(x){x.classList.remove('sel-acct');x.style.opacity='.65';});el.classList.add('sel-acct');el.style.opacity='1';}
 function setGAmt(v){GOAL_DRAFT.amt=parseInt((''+v).replace(/[^0-9]/g,''))||0;}
 function setGPct(v){GOAL_DRAFT.pct=v;var el=document.getElementById('ldonut');if(el)el.innerHTML=ldonutInner(v,Math.round((GOAL_DRAFT.income||2500)*v/100));}
-function saveGoal(){GOAL=Object.assign(GOAL,GOAL_DRAFT);closeL();learnXP(20);showToast('🎯 Goal saved · +20 XP');renderLearn();}
+function saveGoal(){GOAL=Object.assign(GOAL,GOAL_DRAFT);closeL();learnXP(20);showToast('🎯 Goal saved · +20 XP');renderGoalCard();renderLearn();}
 function openL(html){document.getElementById('lsheetInner').innerHTML=html;document.getElementById('lsheetOv').classList.add('open');var sh=document.querySelector('#lsheetOv .sheet');if(sh)sh.scrollTop=0;}
 function closeL(){document.getElementById('lsheetOv').classList.remove('open');}
 function renderLearn(){
@@ -1718,7 +1938,7 @@ function renderLearn(){
   h+='<div class="dstrip"><div class="dstat"><span>🔥</span><div><div class="ds-v">'+LEARN.streak+'</div><div class="ds-k">day streak</div></div></div>'
     +'<div class="dstat">'+lring(daily,50)+'<div><div class="ds-v">'+daily+'/50</div><div class="ds-k">daily goal</div></div></div>'
     +'<div class="dstat"><span>💎</span><div><div class="ds-v">'+LEARN.gems+'</div><div class="ds-k">gems</div></div></div></div>';
-  h+='<div class="goal-hero" onclick="openGoalSetup()"><div class="gh-top"><div class="gh-t">🎯 '+goalTitle(g)+'</div><span class="gh-pct">'+gpct+'%</span></div><div class="gh-bar"><i style="width:'+gpct+'%"></i></div><div class="gh-sub"><span>'+money0(g.saved)+' of '+money0(g.amt)+'</span><span>'+g.years+'-yr plan · ✏️ adjust</span></div></div>';
+  /* goal banner moved to the Home save card (openGoalSetup) */
   h+=miaGuide();
   var L_states=lessonStates();
   learnUnits().forEach(function(u){
@@ -1776,7 +1996,7 @@ renderOB();
 renderPortfolio();renderHoldings();sfSelect('AAPL');
 renderFc('AAPL');loadIndices();
 checkSkillUnlocks();renderLearn();
-renderQOTD();renderPlan();
+renderQOTD();renderPlan();renderGoalCard();
 </script>
 </body>
 </html>
