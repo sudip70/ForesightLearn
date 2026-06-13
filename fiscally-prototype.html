@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>Fiscally — Mobile Prototype</title>
+<title>Fiscally · Mobile Prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -293,6 +293,37 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .ms-t{font-size:13px;font-weight:700;line-height:1.4}
 .ob-foot{padding:14px 22px calc(14px + env(safe-area-inset-bottom));background:var(--bg)}
 
+/* ── Welcome / splash (first launch) ────────── */
+#welcome{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;overflow:hidden;color:#fff;
+  background:linear-gradient(162deg,#6f659a 0%,#857aad 40%,#a99cd0 76%,#c6b9e2 100%)}
+#welcome.hidden{display:none}
+#welcome::after{content:"";position:absolute;right:-72px;top:-46px;width:236px;height:236px;background:rgba(255,255,255,.10);border-radius:50%}
+#welcome::before{content:"";position:absolute;left:-64px;bottom:118px;width:184px;height:184px;background:rgba(255,255,255,.07);border-radius:50%}
+.wel-inner{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px 26px;position:relative;z-index:2;text-align:center}
+.wel-mark{width:84px;height:84px;border-radius:24px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.30);box-shadow:0 16px 40px -12px rgba(40,30,70,.55);
+  animation:welPop .55s cubic-bezier(.2,.9,.3,1.25) both}
+.wel-mark svg{width:48px;height:48px}
+@keyframes welPop{from{opacity:0;transform:scale(.7) translateY(8px)}to{opacity:1;transform:none}}
+.wel-word{font-size:40px;font-weight:800;letter-spacing:-1.2px;line-height:1;margin-bottom:11px;animation:welRise .5s .05s both}
+.wel-tag{font-size:14.5px;font-weight:600;line-height:1.5;opacity:.93;max-width:286px;margin-bottom:22px;animation:welRise .5s .12s both}
+.wel-mia{display:flex;gap:11px;align-items:center;text-align:left;max-width:332px;margin-bottom:22px;padding:12px 14px;border-radius:18px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);box-shadow:0 10px 30px -14px rgba(40,30,70,.5);animation:welRise .5s .19s both}
+.wel-mia .face{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,.5)}
+.wel-mia-b{font-size:13px;line-height:1.5;font-weight:500}
+.wel-mia-b b{font-weight:800}
+.wel-loop{display:flex;align-items:center;justify-content:center;gap:7px;animation:welRise .5s .26s both}
+.wl-step{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:20px;font-size:12.5px;font-weight:800;letter-spacing:-.1px;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.22)}
+.wl-step .wl-e{font-size:14px}
+.wl-arrow{opacity:.6;font-weight:800;font-size:13px}
+.wel-foot{padding:8px 26px calc(20px + env(safe-area-inset-bottom));position:relative;z-index:2;animation:welRise .5s .33s both}
+.wel-cta{width:100%;padding:16px;border-radius:14px;border:none;font-family:var(--font);font-size:15.5px;font-weight:800;cursor:pointer;
+  background:#fff;color:var(--purple-deep);box-shadow:0 12px 30px -8px rgba(40,30,70,.45);transition:transform .1s}
+.wel-cta:active{transform:scale(.985)}
+.wel-note{display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;font-size:11.5px;font-weight:600;opacity:.84;margin-top:13px}
+@keyframes welRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
 /* ── Donut & gauge wrap ─────────────────────── */
 .chart-wrap{display:flex;justify-content:center;align-items:center}
 .donut-val{font-size:30px;font-weight:800;fill:var(--purple-deep)}
@@ -488,6 +519,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .pstep-d{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
 .pstep.now .pstep-d{color:var(--purple-strong);font-weight:700}
 .pstep-go{font-size:24px;color:var(--faint);font-weight:300;align-self:center}
+
+/* ── Home: slim greeting, next-step glance, compact QOTD ── */
+.home-greet{font-size:13.5px;font-weight:600;color:var(--muted);line-height:1.5;margin:7px 2px 14px}
+.home-greet b{color:var(--ink);font-weight:800}
+.nextcard{background:var(--surface);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);cursor:pointer;transition:transform .1s}
+.nextcard:active{transform:scale(.99)}
+.nextcard-k{font-size:11px;font-weight:800;color:var(--purple);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.nextstep{display:flex;align-items:center;gap:12px}
+.nextstep-ic{width:30px;height:30px;border-radius:50%;background:var(--purple-deep);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:850;flex:0 0 auto;box-shadow:0 0 0 4px var(--purple-soft)}
+.nextstep-b{flex:1;min-width:0}
+.nextstep-t{font-size:14.5px;font-weight:800;letter-spacing:-.2px}
+.nextstep-d{font-size:11.5px;color:var(--purple-strong);font-weight:700;margin-top:2px}
+.plan-more-row{text-align:center;margin:10px 0 13px}
+.plan-more{display:inline-block;font-size:12px;font-weight:800;color:var(--purple-strong);cursor:pointer;padding:4px 8px}
+.q-mid{min-width:0;flex:1}
+.q-cta{display:inline-block;margin-top:9px;font-size:12.5px;font-weight:800;color:var(--purple-strong)}
+.qcard:not(.open) .q-top{margin-bottom:0}
 /* Practice: trade asset header */
 .trade-asset{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .ta-t{font-size:18px;font-weight:850;display:flex;align-items:center;gap:8px}
@@ -521,6 +569,36 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 </head>
 <body>
 <div id="app">
+
+  <!-- ════ WELCOME ════ -->
+  <div id="welcome">
+    <div class="wel-inner">
+      <div class="wel-mark">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M24 41 C24 33 23 28 24 22" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          <path d="M24 28 C16 29 11 23.5 11 15.5 C19 15.5 24 20.5 24 28 Z" fill="#fff" opacity=".96"/>
+          <path d="M24.5 24.5 C32 25.5 37 19.5 37 12 C29 12 24.5 17.2 24.5 24.5 Z" fill="#fff" opacity=".78"/>
+        </svg>
+      </div>
+      <div class="wel-word">Fiscally</div>
+      <div class="wel-tag">Learn money and practice investing. Calm, friendly, and risk-free.</div>
+      <div class="wel-mia">
+        <div class="face">__AV__</div>
+        <div class="wel-mia-b">Hi, I'm <b>Mia</b> 👋 I'll be right here, turning the confusing parts of investing into simple, friendly steps.</div>
+      </div>
+      <div class="wel-loop">
+        <div class="wl-step"><span class="wl-e">💡</span>Learn</div>
+        <div class="wl-arrow">→</div>
+        <div class="wl-step"><span class="wl-e">🪙</span>Practice</div>
+        <div class="wl-arrow">→</div>
+        <div class="wl-step"><span class="wl-e">🌱</span>Grow</div>
+      </div>
+    </div>
+    <div class="wel-foot">
+      <button class="wel-cta" onclick="startWelcome()">Get started</button>
+      <div class="wel-note">🌱 Practice money only · your real money stays safe</div>
+    </div>
+  </div>
 
   <!-- ════ ONBOARDING ════ -->
   <div id="onboarding">
@@ -577,11 +655,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       <!-- OB5 account -->
       <div class="ob-screen" data-ob="5">
         <div class="ob-h">What account should I use?</div>
-        <div class="ob-p">Let's start with a <b>TFSA</b> — a kind of savings account. We'll explain more as we go!</div>
+        <div class="ob-p">Let's start with a <b>TFSA</b>, a kind of savings account. We'll explain more as we go!</div>
         <div class="mia" style="margin-top:10px">
           <div class="face">__AV__</div>
           <div>
-            <div class="bubble">Your <b>TFSA</b> is a Tax-Free Savings Account. Every dollar it earns is yours to keep — no tax on the growth!</div>
+            <div class="bubble">Your <b>TFSA</b> is a Tax-Free Savings Account. Every dollar it earns is yours to keep, no tax on the growth!</div>
             <button class="whats" onclick="openTip('tfsa')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>What's That?</button>
           </div>
         </div>
@@ -623,10 +701,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 
     <!-- ─── HOME ─── -->
     <div class="page active" id="page-home">
-      <div class="mia">
-        <div class="face">__AV__</div>
-        <div><div class="bubble">Welcome back 👋 You're <b>4 days</b> in and your portfolio's <b>in the green</b> — nice, steady momentum.</div></div>
-      </div>
+      <div class="home-greet">Welcome back 👋 You're <b>4 days</b> in, and you're <b>in the green</b>.</div>
 
       <div class="hero" style="cursor:pointer" onclick="goTab('journey')">
         <div class="hero-l">Your practice portfolio · tap to open ›</div>
@@ -639,11 +714,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
         </div>
       </div>
 
-      <div id="homeQuestion"></div>
-
       <div id="homeGoal"></div>
 
       <div id="homePlan"></div>
+
+      <div id="homeQuestion"></div>
     </div>
 
     <!-- ─── JOURNEY (sub) ─── -->
@@ -674,7 +749,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       <div class="mia" style="margin:2px 0 13px">
         <div class="face">__AV__</div>
         <div>
-          <div class="bubble">Buy and sell below to practice — it's all <b>virtual cash</b>, zero risk. Your <b>TFSA</b> keeps every gain tax-free.</div>
+          <div class="bubble">Buy and sell below to practice, it's all <b>virtual cash</b>, zero risk. Your <b>TFSA</b> keeps every gain tax-free.</div>
           <button class="whats" onclick="openTip('tfsa')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>What's That?</button>
         </div>
       </div>
@@ -729,14 +804,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       <div class="mia">
         <div class="face">__AV__</div>
         <div>
-          <div class="bubble">The line <b>averages out</b> the daily ups and downs — that's compounding doing its quiet work over time.</div>
+          <div class="bubble">The line <b>averages out</b> the daily ups and downs, that's compounding doing its quiet work over time.</div>
           <button class="whats" onclick="openTip('compound')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>What's That?</button>
         </div>
       </div>
 
       <div class="section-t">More Scenarios</div>
       <div class="scenario-card" onclick="showToast('🔒 Complete Mia\'s Journey to unlock')">
-        <div class="sc-ico">🐻</div><div class="sc-body"><div class="sc-ttl">Riding a Bear Market</div><div class="sc-dsc">See how a downturn feels — and why holding on matters.</div></div>
+        <div class="sc-ico">🐻</div><div class="sc-body"><div class="sc-ttl">Riding a Bear Market</div><div class="sc-dsc">See how a downturn feels, and why holding on matters.</div></div>
         <span class="pill pill-gry">+125 XP</span>
       </div>
       <div class="scenario-card" onclick="showToast('🔒 Complete Mia\'s Journey to unlock')">
@@ -770,7 +845,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 
       <div class="mia">
         <div class="face">__AV__</div>
-        <div><div class="bubble" id="riskTip">A <b>Low</b> risk plan grows slowly but steadily — your money rarely dips. Great for short-term goals.</div></div>
+        <div><div class="bubble" id="riskTip">A <b>Low</b> risk plan grows slowly but steadily, your money rarely dips. Great for short-term goals.</div></div>
       </div>
 
       <div class="btn-row">
@@ -849,7 +924,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     <!-- ─── SOCIAL ─── -->
     <div class="page" id="page-social">
       <div class="page-title">Profile</div>
-      <div class="page-sub">Your level, goals and badges — and the community.</div>
+      <div class="page-sub">Your level, goals and badges, and the community.</div>
 
       <div class="hero" style="background:linear-gradient(140deg,#4f9c7e,#6bbf9c)">
         <div class="hero-l">Your Level</div>
@@ -941,19 +1016,19 @@ document.body.innerHTML=document.body.innerHTML.replace(/__AV__/g,avatar()).repl
 
 /* ── Data ────────────────────────────────────── */
 var GLOSS={
-  tfsa:{t:'TFSA',d:'A Tax-Free Savings Account. Any interest, dividends or growth you earn inside it is completely tax-free — you never pay tax on the gains, even when you withdraw. The best first account for most Canadians.'},
-  rrsp:{t:'RRSP',d:'A Registered Retirement Savings Plan. Contributions lower your taxable income today, and you only pay tax later when you withdraw in retirement — usually at a lower rate.'},
-  etf:{t:'ETF',d:'An Exchange-Traded Fund bundles many stocks or bonds into one. Buy a single ETF and you instantly own a slice of all of them — instant diversification, low effort.'},
-  compound:{t:'Compound Interest',d:'Earning returns on your returns. Each period your gains get added to your balance, so the next period earns even more. Over years it snowballs — the earlier you start, the bigger it grows.'},
-  risk:{t:'Risk',d:'How much an investment can swing up or down. Higher risk can mean bigger gains — and bigger losses. Matching risk to your time horizon is the heart of smart investing.'},
+  tfsa:{t:'TFSA',d:'A Tax-Free Savings Account. Any interest, dividends or growth you earn inside it is completely tax-free, you never pay tax on the gains, even when you withdraw. The best first account for most Canadians.'},
+  rrsp:{t:'RRSP',d:'A Registered Retirement Savings Plan. Contributions lower your taxable income today, and you only pay tax later when you withdraw in retirement, usually at a lower rate.'},
+  etf:{t:'ETF',d:'An Exchange-Traded Fund bundles many stocks or bonds into one. Buy a single ETF and you instantly own a slice of all of them, instant diversification, low effort.'},
+  compound:{t:'Compound Interest',d:'Earning returns on your returns. Each period your gains get added to your balance, so the next period earns even more. Over years it snowballs, the earlier you start, the bigger it grows.'},
+  risk:{t:'Risk',d:'How much an investment can swing up or down. Higher risk can mean bigger gains, and bigger losses. Matching risk to your time horizon is the heart of smart investing.'},
   diversification:{t:'Diversification',d:'Spreading your money across different assets so one bad pick can\'t sink you. The classic line: don\'t put all your eggs in one basket.'},
   bull:{t:'Bull Market',d:'A stretch when prices rise 20%+ from a recent low, often over months. Optimism is high and investors expect gains to continue.'},
   bear:{t:'Bear Market',d:'A stretch when prices fall 20%+ from a recent high. It feels scary, but for long-term investors it can be a chance to buy at lower prices.'},
   inflation:{t:'Inflation',d:'The gradual rise in prices over time, which quietly erodes the buying power of cash. Investing aims to grow your money faster than inflation shrinks it.'},
   dividend:{t:'Dividend',d:'A slice of a company\'s profit paid out to shareholders, usually every quarter. Reinvesting dividends is a powerful way to compound faster.'},
-  concentration:{t:'Concentration',d:'How much of your money sits in one place — one holding or one sector. High concentration means one bad move hits you hard.'},
+  concentration:{t:'Concentration',d:'How much of your money sits in one place, one holding or one sector. High concentration means one bad move hits you hard.'},
   position_sizing:{t:'Position sizing',d:'Deciding how much to put into one holding. A common guardrail: keep any single position under about 25% of your money.'},
-  uncertainty:{t:'Why a range, not a number',d:'Nobody can predict a price. A range shows the outcomes that are realistically plausible — and honestly reminds you the future isn\'t knowable.'},
+  uncertainty:{t:'Why a range, not a number',d:'Nobody can predict a price. A range shows the outcomes that are realistically plausible, and honestly reminds you the future isn\'t knowable.'},
   bouncy:{t:'Bounciness (volatility)',d:'How much a price swings around. Bouncier investments can grow faster, but they can also drop harder.'}
 };
 var FC={
@@ -1033,7 +1108,7 @@ var scenVals=[100,100.4,100.2,100.7,100.5,101,101.3,101.1];
 document.getElementById('scenarioChart').innerHTML=areaChart(scenVals,300,120,'#7d72a8');
 /* Stock Finder now renders a live forecast fan chart (see sfSelect) */
 renderGauge(20);renderDonut(10);onCalc();
-/* NOTE: live-data init (renderFc/loadIndices) runs at the very end of the script —
+/* NOTE: live-data init (renderFc/loadIndices) runs at the very end of the script;
    it depends on `var API` which is assigned further down. */
 
 function renderDonut(pct){
@@ -1081,7 +1156,12 @@ function finishOB(){
   goTab('home');
   setTimeout(function(){showToast('🎉 Your journey has begun!');},400);
 }
-function restartOnboarding(){obStep=1;renderOB();document.getElementById('onboarding').classList.remove('hidden');document.getElementById('appHeader').classList.add('hidden');document.getElementById('appNav').classList.add('hidden');}
+function startWelcome(){
+  var w=document.getElementById('welcome');
+  w.style.transition='opacity .4s ease';w.style.opacity='0';
+  setTimeout(function(){w.classList.add('hidden');w.style.opacity='';w.style.transition='';},400);
+}
+function restartOnboarding(){obStep=1;renderOB();document.getElementById('welcome').classList.remove('hidden');document.getElementById('onboarding').classList.remove('hidden');document.getElementById('appHeader').classList.add('hidden');document.getElementById('appNav').classList.add('hidden');}
 function pickExp(el,v){document.querySelectorAll('.exp-card').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');}
 function pickWhy(el){document.querySelectorAll('.why').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');}
 function onPct(v){
@@ -1165,7 +1245,7 @@ function chartSeries(r){var T=totals().total,M={'1M':[22,0.985,11],'3M':[64,0.96
 function lineChart(data,w,h,color,range){
   var padX=8,padT=10,padB=20,mn=Math.min.apply(null,data),mx=Math.max.apply(null,data),rg=(mx-mn)||1,n=data.length,sx=(w-padX*2)/(n-1);
   function X(i){return padX+i*sx;}function Y(v){return padT+(h-padT-padB)*(1-(v-mn)/rg);}
-  /* crisp straight segments — keep every data point's nuance */
+  /* crisp straight segments, keep every data point's nuance */
   var line=data.map(function(v,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1);}).join(' ');
   var ex=X(n-1).toFixed(1),ey=Y(data[n-1]).toFixed(1),gid='g'+Math.round(Math.random()*1e6);
   var base=(h-padB).toFixed(1),area=line+' L'+ex+' '+base+' L'+X(0).toFixed(1)+' '+base+' Z';
@@ -1210,10 +1290,10 @@ function renderHoldings(){
     var COLW={stock:'#9084b4',etf:'#5b8def',crypto:'#e0a92f'};
     var seg=Object.keys(mix.by).map(function(c){return '<div style="width:'+(mix.by[c]/mix.inv*100)+'%;background:'+(COLW[c]||'#9084b4')+'"></div>';}).join('');
     var labels=Object.keys(mix.by).map(function(c){return Math.round(mix.by[c]/mix.inv*100)+'% '+c;}).join(' · ');
-    var read=mix.classes>=3?'Nicely spread across '+mix.classes+' asset types 🧺':'Mostly in '+mix.classes+' type'+(mix.classes>1?'s':'')+' — spreading out lowers risk';
+    var read=mix.classes>=3?'Nicely spread across '+mix.classes+' asset types 🧺':'Mostly in '+mix.classes+' type'+(mix.classes>1?'s':'')+', spreading out lowers risk';
     html+='<div class="card"><div class="card-t" style="margin-bottom:10px">Portfolio analytics</div><div class="mixbar">'+seg+'</div><div class="mininote" style="margin-top:9px"><b style="color:var(--ink)">'+read+'</b><br>'+labels+'</div></div>';
   }
-  if(!PF.pos.length){html='<div class="card"><div class="muted-note" style="text-align:left">No holdings yet. Tap <b>Trade</b> to make your first paper investment — virtual cash, zero risk.</div></div>';}
+  if(!PF.pos.length){html='<div class="card"><div class="muted-note" style="text-align:left">No holdings yet. Tap <b>Trade</b> to make your first paper investment, virtual cash, zero risk.</div></div>';}
   else{
     html+='<div class="card"><div class="row" style="margin-bottom:13px"><div class="card-t" style="margin-bottom:0">Positions</div><span class="pill pill-pur">'+PF.pos.length+' holdings</span></div>';
     PF.pos.forEach(function(p){
@@ -1269,12 +1349,12 @@ function renderTradePanel(){
   if(tradeAction==='buy'){
     var fc=TRADE_FC[t];
     if(fc){var lo=px*(1+fc.bear),hi=px*(1+fc.bull),mid=px*(1+fc.base);
-      h+='<div class="pretrade-card"><div class="pretrade-title" style="color:var(--purple-deep)">🔭 A range, not a prediction</div><div style="font-size:12.5px;color:var(--purple-strong);line-height:1.5">Over the next 3 months, '+bn+' could realistically sit between <b>'+money(lo)+'</b> and <b>'+money(hi)+'</b> — most likely near '+money(mid)+'. Nobody can call which; that\'s exactly why we practice first.</div></div>';
+      h+='<div class="pretrade-card"><div class="pretrade-title" style="color:var(--purple-deep)">🔭 A range, not a prediction</div><div style="font-size:12.5px;color:var(--purple-strong);line-height:1.5">Over the next 3 months, '+bn+' could realistically sit between <b>'+money(lo)+'</b> and <b>'+money(hi)+'</b>, most likely near '+money(mid)+'. Nobody can call which; that\'s exactly why we practice first.</div></div>';
     }else h+='<div class="muted-note" style="text-align:left">Loading '+bn+'\'s outlook…</div>';
   }else{
     if(have){var pl=(px-have.avg)*Math.min(sh||have.sh,have.sh);
-      h+='<div class="pretrade-card" style="background:var(--purple-soft);border-color:var(--purple-line)"><div class="pretrade-title" style="color:var(--purple-deep)">You hold '+have.sh+' × '+bn+' · avg '+money(have.avg)+'</div><div style="font-size:12.5px;color:var(--purple-strong)">Selling '+(sh||have.sh)+' now locks in about <b>'+signed(pl)+'</b> as realized P&amp;L — that part becomes final.</div></div>';
-    }else h+='<div class="muted-note" style="text-align:left">You don\'t hold any '+bn+' yet — switch to <b>Buy</b> to start a position.</div>';
+      h+='<div class="pretrade-card" style="background:var(--purple-soft);border-color:var(--purple-line)"><div class="pretrade-title" style="color:var(--purple-deep)">You hold '+have.sh+' × '+bn+' · avg '+money(have.avg)+'</div><div style="font-size:12.5px;color:var(--purple-strong)">Selling '+(sh||have.sh)+' now locks in about <b>'+signed(pl)+'</b> as realized P&amp;L, that part becomes final.</div></div>';
+    }else h+='<div class="muted-note" style="text-align:left">You don\'t hold any '+bn+' yet, switch to <b>Buy</b> to start a position.</div>';
   }
   h+='<button class="btn btn-pur" style="margin-top:12px" onclick="execTrade()">'+(tradeAction==='buy'?'Buy ':'Sell ')+bn+'</button>';
   el.innerHTML=h;
@@ -1287,7 +1367,7 @@ function execTrade(){
   if(!sh||sh<=0){showToast('Enter how many shares');return;}
   var t=tradeTicker,p=curPx(t),val=sh*p,bn=t.replace('-USD','');
   if(tradeAction==='buy'){
-    if(val>PF.cash){showToast('Not enough cash — you have '+money(PF.cash));return;}
+    if(val>PF.cash){showToast('Not enough cash, you have '+money(PF.cash));return;}
     PF.cash-=val;
     var ex=PF.pos.filter(function(x){return x.t===t;})[0];
     if(ex){var tot=ex.sh+sh;ex.avg=(ex.sh*ex.avg+sh*p)/tot;ex.sh=tot;}
@@ -1301,7 +1381,7 @@ function execTrade(){
     if(pos.sh<=0.0001)PF.pos=PF.pos.filter(function(x){return x.t!==t;});
     ACTIVITY.unshift({ic:'🔴',main:'Sold '+sh+' × '+bn,sub:'Day 4 · @ '+money(p),amt:'+'+money(val),cls:realized>=0?'up':'down'});
     showToast((realized>=0?'✓ Sold for a gain':'Sold')+' '+sh+' × '+bn);
-    openSheet((realized>=0?'🎉 ':'')+'Trade complete — '+signed(realized)+' realized','You bought '+bn+' at an average of '+money(pos.avg)+' and sold at '+money(p)+'. That\'s a '+signed(realized)+' '+(realized>=0?'gain':'loss')+', now locked in as realized P&L. '+(realized>=0?'Nice work!':'Every trade is a lesson on the way.'));
+    openSheet((realized>=0?'🎉 ':'')+'Trade complete, '+signed(realized)+' realized','You bought '+bn+' at an average of '+money(pos.avg)+' and sold at '+money(p)+'. That\'s a '+signed(realized)+' '+(realized>=0?'gain':'loss')+', now locked in as realized P&L. '+(realized>=0?'Nice work!':'Every trade is a lesson on the way.'));
   }
   var shIn=document.getElementById('tradeSh');if(shIn)shIn.value='';
   renderPortfolio();renderTradePanel();refreshLearn();
@@ -1326,7 +1406,7 @@ function renderPlan(){
     +'<div class="milestone"><div class="ms-n">3</div><div class="ms-t">Contribute 10% of your earnings monthly</div></div>'
     +'<div class="milestone"><div class="ms-n">4</div><div class="ms-t">Open a real TFSA &amp; apply what you\'ve learned!</div></div>';
 }
-function planNote(){var yr=contrib.amt*(contrib.freq==='Weekly'?52:12);return 'Fiscally will remind you to invest $'+contrib.amt+' '+contrib.freq.toLowerCase()+' — about '+('$'+yr.toLocaleString())+'/yr toward your goal.';}
+function planNote(){var yr=contrib.amt*(contrib.freq==='Weekly'?52:12);return 'Fiscally will remind you to invest $'+contrib.amt+' '+contrib.freq.toLowerCase()+', about '+('$'+yr.toLocaleString())+'/yr toward your goal.';}
 function setFreq(f){contrib.freq=f;renderPlan();}
 function openSheet(term,def){document.getElementById('sheetTerm').textContent=term;document.getElementById('sheetDef').textContent=def;document.getElementById('sheetOv').classList.add('open');}
 /* ── Stock Finder · 56 assets + live forecast ── */
@@ -1362,12 +1442,12 @@ function loadSF(){
     SF_CACHE[key]=d;if(p&&p.fields)PROFILE_CACHE[a.t]=p;
     if(sfCurrent&&sfCurrent.t===a.t)paintSF(a,d,PROFILE_CACHE[a.t]);
   }).catch(function(){
-    if(sfCurrent&&sfCurrent.t===a.t)document.getElementById('sfDetail').innerHTML='<div class="card"><div class="muted-note" style="text-align:left">Couldn\'t reach the forecast server for '+a.t+' — it may be asleep.</div><button class="btn btn-soft" style="margin-top:11px" onclick="loadSF()">Retry</button></div>';
+    if(sfCurrent&&sfCurrent.t===a.t)document.getElementById('sfDetail').innerHTML='<div class="card"><div class="muted-note" style="text-align:left">Couldn\'t reach the forecast server for '+a.t+', it may be asleep.</div><button class="btn btn-soft" style="margin-top:11px" onclick="loadSF()">Retry</button></div>';
   });
 }
 function sfMoney(n){return n>=1000?'$'+n.toLocaleString(undefined,{maximumFractionDigits:0}):(n>=1?'$'+n.toFixed(2):'$'+n.toFixed(4));}
-function fmtCap(n){if(!n)return '—';if(n>=1e12)return '$'+(n/1e12).toFixed(2)+'T';if(n>=1e9)return '$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return '$'+(n/1e6).toFixed(2)+'M';return '$'+n.toFixed(0);}
-function fmtVol(n){if(!n)return '—';if(n>=1e9)return (n/1e9).toFixed(2)+'B';if(n>=1e6)return (n/1e6).toFixed(2)+'M';if(n>=1e3)return (n/1e3).toFixed(1)+'K';return ''+n;}
+function fmtCap(n){if(!n)return 'n/a';if(n>=1e12)return '$'+(n/1e12).toFixed(2)+'T';if(n>=1e9)return '$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return '$'+(n/1e6).toFixed(2)+'M';return '$'+n.toFixed(0);}
+function fmtVol(n){if(!n)return 'n/a';if(n>=1e9)return (n/1e9).toFixed(2)+'B';if(n>=1e6)return (n/1e6).toFixed(2)+'M';if(n>=1e3)return (n/1e3).toFixed(1)+'K';return ''+n;}
 function forecastChart(hist,bear,base,bull,w,h){
   var pad=8,nH=hist.length,nF=base.length,all=hist.concat(bear,base,bull);
   var mn=Math.min.apply(null,all),mx=Math.max.apply(null,all),rg=(mx-mn)||1;
@@ -1412,8 +1492,8 @@ function paintSF(a,d,p){
     +'<div id="sfChart">'+forecastChart(hist,bear,base,bull,300,152)+'</div>'
     +'<div class="sf-legend"><span><i style="background:#4f9c7e"></i>Past &amp; likely</span><span><i style="background:#5b8def"></i>If it goes well</span><span><i style="background:#cf5a40"></i>If it goes poorly</span><span style="color:var(--faint)">┊ today</span></div>'
     +'</div>';
-  // Mia verdict — the gist in plain words
-  html+='<div class="mia"><div class="face">'+avatar()+'</div><div><div class="bubble">Nobody can predict this — but over the next <b>'+hWords(H)+'</b>, '+bn+' could realistically land anywhere from ~'+sfMoney(d.target_prices.bear)+' to ~'+sfMoney(d.target_prices.bull)+', most likely near <b>'+sfMoney(d.target_prices.base)+'</b> ('+pc(d.returns.base)+').</div><button class="whats" onclick="openSheet(\'Why three numbers?\',\''+(lit.bear_base_bull||'Bear, base and bull are scenario ranges, not guaranteed prices.').replace(/'/g,"\\'")+'\')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>Why three numbers?</button></div></div>';
+  // Mia verdict, the gist in plain words
+  html+='<div class="mia"><div class="face">'+avatar()+'</div><div><div class="bubble">Nobody can predict this, but over the next <b>'+hWords(H)+'</b>, '+bn+' could realistically land anywhere from ~'+sfMoney(d.target_prices.bear)+' to ~'+sfMoney(d.target_prices.bull)+', most likely near <b>'+sfMoney(d.target_prices.base)+'</b> ('+pc(d.returns.base)+').</div><button class="whats" onclick="openSheet(\'Why three numbers?\',\''+(lit.bear_base_bull||'Bear, base and bull are scenario ranges, not guaranteed prices.').replace(/'/g,"\\'")+'\')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>Why three numbers?</button></div></div>';
   // scenario cards with plain micro-labels
   html+='<div class="card"><div class="scn3">'
     +'<div class="c bear"><div class="l">Rough case</div><div class="v">'+sfMoney(d.target_prices.bear)+'</div><div class="p">'+pc(d.returns.bear)+'</div></div>'
@@ -1421,7 +1501,7 @@ function paintSF(a,d,p){
     +'<div class="c bull"><div class="l">Strong case</div><div class="v">'+sfMoney(d.target_prices.bull)+'</div><div class="p">'+pc(d.returns.bull)+'</div></div>'
     +'</div></div>';
   // one teaching point (risk, plain)
-  html+='<div class="teach"><div class="teach-ic">💡</div><div><b>'+bn+'</b> is '+bouncyWord(volPct)+' — its price can swing about <b>'+volPct.toFixed(0)+'%</b> in a year. '+classContext(a.c,volPct)+'</div></div>';
+  html+='<div class="teach"><div class="teach-ic">💡</div><div><b>'+bn+'</b> is '+bouncyWord(volPct)+', its price can swing about <b>'+volPct.toFixed(0)+'%</b> in a year. '+classContext(a.c,volPct)+'</div></div>';
   // collapsible: all the numbers
   html+='<button class="sf-toggle" id="sfNumBtn" onclick="toggleSFNumbers()">'+(sfShowNumbers?'Hide the numbers ▴':'See all the numbers ▾')+'</button>';
   html+='<div id="sfNumbers" style="display:'+(sfShowNumbers?'block':'none')+'">';
@@ -1431,7 +1511,7 @@ function paintSF(a,d,p){
     +mrow('Bounciness (volatility)',volPct.toFixed(1)+'%','How much the price moves around. It has swung about '+volPct.toFixed(0)+'% up or down over a year.')
     +mrow('Worst drop','-'+ddPct.toFixed(0)+'%','The biggest fall from a recent high. Holding through it, your money dipped about '+ddPct.toFixed(0)+'% before recovering.')
     +mrow('Confidence',conf+'% · '+d.confidence_label,'How sure the model is, based on how clean and steady recent data is.')
-    +mrow('Risk level',d.risk_label,'A plain rating of how much this could swing — currently '+(d.risk_label||'').toLowerCase()+'.')
+    +mrow('Risk level',d.risk_label,'A plain rating of how much this could swing, currently '+(d.risk_label||'').toLowerCase()+'.')
     +'</div>';
   var since=(fc&&fc.available&&fc.previous_as_of)?('Barely moved since '+fc.previous_as_of+' (base '+(fc.base_return_delta>=0?'+':'')+(fc.base_return_delta*100).toFixed(2)+'%).'):'';
   html+='<div class="card"><div class="card-t">Where this data comes from</div><div style="display:flex;gap:7px;flex-wrap:wrap'+(since?';margin-bottom:9px':'')+'"><span class="pill pill-grn">'+(dq.freshness_label||'Fresh')+'</span><span class="pill pill-pur">Daily snapshot</span><span class="pill pill-gry">'+(d.data_as_of||dq.as_of_date||'')+'</span></div>'+(since?'<div class="mrow-s" style="margin:0">'+since+'</div>':'')+'</div>';
@@ -1447,7 +1527,7 @@ function paintSF(a,d,p){
   html+='</div>';
   // about (brief)
   var about=(pf.sector?bn+' is a '+a.c+' in the '+pf.sector+' sector'+(pf.industry?' ('+pf.industry+')':'')+'. ':'')+(d.plain_language||'');
-  html+='<div class="card"><div class="card-t">About '+bn+'</div><div style="font-size:13px;color:var(--muted);line-height:1.6">'+about+' <span style="font-size:11px">These are model estimates for learning — not advice. Data as of '+(d.data_as_of||dq.as_of_date||'')+'.</span></div></div>';
+  html+='<div class="card"><div class="card-t">About '+bn+'</div><div style="font-size:13px;color:var(--muted);line-height:1.6">'+about+' <span style="font-size:11px">These are model estimates for learning, not advice. Data as of '+(d.data_as_of||dq.as_of_date||'')+'.</span></div></div>';
   html+='<button class="btn btn-pur" onclick="showToast(\'Added '+bn+' to watchlist ⭐\')">+ Add to Watchlist</button>';
   document.getElementById('sfDetail').innerHTML=html;
 }
@@ -1465,7 +1545,7 @@ function renderFc(t){
   var d=FC[t];
   document.getElementById('fcScen').innerHTML=scenGrid(d.bear,d.base,d.bull)
     +'<div class="row" style="margin-top:11px"><span id="fcStatus" style="font-size:11px;color:var(--muted);font-weight:700">Updating…</span></div>';
-  document.getElementById('fcTip').innerHTML='Nobody can predict <b>'+t+'</b> — so here\'s the <b>range</b>: a rough case, the most-likely middle, and a strong case. Plan around the middle.';
+  document.getElementById('fcTip').innerHTML='Nobody can predict <b>'+t+'</b>, so here\'s the <b>range</b>: a rough case, the most-likely middle, and a strong case. Plan around the middle.';
   loadForecast(t);
 }
 
@@ -1520,7 +1600,7 @@ function loadForecast(t){
      if(d.plain_language)document.getElementById('fcTip').innerHTML=d.plain_language;
    }).catch(function(){
      if(fcCurrent!==t)return;
-     var s=st();if(s)s.innerHTML='Showing sample numbers — <a href="#" onclick="renderFc(\''+t+'\');return false;" style="color:#7d72a8;font-weight:800;text-decoration:none">retry</a>';
+     var s=st();if(s)s.innerHTML='Showing sample numbers, <a href="#" onclick="renderFc(\''+t+'\');return false;" style="color:#7d72a8;font-weight:800;text-decoration:none">retry</a>';
    });
 }
 
@@ -1542,9 +1622,9 @@ function onRisk(v){
   document.getElementById('riskRate').textContent=pct+'%';
   document.getElementById('riskReturn').textContent='+$'+ret;
   var tip;
-  if(v<33)tip='A <b>Low</b> risk plan grows slowly but steadily — your money rarely dips. Great for short-term goals.';
+  if(v<33)tip='A <b>Low</b> risk plan grows slowly but steadily, your money rarely dips. Great for short-term goals.';
   else if(v<70)tip='A <b>Medium</b> risk plan balances growth and safety. Expect some bumps, but stronger long-run returns.';
-  else tip='A <b>High</b> risk plan can grow fast — but can also drop sharply. Best when you won\'t need the money for years.';
+  else tip='A <b>High</b> risk plan can grow fast, but can also drop sharply. Best when you won\'t need the money for years.';
   document.getElementById('riskTip').innerHTML=tip;
 }
 
@@ -1567,7 +1647,7 @@ function speedUp(){
     if(simDay>=28){
       clearInterval(iv);simRunning=false;
       document.getElementById('speedBtn').textContent='Journey Complete! 🏁';
-      showToast('🎉 Scenario complete — +0.25%/day compounded to +1.8%!');
+      showToast('🎉 Scenario complete, +0.25%/day compounded to +1.8%!');
       setTimeout(function(){showToast('🏅 Badge earned: Compounder');},1900);
     }
   },520);
@@ -1594,7 +1674,7 @@ var GOAL={what:'a car',amt:10000,years:5,saved:4700,pct:10,account:'TFSA',why:'S
 var GOAL_DRAFT=null;
 var LEARN={level:3,levelName:'Building Confidence',xp:340,xpToNext:500,streak:5,dailyXP:30,gems:120,checked:{},flags:{},done:{f_budget:1,f_emergency:1,f_debt:1,f_inflation:1,v_save:1,v_compound:1,v_assets:1,v_timing:1,p_risk:1}};
 var PET={emoji:'🦊',name:'Penny'};
-var RECAP={m1:'Money is a tool for trading your time and effort — investing puts it to work. ✓',m2:'Saving keeps money safe; investing grows it over the years. ✓',m3:'Unit 1 complete — the basics are locked in! ⭐',i1:'A stock is a tiny slice of a real company. ✓',i2:'Stocks, ETFs and bonds — different tools, different risk. ✓',i3:'Unit 2 complete — you know the building blocks! ⭐',why_risk:'Every investment can swing up or down — that swing is what we call risk. ✓'};
+var RECAP={m1:'Money is a tool for trading your time and effort, investing puts it to work. ✓',m2:'Saving keeps money safe; investing grows it over the years. ✓',m3:'Unit 1 complete, the basics are locked in! ⭐',i1:'A stock is a tiny slice of a real company. ✓',i2:'Stocks, ETFs and bonds, different tools, different risk. ✓',i3:'Unit 2 complete, you know the building blocks! ⭐',why_risk:'Every investment can swing up or down, that swing is what we call risk. ✓'};
 var SKILLS=[
   {id:'first',icon:'🌱',name:'First Step',how:'Make your first practice trade'},
   {id:'uncertainty',icon:'🔭',name:'Reads Uncertainty',how:'Explore what moves a price'},
@@ -1635,131 +1715,131 @@ var LESSONS_L={
     {say:'Before investing, know where your money goes. One simple split keeps it easy: <b>50 / 30 / 20</b>. 🧾'},
     {say:'Of each paycheque: <b>50%</b> to needs, <b>30%</b> to wants, <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#7a5cae">50% needs</div><div style="width:30%;background:#5b8def">30% wants</div><div style="width:20%;background:#4f9c7e">20% save</div></div>';}},
     {q:'You take home $2,000 a month. Using 50/30/20, how much goes to saving &amp; debt?',opts:['$100','$400','$1,000'],correct:1,yes:'Exactly!',why:'20% of $2,000 = $400. Automate it and you barely notice it leave.'},
-    {say:'Tip: <b>pay yourself first</b> — move that 20% the day you\'re paid, before it can disappear. 💪'}
+    {say:'Tip: <b>pay yourself first</b>, move that 20% the day you\'re paid, before it can disappear. 💪'}
   ]},
   f_emergency:{xp:40,celeb:'You built the foundation everything else stands on.',steps:[
-    {say:'Life happens — a car repair, a lost job. An <b>emergency fund</b> stops a surprise becoming a crisis. 🛟'},
+    {say:'Life happens, a car repair, a lost job. An <b>emergency fund</b> stops a surprise becoming a crisis. 🛟'},
     {say:'Aim for <b>3–6 months</b> of essential expenses, kept in a plain savings account you can reach instantly.'},
-    {q:'Where should your emergency fund live?',opts:['Invested in stocks','A savings account you can access anytime','Locked away for 5 years'],correct:1,yes:'Right.',why:'It must be safe and instant — not invested, where it could drop right when you need it most.'},
-    {say:'Build this <b>before</b> investing seriously — it\'s what lets you stay calm when markets dip. 🧘'}
+    {q:'Where should your emergency fund live?',opts:['Invested in stocks','A savings account you can access anytime','Locked away for 5 years'],correct:1,yes:'Right.',why:'It must be safe and instant, not invested, where it could drop right when you need it most.'},
+    {say:'Build this <b>before</b> investing seriously, it\'s what lets you stay calm when markets dip. 🧘'}
   ]},
   f_debt:{xp:40,celeb:'You know which dollars to attack first.',steps:[
     {say:'Not all debt is equal. A mortgage at 4% is very different from a credit card at <b>20%</b>. 💳'},
-    {say:'Paying off a 20% card is like earning a <b>guaranteed 20% return</b> — better than almost any investment.'},
+    {say:'Paying off a 20% card is like earning a <b>guaranteed 20% return</b>, better than almost any investment.'},
     {q:'Spare cash: a card charges 20%, investing might earn ~8%. What wins?',opts:['Invest the cash','Pay off the card'],correct:1,yes:'Yes.',why:'Clearing 20% interest beats earning 8%. Crush high-interest debt before investing.'},
     {say:'Rule of thumb: high-interest debt first, then invest. Low-interest debt (like a mortgage) can ride alongside. 👍'}
   ]},
   f_inflation:{xp:40,celeb:'Now you know the real reason to invest.',steps:[
-    {say:'Cash feels safe — but <b>inflation</b> quietly shrinks what it can buy. 🎈'},
+    {say:'Cash feels safe, but <b>inflation</b> quietly shrinks what it can buy. 🎈'},
     {say:'At ~3% inflation, $100 today buys only about <b>$74</b> of stuff in 10 years if it just sits there.',viz:function(){return '<div class="viz-bar"><div class="viz-fill" style="width:74%">$100 → ~$74 of buying power in 10 yrs</div></div>';}},
     {q:'Why is "safe" cash actually risky long-term?',opts:['It can be stolen','Inflation erodes its buying power','Banks always lose it'],correct:1,yes:'Exactly!',why:'Money that doesn\'t grow faster than inflation loses value every year. Investing aims to outpace it.'},
-    {say:'So investing isn\'t about getting rich quick — it\'s about <b>beating inflation</b> over time. 🌱'}
+    {say:'So investing isn\'t about getting rich quick, it\'s about <b>beating inflation</b> over time. 🌱'}
   ]},
   /* ── Unit 2 · Why invest ── */
   v_save:{xp:40,celeb:'You\'ll always match the tool to the timeline now.',steps:[
-    {say:'Saving and investing are both good — but they do <b>different jobs</b>. 🐷'},
+    {say:'Saving and investing are both good, but they do <b>different jobs</b>. 🐷'},
     {say:'<b>Save</b> (safe, instant) for short-term goals &amp; emergencies. <b>Invest</b> (grows, bounces) for goals 5+ years away.'},
-    {q:'Saving for a vacation in 8 months — save or invest?',opts:['Invest it','Save it'],correct:1,yes:'Right.',why:'Short timeline = save. Investing could dip just before you need it. Long timeline = invest.'},
+    {q:'Saving for a vacation in 8 months, save or invest?',opts:['Invest it','Save it'],correct:1,yes:'Right.',why:'Short timeline = save. Investing could dip just before you need it. Long timeline = invest.'},
     {say:'Match the tool to the timeline and you\'ll never be caught short. ⏱️'}
   ]},
   v_compound:{xp:50,celeb:'You just met the most powerful force in money.',steps:[
-    {say:'The closest thing to magic in money: <b>compounding</b> — earning returns on your past returns. ❄️'},
-    {say:'$100 at 8%/yr becomes about <b>$466</b> in 20 years — most of that is growth <i>on the growth</i>.',viz:function(){return '<div class="viz-bar"><div class="viz-fill" style="width:100%">$100 → ~$466 in 20 yrs at 8%/yr</div></div>';}},
-    {q:'What matters most for compounding?',opts:['Picking the perfect stock','Time — starting early','One huge deposit'],correct:1,yes:'Exactly!',why:'Time is the secret ingredient. Starting 10 years earlier often beats investing twice as much later.'},
+    {say:'The closest thing to magic in money: <b>compounding</b>, earning returns on your past returns. ❄️'},
+    {say:'$100 at 8%/yr becomes about <b>$466</b> in 20 years, most of that is growth <i>on the growth</i>.',viz:function(){return '<div class="viz-bar"><div class="viz-fill" style="width:100%">$100 → ~$466 in 20 yrs at 8%/yr</div></div>';}},
+    {q:'What matters most for compounding?',opts:['Picking the perfect stock','Time, starting early','One huge deposit'],correct:1,yes:'Exactly!',why:'Time is the secret ingredient. Starting 10 years earlier often beats investing twice as much later.'},
     {say:'The takeaway: <b>start now</b>, even small. Your future self will thank you. 🙏'}
   ]},
   v_assets:{xp:40,celeb:'You know the three building blocks of investing.',steps:[
     {say:'Three building blocks you\'ll use forever: <b>stocks, ETFs and bonds</b>. 🧩'},
     {say:'A <b>stock</b> = a slice of one company. A <b>bond</b> = a loan that pays interest. An <b>ETF</b> = a basket of many, in one buy.'},
-    {q:'You want instant diversification in one purchase. Which?',opts:['A single stock','An ETF','One company\'s bond'],correct:1,yes:'Yes!',why:'An ETF bundles hundreds of holdings — instant spread, low effort. Great for beginners.'},
-    {say:'Most beginners start with a broad, low-cost <b>ETF</b> — simple and spread out. 👌'}
+    {q:'You want instant diversification in one purchase. Which?',opts:['A single stock','An ETF','One company\'s bond'],correct:1,yes:'Yes!',why:'An ETF bundles hundreds of holdings, instant spread, low effort. Great for beginners.'},
+    {say:'Most beginners start with a broad, low-cost <b>ETF</b>, simple and spread out. 👌'}
   ]},
   v_timing:{xp:40,celeb:'You\'ll stop trying to outguess the market.',steps:[
     {say:'Tempted to wait for the "perfect" moment to invest? Almost nobody gets it right. 🎯'},
-    {say:'Markets rise over the long run, and the best days often come right after the worst — miss a few and returns crater.'},
-    {q:'What beats trying to time the market?',opts:['Time IN the market','Checking prices hourly','Buying only at the bottom'],correct:0,yes:'Right!',why:'Staying invested through ups and downs — "time in the market beats timing the market."'},
+    {say:'Markets rise over the long run, and the best days often come right after the worst, miss a few and returns crater.'},
+    {q:'What beats trying to time the market?',opts:['Time IN the market','Checking prices hourly','Buying only at the bottom'],correct:0,yes:'Right!',why:'Staying invested through ups and downs, "time in the market beats timing the market."'},
     {say:'So invest regularly and <b>stay in</b>. Boring beats clever here. 🧘'}
   ]},
   /* ── Unit 3 · Build a smart portfolio ── */
   p_risk:{xp:45,celeb:'You can now match risk to your timeline.',steps:[
-    {say:'Risk isn\'t bad — it\'s the engine of returns. The trick is matching it to your <b>time horizon</b>. 🛡️'},
+    {say:'Risk isn\'t bad, it\'s the engine of returns. The trick is matching it to your <b>time horizon</b>. 🛡️'},
     {say:'Money you need <b>soon</b> → keep it calm (less risk). Money for <b>years away</b> → it can ride the bumps for more growth.'},
-    {q:'Retirement is 30 years away. How much short-term bounciness can you handle?',opts:['Very little','Quite a lot'],correct:1,yes:'Exactly.',why:'A long horizon lets you ride out dips — so you can take more risk for more growth.'},
-    {say:'Right risk for the right timeline — that\'s the heart of smart investing. ⏳'}
+    {q:'Retirement is 30 years away. How much short-term bounciness can you handle?',opts:['Very little','Quite a lot'],correct:1,yes:'Exactly.',why:'A long horizon lets you ride out dips, so you can take more risk for more growth.'},
+    {say:'Right risk for the right timeline, that\'s the heart of smart investing. ⏳'}
   ]},
   risk_div:{xp:50,celeb:'You just learned the #1 way to protect your money.',steps:[
-    {say:'Quick one, friend — let\'s see what happens when most of your money sits in <b>one</b> place. 👀'},
+    {say:'Quick one, friend, let\'s see what happens when most of your money sits in <b>one</b> place. 👀'},
     {say:function(s){return 'Right now your biggest holding, <b>'+s.big.t+'</b>, is <b>'+Math.round(s.big.pct*100)+'%</b> of your invested money.';},viz:function(s){var p=Math.round(s.big.pct*100);return '<div class="viz-bar"><div class="viz-fill" style="width:'+Math.max(14,p)+'%">'+s.big.t+' · '+p+'%</div></div>';}},
     {q:function(s){return 'If <b>'+s.big.t+'</b> dropped <b>20%</b>, about how much would your <i>whole</i> portfolio fall?';},opts:function(s){return ['About 2%','About '+Math.round(s.big.pct*20)+'%','About 50%'];},correct:1,yes:'That\'s it!',why:function(s){return Math.round(s.big.pct*100)+'% × 20% ≈ '+Math.round(s.big.pct*20)+'%. One holding\'s dip becomes most of your loss.';}},
-    {say:'Exactly — concentration turns one bad day into a big one. Spreading across more holdings <b>softens the swings</b>. 🛡️'},
+    {say:'Exactly, concentration turns one bad day into a big one. Spreading across more holdings <b>softens the swings</b>. 🛡️'},
     {say:'Try it for real next: add a different asset type in <b>Trade</b> and watch your risk drop. Penny\'s cheering you on! 🦊'}
   ]},
   p_mix:{xp:45,celeb:'You can design a mix you\'ll actually stick with.',steps:[
-    {say:'Your <b>asset mix</b> — how much in stocks vs bonds — drives most of your long-run results. 🥗'},
+    {say:'Your <b>asset mix</b>, how much in stocks vs bonds, drives most of your long-run results. 🥗'},
     {say:'A classic start: more <b>stocks</b> when young (growth), shifting to more <b>bonds</b> as your goal nears (stability).',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#7a5cae">80% stocks</div><div style="width:20%;background:#5b8def">20% bonds</div></div>';}},
     {q:'You\'re 25, investing for retirement. A reasonable tilt?',opts:['Mostly bonds','Mostly stocks','All cash'],correct:1,yes:'Yes.',why:'Young + long horizon = lean to stocks for growth; add bonds as the goal gets closer.'},
-    {say:'Pick a mix you can <b>hold through a downturn</b> — that matters more than the perfect ratio. 🤝'}
+    {say:'Pick a mix you can <b>hold through a downturn</b>, that matters more than the perfect ratio. 🤝'}
   ]},
   p_fees:{xp:45,celeb:'You\'ll keep more of every dollar you earn.',steps:[
     {say:'Fees feel tiny but quietly eat returns. <b>1%</b> vs <b>0.1%</b> a year can cost tens of thousands over decades. 🪙'},
-    {say:'<b>Index funds / ETFs</b> just track the market at very low cost — and beat most pricey "active" funds over time.'},
+    {say:'<b>Index funds / ETFs</b> just track the market at very low cost, and beat most pricey "active" funds over time.'},
     {q:'Two funds hold similar things; one charges 1%, one 0.1%. Smarter pick?',opts:['The 1% one','The 0.1% one'],correct:1,yes:'Right!',why:'Lower fees = more of the return stays yours. With index funds you rarely give up performance for the savings.'},
     {say:'Always check the <b>MER</b> (the fee) before you buy. Low and boring wins. 👍'}
   ]},
-  uncertainty:{xp:50,celeb:'You now read forecasts like a pro — ranges, not promises.',onDone:function(){LEARN.flags.uncertainty=true;},steps:[
-    {say:'Ever seen an app promise an <b>exact</b> future price? 🤨 Truth is — nobody can know it.'},
+  uncertainty:{xp:50,celeb:'You now read forecasts like a pro, ranges, not promises.',onDone:function(){LEARN.flags.uncertainty=true;},steps:[
+    {say:'Ever seen an app promise an <b>exact</b> future price? 🤨 Truth is, nobody can know it.'},
     {say:'So instead we show a <b>range</b>: a rough case, a likely middle, and a strong case. 🔭'},
     {q:'A <b>wider</b> range means…',opts:['More certainty','Less certainty','Guaranteed profit'],correct:1,yes:'Yes!',why:'Wider = more spread of possible outcomes = less certain. Narrow ranges are the confident ones.'},
-    {say:'We never show a single "prediction" — that\'d be a lie. We show the range <b>and</b> what moves it. 🌱'}
+    {say:'We never show a single "prediction", that\'d be a lie. We show the range <b>and</b> what moves it. 🌱'}
   ]},
   /* ── Unit 4 · Canadian accounts ── */
   c_tfsa:{xp:45,celeb:'You\'ve unlocked Canada\'s friendliest account.',steps:[
     {say:'In Canada, the <b>TFSA</b> is a beginner\'s best friend. 🍁'},
-    {say:'Everything it earns — growth, dividends, interest — is <b>completely tax-free</b>, even when you withdraw. Take money out anytime.'},
-    {q:'You make $500 of gains inside a TFSA. Tax owed on it?',opts:['$0','About $100','Depends on income'],correct:0,yes:'Exactly!',why:'Zero. That\'s the magic of a TFSA — gains are never taxed.'},
+    {say:'Everything it earns, growth, dividends, interest, is <b>completely tax-free</b>, even when you withdraw. Take money out anytime.'},
+    {q:'You make $500 of gains inside a TFSA. Tax owed on it?',opts:['$0','About $100','Depends on income'],correct:0,yes:'Exactly!',why:'Zero. That\'s the magic of a TFSA, gains are never taxed.'},
     {say:'Flexible + tax-free makes the TFSA a great <b>first account</b> for most people. 🎉'}
   ]},
   c_rrsp:{xp:45,celeb:'You understand the RRSP\'s tax twist.',steps:[
-    {say:'The <b>RRSP</b> is built for retirement — with a tax twist. 🏦'},
-    {say:'Contributions <b>lower your taxable income now</b> (a refund today); you pay tax later when you withdraw — usually at a lower rate.'},
+    {say:'The <b>RRSP</b> is built for retirement, with a tax twist. 🏦'},
+    {say:'Contributions <b>lower your taxable income now</b> (a refund today); you pay tax later when you withdraw, usually at a lower rate.'},
     {q:'When does an RRSP help most?',opts:['When your income is low','When your income is high (bigger refund now)'],correct:1,yes:'Right.',why:'Higher income → bigger deduction now, and you likely withdraw at a lower rate in retirement.'},
     {say:'Best for steady retirement saving, especially in your higher-earning years. 📈'}
   ]},
   c_which:{xp:45,celeb:'You can pick the right account with confidence.',steps:[
-    {say:'So — TFSA or RRSP? A simple rule of thumb based on your income. ⚖️'},
+    {say:'So, TFSA or RRSP? A simple rule of thumb based on your income. ⚖️'},
     {say:'Lower income now → lean <b>TFSA</b> (bank the RRSP room for later). Higher income → the <b>RRSP</b> deduction is worth more.'},
-    {q:'You\'re a student earning little this year. Which usually first?',opts:['RRSP','TFSA'],correct:1,yes:'Yes!',why:'At low income the RRSP deduction is small — TFSA flexibility wins, and you save RRSP room for higher-earning years.'},
+    {q:'You\'re a student earning little this year. Which usually first?',opts:['RRSP','TFSA'],correct:1,yes:'Yes!',why:'At low income the RRSP deduction is small, TFSA flexibility wins, and you save RRSP room for higher-earning years.'},
     {say:'Plenty of people use <b>both</b> over time. Start where the rule points today. 🤝'}
   ]},
   c_order:{xp:45,celeb:'You know exactly where each new dollar should go.',steps:[
     {say:'A handy priority order for where new money should go. 📊'},
     {say:'1) Emergency fund → 2) crush high-interest debt → 3) any employer match → 4) TFSA / RRSP → 5) taxable account.'},
-    {q:'Your employer matches retirement contributions. Where does that rank?',opts:['Last','Near the top — it\'s free money','Skip it'],correct:1,yes:'Exactly!',why:'A match is an instant 100% return — grab it before most other investing.'},
+    {q:'Your employer matches retirement contributions. Where does that rank?',opts:['Last','Near the top, it\'s free money','Skip it'],correct:1,yes:'Exactly!',why:'A match is an instant 100% return, grab it before most other investing.'},
     {say:'Work down the list and your money always lands in the highest-value spot. ✅'}
   ]},
   /* ── Unit 5 · Plan & reach your goals ── */
   g_smart:{xp:45,celeb:'Your goals just got real and reachable.',steps:[
     {say:'A vague "I should save more" rarely works. A <b>SMART</b> goal does. 🎯'},
-    {say:'Specific, Measurable, Achievable, Relevant, Time-based — e.g. "Save <b>$10,000</b> for a car in <b>5 years</b>."'},
-    {q:'Which is a SMART goal?',opts:['"Get rich"','"Save $6,000 for a trip in 2 years"','"Invest someday"'],correct:1,yes:'Right!',why:'It names the amount and the deadline — so you can plan backwards and track it.'},
+    {say:'Specific, Measurable, Achievable, Relevant, Time-based, e.g. "Save <b>$10,000</b> for a car in <b>5 years</b>."'},
+    {q:'Which is a SMART goal?',opts:['"Get rich"','"Save $6,000 for a trip in 2 years"','"Invest someday"'],correct:1,yes:'Right!',why:'It names the amount and the deadline, so you can plan backwards and track it.'},
     {say:'Set yours in the <b>goal card</b> on Home and we\'ll help you reach it. 🗺️'}
   ]},
   g_buckets:{xp:45,celeb:'Every goal now has the right home.',steps:[
     {say:'Different goals need different homes for the money. 🪣'},
     {say:'<b>Short-term</b> (under ~3 yrs): keep it safe in savings. <b>Long-term</b> (5+ yrs): invest it so it grows.'},
-    {q:'A down payment you need in 2 years — where?',opts:['Invested in stocks','Safe in savings'],correct:1,yes:'Yes.',why:'Too soon to risk a dip — keep near-term money safe. Long-term money can ride the market.'},
+    {q:'A down payment you need in 2 years, where?',opts:['Invested in stocks','Safe in savings'],correct:1,yes:'Yes.',why:'Too soon to risk a dip, keep near-term money safe. Long-term money can ride the market.'},
     {say:'Sort each goal into a bucket and the "save or invest" question answers itself. 👌'}
   ]},
   g_howmuch:{xp:45,celeb:'You have a contribution plan that sticks.',steps:[
     {say:'How much should you invest? Enough to matter, not so much it hurts. 💧'},
     {say:'A common start: <b>5–10%</b> of your income, automated. Nudge it up a little whenever your income rises.'},
-    {q:'What makes investing actually stick?',opts:['Big one-time deposits','Automating a regular amount','Waiting for spare cash'],correct:1,yes:'Exactly!',why:'Automatic, regular contributions beat willpower — you invest before you can spend it.'},
+    {q:'What makes investing actually stick?',opts:['Big one-time deposits','Automating a regular amount','Waiting for spare cash'],correct:1,yes:'Exactly!',why:'Automatic, regular contributions beat willpower, you invest before you can spend it.'},
     {say:'Set it, automate it, forget it. Consistency is the whole game. 🔁'}
   ]},
   g_ready:{xp:60,celeb:'You\'re ready to invest for real. 🎉',steps:[
     {say:'You\'ve learned the foundations and practised with no risk. How do you know you\'re <b>ready for real money</b>? 🎓'},
     {say:'A quick checklist: emergency fund ✓, high-interest debt handled ✓, a clear goal ✓, and a mix you can hold calmly through a dip ✓.'},
-    {q:'The best sign you\'re ready to invest for real?',opts:['You found a hot stock tip','You have a plan and stayed calm through practice dips','The market just went up'],correct:1,yes:'That\'s it. 🎉',why:'Readiness is about your plan and temperament — not a tip or market timing.'},
+    {q:'The best sign you\'re ready to invest for real?',opts:['You found a hot stock tip','You have a plan and stayed calm through practice dips','The market just went up'],correct:1,yes:'That\'s it. 🎉',why:'Readiness is about your plan and temperament, not a tip or market timing.'},
     {say:'When you can check those boxes, open a real <b>TFSA</b> and start small. You\'ve got this. 🌟'}
   ]}
 };
@@ -1867,10 +1947,10 @@ function nodeTap(id,mile,locked){
 }
 function miaGuide(){
   var st=lessonStates(),act=st.activeId,msg;
-  if(pfClasses()>=3)msg='Look at you — your money\'s spread across <b>'+pfClasses()+'</b> types now. '+PET.name+' is wagging her tail! 🦊 Keep that streak alive.';
+  if(pfClasses()>=3)msg='Look at you, your money\'s spread across <b>'+pfClasses()+'</b> types now. '+PET.name+' is wagging her tail! 🦊 Keep that streak alive.';
   else if(act==='risk_div')msg='Next stop on the trail: learn to <b>spread your money</b> so one dip can\'t sink you. '+PET.name+' and I are right behind you! 🐾';
-  else if(act==='uncertainty')msg='Now let\'s learn why we never <i>predict</i> a price — only show a range. Tap the glowing lesson! 🔭';
-  else msg='Tap the glowing lesson to keep going — '+PET.name+'\'s following your trail! 🐾';
+  else if(act==='uncertainty')msg='Now let\'s learn why we never <i>predict</i> a price, only show a range. Tap the glowing lesson! 🔭';
+  else msg='Tap the glowing lesson to keep going, '+PET.name+'\'s following your trail! 🐾';
   return '<div class="mia-guide"><div class="mg-face">'+avatar()+'</div><div class="mg-bubble"><div class="mg-name">Mia · your guide</div>'+msg+'</div></div>';
 }
 /* ── interactive lesson player (Mia-guided, step by step) ── */
@@ -1900,11 +1980,11 @@ function lpNext(){var L=LESSONS_L[LP.id];if(LP.i<L.steps.length-1){LP.i++;LP.ans
 function finishLesson(){
   var id=LP.id,L=LESSONS_L[id];if(L.onDone)L.onDone();LEARN.done[id]=true;learnXP(L.xp||40);
   var perfect=((LP.wrong||0)===0);
-  document.getElementById('lsheetInner').innerHTML='<div class="cele"><div class="cele-burst">🎉</div><div class="cele-fox">'+petSVG()+'</div><div class="cele-h">Lesson complete!</div><div class="cele-sub">'+(L.celeb||'Nice work — you\'re leveling up.')+'</div><div class="cele-stats"><div class="cstat gold"><div class="cstat-v">+'+(L.xp||40)+'</div><div class="cstat-k">XP earned</div></div><div class="cstat '+(perfect?'green':'pur')+'"><div class="cstat-v">'+(perfect?'💯':'👍')+'</div><div class="cstat-k">'+(perfect?'No mistakes':'Nice effort')+'</div></div><div class="cstat orange"><div class="cstat-v">🔥 '+LEARN.streak+'</div><div class="cstat-k">Day streak</div></div></div><button class="lp-cta" style="margin-top:18px" onclick="closeL();afterLessonDone()">Claim reward</button></div>';
+  document.getElementById('lsheetInner').innerHTML='<div class="cele"><div class="cele-burst">🎉</div><div class="cele-fox">'+petSVG()+'</div><div class="cele-h">Lesson complete!</div><div class="cele-sub">'+(L.celeb||'Nice work, you\'re leveling up.')+'</div><div class="cele-stats"><div class="cstat gold"><div class="cstat-v">+'+(L.xp||40)+'</div><div class="cstat-k">XP earned</div></div><div class="cstat '+(perfect?'green':'pur')+'"><div class="cstat-v">'+(perfect?'💯':'👍')+'</div><div class="cstat-k">'+(perfect?'No mistakes':'Nice effort')+'</div></div><div class="cstat orange"><div class="cstat-v">🔥 '+LEARN.streak+'</div><div class="cstat-k">Day streak</div></div></div><button class="lp-cta" style="margin-top:18px" onclick="closeL();afterLessonDone()">Claim reward</button></div>';
 }
 function afterLessonDone(){checkSkillUnlocks();LEARN.petJump=true;renderLearn();}
 function openMilestone(done){
-  if(done){openL('<div class="ls-tag">Milestone · done</div><div class="ls-h">🧺 Spread across 3+ types</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><p class="ls-p" style="margin-top:10px">You\'re holding <b>3+ asset types</b> in your practice portfolio — earned by <b>doing</b>. '+PET.name+' is proud of you! 🦊</p><button class="btn-ghost-l" onclick="closeL()">Nice</button>');return;}
+  if(done){openL('<div class="ls-tag">Milestone · done</div><div class="ls-h">🧺 Spread across 3+ types</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><p class="ls-p" style="margin-top:10px">You\'re holding <b>3+ asset types</b> in your practice portfolio, earned by <b>doing</b>. '+PET.name+' is proud of you! 🦊</p><button class="btn-ghost-l" onclick="closeL()">Nice</button>');return;}
   openL('<div class="ls-tag">Milestone · do it to unlock</div><div class="ls-h">🧺 Hold 3+ asset types</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><p class="ls-p" style="margin-top:10px">This one unlocks by <b>doing</b>: hold at least 3 different asset types (a stock, an ETF, a crypto) at once. You hold <b>'+pfClasses()+'</b> right now.</p><button class="btn btn-pur" style="width:100%;margin-top:6px" onclick="closeL();goTab(\'journey\')">Go to Trade</button><button class="btn-ghost-l" onclick="closeL()">Later</button>');
 }
 function openGoalSetup(){GOAL_DRAFT=JSON.parse(JSON.stringify(GOAL));openL(goalSheet());}
@@ -1943,10 +2023,10 @@ function renderLearn(){
   var L_states=lessonStates();
   learnUnits().forEach(function(u){
     var ud=unitDone(u),ua=unitActive(u,L_states);
-    h+='<div class="unit-head'+((!ud&&!ua)?' locked':'')+'"><div class="unit-ic">'+(ud?'✓':(ua?'▶':'🔒'))+'</div><div><div class="unit-k">'+u.k+'</div><div class="unit-t">'+u.t+'</div></div><button class="unit-gb" onclick="showToast(\'📖 Unit guidebook — coming soon\')">📖</button></div>';
+    h+='<div class="unit-head'+((!ud&&!ua)?' locked':'')+'"><div class="unit-ic">'+(ud?'✓':(ua?'▶':'🔒'))+'</div><div><div class="unit-k">'+u.k+'</div><div class="unit-t">'+u.t+'</div></div><button class="unit-gb" onclick="showToast(\'📖 Unit guidebook, coming soon\')">📖</button></div>';
     h+=renderUnitPath(u,L_states);
   });
-  h+='<div class="section-t">Skills you\'ve shown</div><div class="ls-sub">These unlock by <b>doing</b> in your practice portfolio — never a quiz.</div>';
+  h+='<div class="section-t">Skills you\'ve shown</div><div class="ls-sub">These unlock by <b>doing</b> in your practice portfolio, never a quiz.</div>';
   h+='<div class="skills">'+SKILLS.map(function(s){var g2=skillGot(s.id);return '<div class="skill '+(g2?'got':'locked')+'"><div class="skill-ic">'+s.icon+'</div><div class="skill-badge">'+(g2?'✓':'🔒')+'</div><div class="skill-n">'+s.name+'</div><div class="skill-h">'+s.how+'</div></div>';}).join('')+'</div>';
   h+='<div class="section-t">Glossary</div><div class="card"><div style="display:flex;flex-wrap:wrap;gap:7px">'+['tfsa','rrsp','etf','compound','risk','diversification','bull','bear','inflation','dividend'].map(function(k){return '<span class="whats" style="margin:0" onclick="openTip(\''+k+'\')">'+GLOSS[k].t+'</span>';}).join('')+'</div></div>';
   h+='<div class="card"><div class="row"><span style="font-size:13px;color:var(--muted);font-weight:600">Concepts explored</span><span class="pill pill-pur" id="conceptCount">'+(Object.keys(seen).length)+' explored</span></div></div>';
@@ -1956,41 +2036,58 @@ function renderLearn(){
 
 /* ── Home: Question of the Day (daily bite-sized learning) ── */
 var QOTD=[
-  {q:'You invest <b>$100</b> and it grows about <b>8%</b> in a year. Roughly what\'s it worth?',opts:['$108','$180','$800'],correct:0,why:'8% of $100 is $8 — so about $108. Small percentages snowball over many years; that\'s compounding.'},
-  {q:'Which of these usually <b>bounces around</b> the most in price?',opts:['A bond ETF','A big-company stock','A crypto coin'],correct:2,why:'Crypto is the bounciest — bigger ups and bigger downs. Bonds are the calmest of the three.'},
-  {q:'What does a <b>TFSA</b> let you do?',opts:['Grow money tax-free','Borrow at 0%','Guarantee profits'],correct:0,why:'A TFSA lets your investments grow — and come out — completely tax-free. Nothing guarantees profits.'},
-  {q:'Spreading money across different investments is called…',opts:['Chasing','Diversifying','Day-trading'],correct:1,why:'Diversifying — it softens the blow if any one thing drops. The closest thing to a free lunch in investing.'}
+  {q:'You invest <b>$100</b> and it grows about <b>8%</b> in a year. Roughly what\'s it worth?',opts:['$108','$180','$800'],correct:0,why:'8% of $100 is $8, so about $108. Small percentages snowball over many years; that\'s compounding.'},
+  {q:'Which of these usually <b>bounces around</b> the most in price?',opts:['A bond ETF','A big-company stock','A crypto coin'],correct:2,why:'Crypto is the bounciest, bigger ups and bigger downs. Bonds are the calmest of the three.'},
+  {q:'What does a <b>TFSA</b> let you do?',opts:['Grow money tax-free','Borrow at 0%','Guarantee profits'],correct:0,why:'A TFSA lets your investments grow, and come out, completely tax-free. Nothing guarantees profits.'},
+  {q:'Spreading money across different investments is called…',opts:['Chasing','Diversifying','Day-trading'],correct:1,why:'Diversifying, it softens the blow if any one thing drops. The closest thing to a free lunch in investing.'}
 ];
-var qPick=0,qDone=false,qChoice=-1;
+var qPick=0,qOpen=false,qDone=false,qChoice=-1;
 function renderQOTD(){
   var el=document.getElementById('homeQuestion');if(!el)return;
   var Q=QOTD[qPick%QOTD.length];
-  var h='<div class="qcard"><div class="q-top"><div class="q-face">'+avatar()+'</div><div><div class="q-k">Today\'s question</div><div class="q-q">'+Q.q+'</div></div></div>';
-  if(!qDone){
-    h+='<div class="q-opts">'+Q.opts.map(function(o,i){return '<button class="q-opt" onclick="answerQOTD('+i+')">'+o+'</button>';}).join('')+'</div>';
-  }else{
-    h+='<div class="q-opts">'+Q.opts.map(function(o,i){var c=(i===Q.correct)?' right':((i===qChoice)?' wrong':'');return '<div class="q-opt'+c+'">'+o+'</div>';}).join('')+'</div>';
-    h+='<div class="q-fb '+(qChoice===Q.correct?'ok':'no')+'">'+(qChoice===Q.correct?'✓ Nice! ':'Not quite — ')+Q.why+'<div class="q-next">Come back tomorrow for a new one 🌱</div></div>';
+  var open=qOpen||qDone;
+  var top='<div class="q-top"'+(!open?' onclick="openQOTD()" style="cursor:pointer"':'')+'><div class="q-face">'+avatar()+'</div><div class="q-mid"><div class="q-k">Today\'s question</div><div class="q-q">'+Q.q+'</div>'+(!open?'<div class="q-cta">Answer ›</div>':'')+'</div></div>';
+  var h='<div class="qcard'+(open?' open':'')+'">'+top;
+  if(open){
+    if(!qDone){
+      h+='<div class="q-opts">'+Q.opts.map(function(o,i){return '<button class="q-opt" onclick="answerQOTD('+i+')">'+o+'</button>';}).join('')+'</div>';
+    }else{
+      h+='<div class="q-opts">'+Q.opts.map(function(o,i){var c=(i===Q.correct)?' right':((i===qChoice)?' wrong':'');return '<div class="q-opt'+c+'">'+o+'</div>';}).join('')+'</div>';
+      h+='<div class="q-fb '+(qChoice===Q.correct?'ok':'no')+'">'+(qChoice===Q.correct?'✓ Nice! ':'Not quite, ')+Q.why+'<div class="q-next">Come back tomorrow for a new one 🌱</div></div>';
+    }
   }
   el.innerHTML=h+'</div>';
 }
+function openQOTD(){qOpen=true;renderQOTD();}
 function answerQOTD(i){qDone=true;qChoice=i;renderQOTD();}
 /* ── Home: Your plan (milestones → graduation) ── */
 var PLAN=[
-  {t:'Open your practice account',d:'Done — your $10,000 is ready to invest',st:'done'},
+  {t:'Open your practice account',d:'Done, your $10,000 is ready to invest',st:'done'},
   {t:'Learn risk & diversification',d:'Lesson 3 of 5 · tap to continue',st:'now',go:"goTab('learn')"},
   {t:'Practice contributing regularly',d:'Build the habit with practice money',st:'next'},
   {t:'Open a real account & invest for real',d:'Your graduation 🎓',st:'next'}
 ];
+var planOpen=false;
 function renderPlan(){
   var el=document.getElementById('homePlan');if(!el)return;
-  var h='<div class="section-t" style="margin-top:2px">Your plan to invest for real</div><div class="plan">';
-  PLAN.forEach(function(s,i){
-    var ic=s.st==='done'?'✓':(i+1),click=s.go?(' onclick="'+s.go+'" style="cursor:pointer"'):'';
-    h+='<div class="pstep '+s.st+'"'+click+'><div class="pstep-l"><div class="pstep-ic">'+ic+'</div>'+(i<PLAN.length-1?'<div class="pstep-line"></div>':'')+'</div><div class="pstep-b"><div class="pstep-t">'+s.t+'</div><div class="pstep-d">'+s.d+'</div></div>'+(s.st==='now'?'<div class="pstep-go">›</div>':'')+'</div>';
-  });
-  el.innerHTML=h+'</div>';
+  var doneN=PLAN.filter(function(s){return s.st==='done';}).length;
+  if(planOpen){
+    var h='<div class="row" style="margin:2px 2px 10px"><div class="section-t" style="margin:0">Your plan to invest for real</div><span class="plan-more" onclick="togglePlan()">Show less ▴</span></div><div class="plan">';
+    PLAN.forEach(function(s,i){
+      var ic=s.st==='done'?'✓':(i+1),click=s.go?(' onclick="'+s.go+'" style="cursor:pointer"'):'';
+      h+='<div class="pstep '+s.st+'"'+click+'><div class="pstep-l"><div class="pstep-ic">'+ic+'</div>'+(i<PLAN.length-1?'<div class="pstep-line"></div>':'')+'</div><div class="pstep-b"><div class="pstep-t">'+s.t+'</div><div class="pstep-d">'+s.d+'</div></div>'+(s.st==='now'?'<div class="pstep-go">›</div>':'')+'</div>';
+    });
+    el.innerHTML=h+'</div>';
+  }else{
+    var cur=PLAN.filter(function(s){return s.st==='now';})[0]||PLAN.filter(function(s){return s.st==='next';})[0]||PLAN[0],
+        idx=PLAN.indexOf(cur)+1,
+        click=cur&&cur.go?(' onclick="'+cur.go+'" style="cursor:pointer"'):'';
+    el.innerHTML='<div class="nextcard"'+click+'><div class="nextcard-k">Your next step</div>'
+      +'<div class="nextstep"><div class="nextstep-ic">'+idx+'</div><div class="nextstep-b"><div class="nextstep-t">'+cur.t+'</div><div class="nextstep-d">'+cur.d+'</div></div><div class="pstep-go">›</div></div></div>'
+      +'<div class="plan-more-row"><span class="plan-more" onclick="togglePlan()">See full plan · '+doneN+'/'+PLAN.length+' done ›</span></div>';
+  }
 }
+function togglePlan(){planOpen=!planOpen;renderPlan();}
 
 renderOB();
 renderPortfolio();renderHoldings();sfSelect('AAPL');
