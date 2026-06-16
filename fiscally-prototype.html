@@ -371,22 +371,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .gh-bar{height:9px;background:var(--line);border-radius:20px;overflow:hidden;margin:11px 0 8px}
 .gh-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--purple),var(--purple-deep));border-radius:20px}
 .gh-sub{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:700}
-.unit-head{display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,var(--purple),var(--purple-deep));color:#fff;border-radius:16px;padding:13px 16px;margin:22px 0 4px;box-shadow:var(--shadow)}
+.unit-head{--acc:#6f659a;display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,var(--purple),var(--purple-deep));background:linear-gradient(135deg,color-mix(in srgb,var(--acc),#fff 10%),color-mix(in srgb,var(--acc),#000 15%));color:#fff;border-radius:16px;padding:13px 16px;margin:22px 0 4px;box-shadow:var(--shadow)}
 .unit-head.locked{background:#c3bbd9;box-shadow:none}
 .unit-ic{font-size:16px;width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}
 .unit-k{font-size:10.5px;font-weight:800;opacity:.85;text-transform:uppercase;letter-spacing:.4px}
 .unit-t{font-size:15px;font-weight:800;letter-spacing:-.2px}
-.path{padding:16px 0 4px}
+.path{padding:16px 0 4px;--acc:#6f659a}
 .node-row{display:flex;justify-content:center;margin:9px 0}
 .node{position:relative;display:flex;flex-direction:column;align-items:center}
-.node-btn{width:64px;height:64px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;transition:transform .08s}
-.node-btn.done{background:linear-gradient(135deg,var(--purple),var(--purple-deep));color:#fff;box-shadow:0 5px 0 #463a78}
-.node-btn.active{background:#fff;color:var(--purple-deep);box-shadow:0 5px 0 var(--purple-soft2)}
+.node-btn{width:64px;height:64px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .08s}
+.node-btn.done{background:linear-gradient(135deg,var(--purple),var(--purple-deep));box-shadow:0 5px 0 #463a78;background:linear-gradient(140deg,color-mix(in srgb,var(--acc),#fff 24%),var(--acc));color:#fff;box-shadow:0 5px 0 color-mix(in srgb,var(--acc),#000 34%)}
+.node-btn.active{background:#fff;color:var(--purple-deep);box-shadow:0 5px 0 var(--purple-soft2);color:var(--acc);box-shadow:0 5px 0 color-mix(in srgb,var(--acc),#fff 72%)}
 .node-btn.lock{background:var(--surface-soft);color:#b3aac8;box-shadow:0 5px 0 #ddd6ec;cursor:default}
 .node-btn.mile{background:linear-gradient(135deg,#f3c34c,#dca02a);color:#fff;box-shadow:0 5px 0 #b9842a}
 .node-btn.milelock{background:#ece3cf;color:#cbb98c;box-shadow:0 5px 0 #ddd1b4}
 .node-btn:not(.lock):active{transform:translateY(3px)}
-.node-ring{position:absolute;top:-7px;width:78px;height:78px;border-radius:50%;border:3px solid var(--purple-soft2);opacity:.6;animation:npulse 1.7s infinite;pointer-events:none}
+.node-btn svg{width:31px;height:31px}
+.unit-ic svg{width:18px;height:18px}
+.unit-gb svg{width:18px;height:18px}
+svg.duo .duo-f{fill:currentColor;opacity:.24}
+svg.duo .duo-s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.node-ring{position:absolute;top:-7px;width:78px;height:78px;border-radius:50%;border:3px solid var(--purple-soft2);border-color:color-mix(in srgb,var(--acc),#fff 50%);opacity:.7;animation:npulse 1.7s infinite;pointer-events:none}
 @keyframes npulse{0%{transform:scale(.84);opacity:.7}80%{transform:scale(1.12);opacity:0}100%{opacity:0}}
 .start-bubble{position:absolute;top:-33px;background:#fff;color:var(--purple-deep);font-weight:800;font-size:11px;padding:6px 12px;border-radius:11px;box-shadow:var(--shadow-lg);animation:bob 1.4s ease-in-out infinite;letter-spacing:.6px;pointer-events:none}
 .start-bubble:after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#fff}
@@ -703,8 +708,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     <div class="page active" id="page-home">
       <div class="home-greet">Welcome back 👋 You're <b>4 days</b> in, and you're <b>in the green</b>.</div>
 
+      <div class="section-t" style="margin-top:0">Practice Portfolio</div>
       <div class="hero" style="cursor:pointer" onclick="goTab('journey')">
-        <div class="hero-l">Your practice portfolio · tap to open ›</div>
+        <div class="hero-l">Tap to open ›</div>
         <div class="hero-v tnum" id="homeVal">$10,041.67</div>
         <div class="hero-c" id="homeChg">▲ +$41.67 (+0.4%) all time</div>
         <div class="hero-row">
@@ -714,10 +720,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
         </div>
       </div>
 
+      <div class="section-t">My Goals</div>
       <div id="homeGoal"></div>
 
+      <div class="section-t">My Plan</div>
       <div id="homePlan"></div>
 
+      <div class="section-t">Question of the Day</div>
       <div id="homeQuestion"></div>
     </div>
 
@@ -928,31 +937,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 
       <div class="hero" style="background:linear-gradient(140deg,#4f9c7e,#6bbf9c)">
         <div class="hero-l">Your Level</div>
-        <div class="hero-v">Level 3 · Sprout 🌱</div>
-        <div class="hero-c">175 XP · 75 to Level 4</div>
-        <div class="bar" style="background:rgba(255,255,255,.25);margin-top:12px"><div class="bar-fill" style="width:70%;background:#fff"></div></div>
+        <div class="hero-v" id="pfLevel">Level 3 · Sprout 🌱</div>
+        <div class="hero-c" id="pfLevelXP">340 XP</div>
+        <div class="bar" style="background:rgba(255,255,255,.25);margin-top:12px"><div class="bar-fill" id="pfLevelBar" style="width:68%;background:#fff"></div></div>
       </div>
 
       <div class="card">
         <div class="card-t">Community · weekly leaderboard</div>
-        <div class="lb-row"><div class="lb-rank gold">1</div><div class="lb-av">🧑</div><div class="lb-n">Jordan</div><div class="lb-x">+8.2%</div></div>
-        <div class="lb-row"><div class="lb-rank">2</div><div class="lb-av">🐢</div><div class="lb-n">Priya</div><div class="lb-x">+6.9%</div></div>
-        <div class="lb-row"><div class="lb-rank me">3</div><div class="lb-av">__AVMINI__</div><div class="lb-n">You</div><div class="lb-x">+2.5%</div></div>
-        <div class="lb-row"><div class="lb-rank">4</div><div class="lb-av">🐼</div><div class="lb-n">Marcus</div><div class="lb-x">+1.8%</div></div>
+        <div class="ls-sub" style="margin:-2px 0 8px">Ranked by what you've learned, not by who took the biggest risk.</div>
+        <div id="lbRows"></div>
       </div>
 
       <div class="section-t">Your Badges</div>
-      <div class="badge-grid">
-        <div class="badge"><div class="be">🚀</div><div class="bt">First Steps</div></div>
-        <div class="badge"><div class="be">📊</div><div class="bt">Know Before You Buy</div></div>
-        <div class="badge locked"><div class="be">🐻</div><div class="bt">Bear Aware</div></div>
-        <div class="badge locked"><div class="be">🌐</div><div class="bt">Diversified</div></div>
-        <div class="badge locked"><div class="be">💰</div><div class="bt">Lock It In</div></div>
-        <div class="badge locked"><div class="be">❄️</div><div class="bt">Compounder</div></div>
-      </div>
+      <div class="badge-grid" id="badgeGrid"></div>
 
       <button class="btn btn-soft" style="margin-top:6px" onclick="showToast('Shared your journey 🎉')">Share My Journey</button>
       <button class="btn btn-ghost" style="margin-top:10px" onclick="restartOnboarding()">↺ Replay Onboarding</button>
+      <button class="btn btn-ghost" style="margin-top:10px;color:var(--red)" onclick="resetProgress()">↺ Reset all progress</button>
     </div>
 
   </div>
@@ -1122,10 +1123,12 @@ var TAB_OF={home:'home',learn:'learn',tools:'tools',social:'social',journey:'jou
 var TITLES={home:"Fiscally",learn:'Learn',tools:'Explore',social:'Profile',journey:'Practice',scenario:'Scenarios',risk:'Risk Level',stockfinder:'Stock Finder'};
 var stack=['home'];
 function show(id){
+  closeL();closeTipBtn();/* never leave a lesson/term sheet floating over a new tab */
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page-'+id).classList.add('active');
   if(id==='learn')renderLearn();
   if(id==='journey')refreshHeldPrices();
+  if(id==='social')renderProfile();
   var tab=TAB_OF[id];
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});
   var isSub=['scenario','risk','stockfinder'].indexOf(id)>=0;
@@ -1150,10 +1153,8 @@ function renderOB(){
 }
 function obNext(){if(obStep<OB_MAX){obStep++;renderOB();}else finishOB();}
 function finishOB(){
-  document.getElementById('onboarding').classList.add('hidden');
-  document.getElementById('appHeader').classList.remove('hidden');
-  document.getElementById('appNav').classList.remove('hidden');
-  goTab('home');
+  onboarded=true;saveState();
+  enterApp();
   setTimeout(function(){showToast('🎉 Your journey has begun!');},400);
 }
 function startWelcome(){
@@ -1210,19 +1211,49 @@ function fetchLive(t,cb){
     .catch(function(){if(cb)cb();});
 }
 var initDone=false;
+/* stable per-ticker entry offset so seed holdings show a realistic MIX of P&L, not a uniform +1.5% */
+function anchorOffset(t){var h=0;for(var i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))%997;return 0.95+(h/997)*0.085;}
 function anchorInit(){
   if(initDone)return;
   var inits=PF.pos.filter(function(p){return p.init;});
   if(!inits.length){initDone=true;return;}
   if(inits.some(function(p){return !LIVE[p.t];}))return;
-  inits.forEach(function(p){p.avg=+(LIVE[p.t]*0.985).toFixed(2);delete p.init;});
+  inits.forEach(function(p){p.avg=+(LIVE[p.t]*anchorOffset(p.t)).toFixed(2);delete p.init;});
   var cost=0;PF.pos.forEach(function(p){cost+=p.sh*p.avg;});
-  PF.cash=+(START_CAPITAL-cost).toFixed(2);initDone=true;
+  PF.cash=+(START_CAPITAL-cost).toFixed(2);initDone=true;saveState();
 }
 function refreshHeldPrices(){PF.pos.forEach(function(p){if(!LIVE[p.t])fetchLive(p.t,function(){anchorInit();renderPortfolio();var jh=document.getElementById('jHold');if(jh&&jh.style.display!=='none')renderHoldings();});});}
 function money(n){return '$'+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function signed(n){return (n>=0?'+':'-')+'$'+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function totals(){var inv=0,val=0;PF.pos.forEach(function(p){inv+=p.sh*p.avg;val+=p.sh*curPx(p.t);});return {inv:inv,val:val,unreal:val-inv,total:val+PF.cash};}
+
+/* ── Persistence (localStorage, single-file, no backend) ─────────────── */
+var STORE_KEY='fiscally.v1',onboarded=false;
+function saveState(){
+  try{localStorage.setItem(STORE_KEY,JSON.stringify({v:1,onboarded:onboarded,PF:PF,ACTIVITY:ACTIVITY,GOAL:GOAL,LEARN:LEARN,contrib:contrib,seen:seen,initDone:initDone}));}catch(e){}
+}
+function loadState(){
+  try{
+    var raw=localStorage.getItem(STORE_KEY);if(!raw)return false;
+    var d=JSON.parse(raw);if(!d)return false;
+    if(d.PF)PF=d.PF;if(d.ACTIVITY)ACTIVITY=d.ACTIVITY;if(d.GOAL)GOAL=d.GOAL;
+    if(d.LEARN)LEARN=d.LEARN;if(d.contrib)contrib=d.contrib;if(d.seen)seen=d.seen;
+    if(typeof d.initDone==='boolean')initDone=d.initDone;
+    onboarded=!!d.onboarded;return true;
+  }catch(e){return false;}
+}
+function resetProgress(){
+  if(!confirm('Reset all progress? This clears your practice portfolio, goal and lessons, and starts you fresh.'))return;
+  try{localStorage.removeItem(STORE_KEY);}catch(e){}
+  location.reload();
+}
+function enterApp(){
+  document.getElementById('welcome').classList.add('hidden');
+  document.getElementById('onboarding').classList.add('hidden');
+  document.getElementById('appHeader').classList.remove('hidden');
+  document.getElementById('appNav').classList.remove('hidden');
+  goTab('home');
+}
 
 var pfRange='3M';
 var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1384,9 +1415,10 @@ function execTrade(){
     openSheet((realized>=0?'🎉 ':'')+'Trade complete, '+signed(realized)+' realized','You bought '+bn+' at an average of '+money(pos.avg)+' and sold at '+money(p)+'. That\'s a '+signed(realized)+' '+(realized>=0?'gain':'loss')+', now locked in as realized P&L. '+(realized>=0?'Nice work!':'Every trade is a lesson on the way.'));
   }
   var shIn=document.getElementById('tradeSh');if(shIn)shIn.value='';
-  renderPortfolio();renderTradePanel();refreshLearn();
+  renderPortfolio();renderTradePanel();refreshLearn();saveState();
 }
 function renderActivity(){
+  if(!ACTIVITY.length){document.getElementById('jAct').innerHTML='<div class="card"><div class="card-t">Activity</div><div class="muted-note" style="text-align:left">No trades yet. Head to <b>Trade</b> to make your first paper investment, it all shows up here.</div></div>';return;}
   document.getElementById('jAct').innerHTML='<div class="card"><div class="card-t">Activity</div>'+ACTIVITY.map(function(a){
     return '<div class="lrow"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:17px">'+a.ic+'</div><div><div class="l-n">'+a.main+'</div><div class="l-s">'+a.sub+'</div></div></div><div class="l-v"><div class="l-p tnum '+a.cls+'">'+a.amt+'</div></div></div>';
   }).join('')+'</div>';
@@ -1510,7 +1542,7 @@ function paintSF(a,d,p){
     +mrow('Most-likely value','<span class="up">'+sfMoney(d.target_prices.base)+'</span>','The middle-of-the-road estimate for '+bn+' in '+hWords(H)+' ('+pc(d.returns.base)+').')
     +mrow('Bounciness (volatility)',volPct.toFixed(1)+'%','How much the price moves around. It has swung about '+volPct.toFixed(0)+'% up or down over a year.')
     +mrow('Worst drop','-'+ddPct.toFixed(0)+'%','The biggest fall from a recent high. Holding through it, your money dipped about '+ddPct.toFixed(0)+'% before recovering.')
-    +mrow('Confidence',conf+'% · '+d.confidence_label,'How sure the model is, based on how clean and steady recent data is.')
+    +mrow('Data quality',conf+'% · '+d.confidence_label,'How clean and steady the recent data is. Even with great data, nobody can predict the exact price, only a likely range.')
     +mrow('Risk level',d.risk_label,'A plain rating of how much this could swing, currently '+(d.risk_label||'').toLowerCase()+'.')
     +'</div>';
   var since=(fc&&fc.available&&fc.previous_as_of)?('Barely moved since '+fc.previous_as_of+' (base '+(fc.base_return_delta>=0?'+':'')+(fc.base_return_delta*100).toFixed(2)+'%).'):'';
@@ -1596,7 +1628,7 @@ function loadForecast(t){
      function money(v){return v>=1000?'$'+(v/1000).toFixed(1)+'K':'$'+v.toFixed(0);}
      function pc(v){return (v>=0?'+':'')+(v*100).toFixed(0)+'%';}
      document.getElementById('fcScen').innerHTML=scenGrid([money(tp.bear),pc(rt.bear)],[money(tp.base),pc(rt.base)],[money(tp.bull),pc(rt.bull)])
-       +'<div class="row" style="margin-top:11px"><span style="font-size:11px;color:var(--muted);font-weight:700">Confidence: '+d.confidence_label+' · Risk: '+d.risk_label+'</span><span class="pill pill-grn">● Live</span></div>';
+       +'<div class="row" style="margin-top:11px"><span style="font-size:11px;color:var(--muted);font-weight:700">Bounciness: '+d.risk_label+' · a range, not a promise</span><span class="pill pill-grn">● Live</span></div>';
      if(d.plain_language)document.getElementById('fcTip').innerHTML=d.plain_language;
    }).catch(function(){
      if(fcCurrent!==t)return;
@@ -1694,7 +1726,7 @@ function checkSkillUnlocks(){
   if(_gotSnap===null){_gotSnap={};SKILLS.forEach(function(s){_gotSnap[s.id]=skillGot(s.id);});return;}
   SKILLS.forEach(function(s){var g=skillGot(s.id);if(g&&!_gotSnap[s.id]){learnXP(80);showToast('🏅 Skill unlocked: '+s.name+' · +80 XP');}_gotSnap[s.id]=g;});
 }
-function learnXP(n){LEARN.xp+=n;LEARN.dailyXP=Math.min(99,LEARN.dailyXP+n);if(LEARN.xp>=LEARN.xpToNext){LEARN.xp-=LEARN.xpToNext;LEARN.level++;LEARN.xpToNext=Math.round(LEARN.xpToNext*1.25);setTimeout(function(){showToast('🎉 Level up! Level '+LEARN.level);},900);}}
+function learnXP(n){LEARN.xp+=n;LEARN.dailyXP=Math.min(99,LEARN.dailyXP+n);if(LEARN.xp>=LEARN.xpToNext){LEARN.xp-=LEARN.xpToNext;LEARN.level++;LEARN.xpToNext=Math.round(LEARN.xpToNext*1.25);setTimeout(function(){showToast('🎉 Level up! Level '+LEARN.level);},900);}saveState();}
 function refreshLearn(){checkSkillUnlocks();if(document.getElementById('page-learn').classList.contains('active'))renderLearn();}
 function lring(val,max){var r=11,c=2*Math.PI*r,off=c*(1-Math.min(1,val/max));return '<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#e9e4f3" stroke-width="4"/><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#e0a92f" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 15 15)"/></svg>';}
 function ldonutSVG(pct){var r=34,c=2*Math.PI*r,off=c*(1-Math.min(1,pct/20));return '<svg width="120" height="120" viewBox="0 0 90 90"><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#e7e1f4" stroke-width="11"/><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#6f659a" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 45 45)"/></svg>';}
@@ -1844,34 +1876,64 @@ var LESSONS_L={
   ]}
 };
 /* ── lesson/path progression ── */
+/* ── Learn: duotone icon set (filled silhouette + line detail, inherits node colour) ── */
+var ICN={
+ receipt:{f:'<path d="M5 21V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17l-3-2-2 2-2-2-2 2-2-2-3 2Z"/>',s:'<path d="M5 21V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17l-3-2-2 2-2-2-2 2-2-2-3 2Z"/><path d="M9 7.5h6"/><path d="M9 11.5h6"/><path d="M9 15.5h4"/>'},
+ umbrella:{f:'<path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/>',s:'<path d="M12 12v7a2 2 0 0 0 4 0"/><path d="M3.5 12a8.5 8.5 0 0 1 17 0Z"/><path d="M12 3v2"/>'},
+ card:{f:'<rect x="2.5" y="5" width="19" height="14" rx="2.5"/>',s:'<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19"/><path d="M6 14.5h4"/>'},
+ balloon:{f:'<path d="M12 3c-2.9 0-5.2 2.2-5.2 5.3 0 3.4 2.8 6 5.2 6.5 2.4-.5 5.2-3.1 5.2-6.5C17.2 5.2 14.9 3 12 3Z"/>',s:'<path d="M12 3c-2.9 0-5.2 2.2-5.2 5.3 0 3.4 2.8 6 5.2 6.5 2.4-.5 5.2-3.1 5.2-6.5C17.2 5.2 14.9 3 12 3Z"/><path d="M10.8 14.6 12 16l1.2-1.4"/><path d="M12 16c-1.1.8-1.1 2.1 0 2.9s1.1 2.1 0 2.9"/>'},
+ coins:{f:'<path d="M5 6c0-1.7 3.1-3 7-3s7 1.3 7 3v12c0 1.7-3.1 3-7 3s-7-1.3-7-3V6Z"/>',s:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>'},
+ trend:{f:'<path d="M3 17L9 11l4 4 8-8v14H3Z"/>',s:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>'},
+ layers:{f:'<path d="M12 2 2 7l10 5 10-5L12 2Z"/>',s:'<path d="M12 2 2 7l10 5 10-5L12 2Z"/><path d="M2 12l10 5 10-5"/><path d="M2 17l10 5 10-5"/>'},
+ clock:{f:'<circle cx="12" cy="12" r="9"/>',s:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>'},
+ shield:{f:'<path d="M12 3l7.5 3v5.5c0 4.6-3.2 7.7-7.5 9-4.3-1.3-7.5-4.4-7.5-9V6L12 3Z"/>',s:'<path d="M12 3l7.5 3v5.5c0 4.6-3.2 7.7-7.5 9-4.3-1.3-7.5-4.4-7.5-9V6L12 3Z"/><path d="M9 12l2 2 4-4"/>'},
+ pie:{f:'<path d="M22 12A10 10 0 0 0 12 2v10Z"/>',s:'<path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10Z"/>'},
+ sliders:{f:'<circle cx="4" cy="13" r="2.3"/><circle cx="12" cy="7" r="2.3"/><circle cx="20" cy="15" r="2.3"/>',s:'<path d="M4 21v-6M4 11V3M12 21v-9M12 9V3M20 21v-4M20 13V3"/><circle cx="4" cy="13" r="2.3"/><circle cx="12" cy="7" r="2.3"/><circle cx="20" cy="15" r="2.3"/>'},
+ percent:{f:'<circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',s:'<line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>'},
+ chart:{f:'<path d="M7 14L10 11l3 3 5-5v12H7Z"/>',s:'<path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-5"/>'},
+ trophy:{f:'<path d="M7 4h10v4a5 5 0 0 1-10 0V4Z"/>',s:'<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M7 5H4v1a3 3 0 0 0 3 3"/><path d="M17 5h3v1a3 3 0 0 1-3 3"/>'},
+ leaf:{f:'<path d="M11 20A7 7 0 0 1 4 13C4 6 11 4 20 4c0 9-2 16-9 16Z"/>',s:'<path d="M11 20A7 7 0 0 1 4 13C4 6 11 4 20 4c0 9-2 16-9 16Z"/><path d="M4 13c5-1 9-3 12-7"/>'},
+ bank:{f:'<path d="M12 3l8 5H4l8-5Z"/>',s:'<path d="M3 21h18"/><path d="M4 10h16"/><path d="M5.5 10v8M9.5 10v8M14.5 10v8M18.5 10v8"/><path d="M12 3l8 5H4l8-5Z"/>'},
+ scale:{f:'<path d="M5 7.5l-3 5a3 3 0 0 0 6 0Z"/><path d="M19 7.5l3 5a3 3 0 0 1-6 0Z"/>',s:'<path d="M12 4v17"/><path d="M7.5 21h9"/><path d="M5 7.5h14"/><path d="M5 7.5l-3 5a3 3 0 0 0 6 0Z"/><path d="M19 7.5l3 5a3 3 0 0 1-6 0Z"/><path d="M5 7.5 12 5l7 2.5"/>'},
+ order:{f:'<rect x="9.5" y="5" width="11.5" height="2.2" rx="1.1"/><rect x="9.5" y="10.9" width="11.5" height="2.2" rx="1.1"/><rect x="9.5" y="16.8" width="11.5" height="2.2" rx="1.1"/>',s:'<path d="M4 10V5l-1.3 1"/><path d="M3 15c.3-1 2.3-.9 2.3.3 0 .9-2.3 1.5-2.3 2.7h2.4"/><path d="M10 6.1h11"/><path d="M10 12h11"/><path d="M10 17.9h11"/>'},
+ target:{f:'<circle cx="12" cy="12" r="9"/>',s:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>'},
+ bucket:{f:'<path d="M5 8h14l-1.3 11.2a1 1 0 0 1-1 .8H7.3a1 1 0 0 1-1-.8L5 8Z"/>',s:'<path d="M5 8h14l-1.3 11.2a1 1 0 0 1-1 .8H7.3a1 1 0 0 1-1-.8L5 8Z"/><path d="M4 8c0-2.2 3.6-4 8-4s8 1.8 8 4"/>'},
+ calc:{f:'<rect x="5" y="3" width="14" height="18" rx="2"/>',s:'<rect x="5" y="3" width="14" height="18" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><path d="M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18.5h.01M12 18.5h.01M16 18.5h.01"/>'},
+ cap:{f:'<path d="M22 10 12 5 2 10l10 5 10-5Z"/>',s:'<path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.1 2.7 2.5 6 2.5s6-1.4 6-2.5v-5"/><path d="M22 10v6"/>'},
+ check:{s:'<polyline points="20 6 9 17 4 12"/>'},
+ play:{f:'<polygon points="6 4 20 12 6 20"/>',s:'<polygon points="6 4 20 12 6 20"/>'},
+ lock:{f:'<rect x="5" y="11" width="14" height="9" rx="2"/>',s:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'},
+ book:{f:'<path d="M5 4a2 2 0 0 1 2-2h12v16H7a2 2 0 0 0-2 2V4Z"/>',s:'<path d="M5 4a2 2 0 0 1 2-2h12v16H7a2 2 0 0 0-2 2V4Z"/><path d="M19 18H7a2 2 0 0 0-2 2"/>'}
+};
+function lic(n){var o=ICN[n]||{};return '<svg viewBox="0 0 24 24" class="duo">'+(o.f?'<g class="duo-f">'+o.f+'</g>':'')+'<g class="duo-s">'+(o.s||'')+'</g></svg>';}
 function learnUnits(){return [
-  {k:'Unit 1',t:'Money foundations',lessons:[
-    {id:'f_budget',ic:'🧾',label:'Where your money goes'},
-    {id:'f_emergency',ic:'🛟',label:'Your safety net'},
-    {id:'f_debt',ic:'💳',label:'The cost of debt'},
-    {id:'f_inflation',ic:'🎈',label:'Inflation, the silent tax'}]},
-  {k:'Unit 2',t:'Why invest',lessons:[
-    {id:'v_save',ic:'🐷',label:'Saving vs investing'},
-    {id:'v_compound',ic:'❄️',label:'Compounding'},
-    {id:'v_assets',ic:'🧩',label:'Stocks, ETFs & bonds'},
-    {id:'v_timing',ic:'⏳',label:'Time in the market'}]},
-  {k:'Unit 3',t:'Build a smart portfolio',lessons:[
-    {id:'p_risk',ic:'🛡️',label:'Why risk matters'},
-    {id:'risk_div',ic:'📘',label:'Spread it out'},
-    {id:'p_mix',ic:'🥗',label:'Your asset mix'},
-    {id:'p_fees',ic:'🪙',label:'Index funds & fees'},
-    {id:'uncertainty',ic:'🔭',label:'Reading forecasts'},
-    {id:'MILE',ic:'🧺',label:'Hold 3+ asset types',mile:true}]},
-  {k:'Unit 4',t:'Canadian accounts · TFSA & RRSP',lessons:[
-    {id:'c_tfsa',ic:'🍁',label:'TFSA: tax-free growth'},
-    {id:'c_rrsp',ic:'🏦',label:'RRSP: retirement'},
-    {id:'c_which',ic:'⚖️',label:'TFSA vs RRSP'},
-    {id:'c_order',ic:'📊',label:'Which account first'}]},
-  {k:'Unit 5',t:'Plan & reach your goals',lessons:[
-    {id:'g_smart',ic:'🎯',label:'Set a SMART goal'},
-    {id:'g_buckets',ic:'🪣',label:'Short vs long-term'},
-    {id:'g_howmuch',ic:'💧',label:'How much to invest'},
-    {id:'g_ready',ic:'🎓',label:'Ready for real money?'}]}
+  {k:'Unit 1',t:'Money foundations',acc:'#7a6ff0',lessons:[
+    {id:'f_budget',ic:lic('receipt'),label:'Where your money goes'},
+    {id:'f_emergency',ic:lic('umbrella'),label:'Your safety net'},
+    {id:'f_debt',ic:lic('card'),label:'The cost of debt'},
+    {id:'f_inflation',ic:lic('balloon'),label:'Inflation, the silent tax'}]},
+  {k:'Unit 2',t:'Why invest',acc:'#3b8fe0',lessons:[
+    {id:'v_save',ic:lic('coins'),label:'Saving vs investing'},
+    {id:'v_compound',ic:lic('trend'),label:'Compounding'},
+    {id:'v_assets',ic:lic('layers'),label:'Stocks, ETFs & bonds'},
+    {id:'v_timing',ic:lic('clock'),label:'Time in the market'}]},
+  {k:'Unit 3',t:'Build a smart portfolio',acc:'#14a39b',lessons:[
+    {id:'p_risk',ic:lic('shield'),label:'Why risk matters'},
+    {id:'risk_div',ic:lic('pie'),label:'Spread it out'},
+    {id:'p_mix',ic:lic('sliders'),label:'Your asset mix'},
+    {id:'p_fees',ic:lic('percent'),label:'Index funds & fees'},
+    {id:'uncertainty',ic:lic('chart'),label:'Reading forecasts'},
+    {id:'MILE',ic:lic('trophy'),label:'Hold 3+ asset types',mile:true}]},
+  {k:'Unit 4',t:'Canadian accounts · TFSA & RRSP',acc:'#db6090',lessons:[
+    {id:'c_tfsa',ic:lic('leaf'),label:'TFSA: tax-free growth'},
+    {id:'c_rrsp',ic:lic('bank'),label:'RRSP: retirement'},
+    {id:'c_which',ic:lic('scale'),label:'TFSA vs RRSP'},
+    {id:'c_order',ic:lic('order'),label:'Which account first'}]},
+  {k:'Unit 5',t:'Plan & reach your goals',acc:'#28a565',lessons:[
+    {id:'g_smart',ic:lic('target'),label:'Set a SMART goal'},
+    {id:'g_buckets',ic:lic('bucket'),label:'Short vs long-term'},
+    {id:'g_howmuch',ic:lic('calc'),label:'How much to invest'},
+    {id:'g_ready',ic:lic('cap'),label:'Ready for real money?'}]}
 ];}
 function lessonStates(){
   var units=learnUnits(),map={},gate=true,activeId=null;
@@ -1893,11 +1955,11 @@ function renderUnitPath(u,st){
   u.lessons.forEach(function(l,i){
     var stt=st.map[l.id],locked=(stt==='lock'),mile=!!l.mile;
     var cls=mile?('mile'+(stt==='lock'?' milelock':'')):(stt==='active'?'active':(stt==='done'?'done':'lock'));
-    var icon=(locked&&!mile)?'🔒':l.ic;
+    var icon=(locked&&!mile)?lic('lock'):l.ic;
     var click='onclick="nodeTap(\''+l.id+'\','+(mile?'true':'false')+','+(locked?'true':'false')+')"';
     var ring=(stt==='active')?'<div class="node-ring"></div>':'';
     var bub=(stt==='active')?'<div class="start-bubble">START</div>':'';
-    html+='<div class="pnode" style="left:'+PCT[i%8]+'%;top:'+(PTOP+i*PSTEP)+'px">'+bub+ring+'<button class="node-btn '+cls+'" '+click+'>'+icon+'</button><div class="node-label">'+l.label+'</div></div>';
+    html+='<div class="pnode" style="left:'+PCT[i%8]+'%;top:'+(PTOP+i*PSTEP)+'px;--acc:'+u.acc+'">'+bub+ring+'<button class="node-btn '+cls+'" '+click+'>'+icon+'</button><div class="node-label">'+l.label+'</div></div>';
     if(stt==='active')ai=i;
   });
   if(ai>=0){var ax=PCT[ai%8],px=(ax>=50?21:79),py=pcy(ai),jc=LEARN.petJump?' pet-jump':'';
@@ -1982,7 +2044,7 @@ function finishLesson(){
   var perfect=((LP.wrong||0)===0);
   document.getElementById('lsheetInner').innerHTML='<div class="cele"><div class="cele-burst">🎉</div><div class="cele-fox">'+petSVG()+'</div><div class="cele-h">Lesson complete!</div><div class="cele-sub">'+(L.celeb||'Nice work, you\'re leveling up.')+'</div><div class="cele-stats"><div class="cstat gold"><div class="cstat-v">+'+(L.xp||40)+'</div><div class="cstat-k">XP earned</div></div><div class="cstat '+(perfect?'green':'pur')+'"><div class="cstat-v">'+(perfect?'💯':'👍')+'</div><div class="cstat-k">'+(perfect?'No mistakes':'Nice effort')+'</div></div><div class="cstat orange"><div class="cstat-v">🔥 '+LEARN.streak+'</div><div class="cstat-k">Day streak</div></div></div><button class="lp-cta" style="margin-top:18px" onclick="closeL();afterLessonDone()">Claim reward</button></div>';
 }
-function afterLessonDone(){checkSkillUnlocks();LEARN.petJump=true;renderLearn();}
+function afterLessonDone(){checkSkillUnlocks();LEARN.petJump=true;renderLearn();saveState();}
 function openMilestone(done){
   if(done){openL('<div class="ls-tag">Milestone · done</div><div class="ls-h">🧺 Spread across 3+ types</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><p class="ls-p" style="margin-top:10px">You\'re holding <b>3+ asset types</b> in your practice portfolio, earned by <b>doing</b>. '+PET.name+' is proud of you! 🦊</p><button class="btn-ghost-l" onclick="closeL()">Nice</button>');return;}
   openL('<div class="ls-tag">Milestone · do it to unlock</div><div class="ls-h">🧺 Hold 3+ asset types</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><p class="ls-p" style="margin-top:10px">This one unlocks by <b>doing</b>: hold at least 3 different asset types (a stock, an ETF, a crypto) at once. You hold <b>'+pfClasses()+'</b> right now.</p><button class="btn btn-pur" style="width:100%;margin-top:6px" onclick="closeL();goTab(\'journey\')">Go to Trade</button><button class="btn-ghost-l" onclick="closeL()">Later</button>');
@@ -2009,7 +2071,7 @@ function pickWhyG(el,i){GOAL_DRAFT.why=WHYS[i];el.parentNode.querySelectorAll('.
 function pickAcctG(el,i){GOAL_DRAFT.account=ACCTS[i].k;el.parentNode.querySelectorAll('.acct').forEach(function(x){x.classList.remove('sel-acct');x.style.opacity='.65';});el.classList.add('sel-acct');el.style.opacity='1';}
 function setGAmt(v){GOAL_DRAFT.amt=parseInt((''+v).replace(/[^0-9]/g,''))||0;}
 function setGPct(v){GOAL_DRAFT.pct=v;var el=document.getElementById('ldonut');if(el)el.innerHTML=ldonutInner(v,Math.round((GOAL_DRAFT.income||2500)*v/100));}
-function saveGoal(){GOAL=Object.assign(GOAL,GOAL_DRAFT);closeL();learnXP(20);showToast('🎯 Goal saved · +20 XP');renderGoalCard();renderLearn();}
+function saveGoal(){GOAL=Object.assign(GOAL,GOAL_DRAFT);closeL();learnXP(20);showToast('🎯 Goal saved · +20 XP');renderGoalCard();renderLearn();saveState();}
 function openL(html){document.getElementById('lsheetInner').innerHTML=html;document.getElementById('lsheetOv').classList.add('open');var sh=document.querySelector('#lsheetOv .sheet');if(sh)sh.scrollTop=0;}
 function closeL(){document.getElementById('lsheetOv').classList.remove('open');}
 function renderLearn(){
@@ -2017,13 +2079,13 @@ function renderLearn(){
   var h='<div class="page-title">Learn</div>';
   h+='<div class="dstrip"><div class="dstat"><span>🔥</span><div><div class="ds-v">'+LEARN.streak+'</div><div class="ds-k">day streak</div></div></div>'
     +'<div class="dstat">'+lring(daily,50)+'<div><div class="ds-v">'+daily+'/50</div><div class="ds-k">daily goal</div></div></div>'
-    +'<div class="dstat"><span>💎</span><div><div class="ds-v">'+LEARN.gems+'</div><div class="ds-k">gems</div></div></div></div>';
+    +'<div class="dstat"><span>⭐</span><div><div class="ds-v">'+LEARN.xp+'</div><div class="ds-k">XP</div></div></div></div>';
   /* goal banner moved to the Home save card (openGoalSetup) */
   h+=miaGuide();
   var L_states=lessonStates();
   learnUnits().forEach(function(u){
     var ud=unitDone(u),ua=unitActive(u,L_states);
-    h+='<div class="unit-head'+((!ud&&!ua)?' locked':'')+'"><div class="unit-ic">'+(ud?'✓':(ua?'▶':'🔒'))+'</div><div><div class="unit-k">'+u.k+'</div><div class="unit-t">'+u.t+'</div></div><button class="unit-gb" onclick="showToast(\'📖 Unit guidebook, coming soon\')">📖</button></div>';
+    h+='<div class="unit-head'+((!ud&&!ua)?' locked':'')+'" style="--acc:'+u.acc+'"><div class="unit-ic">'+(ud?lic('check'):(ua?lic('play'):lic('lock')))+'</div><div><div class="unit-k">'+u.k+'</div><div class="unit-t">'+u.t+'</div></div><button class="unit-gb" onclick="showToast(\'📖 Unit guidebook, coming soon\')">'+lic('book')+'</button></div>';
     h+=renderUnitPath(u,L_states);
   });
   h+='<div class="section-t">Skills you\'ve shown</div><div class="ls-sub">These unlock by <b>doing</b> in your practice portfolio, never a quiz.</div>';
@@ -2032,6 +2094,35 @@ function renderLearn(){
   h+='<div class="card"><div class="row"><span style="font-size:13px;color:var(--muted);font-weight:600">Concepts explored</span><span class="pill pill-pur" id="conceptCount">'+(Object.keys(seen).length)+' explored</span></div></div>';
   LEARN.petJump=false;
   document.getElementById('learnBody').innerHTML=h;
+}
+
+/* ── Profile: level, XP-ranked leaderboard, behaviour-driven badges ── */
+var TIERS=['Seed 🌰','Seedling 🌱','Sprout 🌱','Sprout 🌱','Sapling 🌿','Sapling 🌿','Grower 🌳','Grower 🌳'];
+function tierName(lv){return TIERS[Math.min(lv,TIERS.length-1)]||'Investor 🌳';}
+function totalXP(){return ((LEARN.level-1)*500)+(LEARN.xp||0);}
+var PEERS=[{n:'Jordan',av:'🧑',xp:1680},{n:'Priya',av:'🐢',xp:1510},{n:'Marcus',av:'🐼',xp:980}];
+var BADGES=[
+  {ic:'🚀',t:'First Steps',got:function(){return PF.pos.length>0;}},
+  {ic:'📊',t:'Know Before You Buy',got:function(){return Object.keys(seen).length>0||!!LEARN.flags.uncertainty;}},
+  {ic:'🐻',t:'Bear Aware',got:function(){return PF.pos.some(function(p){return curPx(p.t)<p.avg;});}},
+  {ic:'🌐',t:'Diversified',got:function(){return skillGot('diversify');}},
+  {ic:'💰',t:'Lock It In',got:function(){return PF.realized>0;}},
+  {ic:'❄️',t:'Compounder',got:function(){return !!LEARN.done.v_compound;}}
+];
+function renderProfile(){
+  var lv=document.getElementById('pfLevel');if(lv)lv.textContent='Level '+LEARN.level+' · '+tierName(LEARN.level);
+  var xe=document.getElementById('pfLevelXP');if(xe)xe.textContent=LEARN.xp+' XP · '+Math.max(0,LEARN.xpToNext-LEARN.xp)+' to Level '+(LEARN.level+1);
+  var bar=document.getElementById('pfLevelBar');if(bar)bar.style.width=Math.min(100,Math.round(LEARN.xp/LEARN.xpToNext*100))+'%';
+  var rows=PEERS.map(function(p){return {n:p.n,av:p.av,xp:p.xp,me:false};});
+  rows.push({n:'You',av:'__ME__',xp:totalXP(),me:true});
+  rows.sort(function(a,b){return b.xp-a.xp;});
+  var lb=document.getElementById('lbRows');
+  if(lb)lb.innerHTML=rows.map(function(r,i){
+    var av=r.me?'<div style="width:24px;height:24px;border-radius:50%;overflow:hidden">'+avatar()+'</div>':r.av;
+    return '<div class="lb-row"><div class="lb-rank'+(i===0?' gold':'')+(r.me?' me':'')+'">'+(i+1)+'</div><div class="lb-av">'+av+'</div><div class="lb-n">'+r.n+'</div><div class="lb-x">'+r.xp.toLocaleString()+' XP</div></div>';
+  }).join('');
+  var bg=document.getElementById('badgeGrid');
+  if(bg)bg.innerHTML=BADGES.map(function(b){var g=b.got();return '<div class="badge'+(g?'':' locked')+'"><div class="be">'+b.ic+'</div><div class="bt">'+b.t+'</div></div>';}).join('');
 }
 
 /* ── Home: Question of the Day (daily bite-sized learning) ── */
@@ -2046,7 +2137,7 @@ function renderQOTD(){
   var el=document.getElementById('homeQuestion');if(!el)return;
   var Q=QOTD[qPick%QOTD.length];
   var open=qOpen||qDone;
-  var top='<div class="q-top"'+(!open?' onclick="openQOTD()" style="cursor:pointer"':'')+'><div class="q-face">'+avatar()+'</div><div class="q-mid"><div class="q-k">Today\'s question</div><div class="q-q">'+Q.q+'</div>'+(!open?'<div class="q-cta">Answer ›</div>':'')+'</div></div>';
+  var top='<div class="q-top"'+(!open?' onclick="openQOTD()" style="cursor:pointer"':'')+'><div class="q-face">'+avatar()+'</div><div class="q-mid"><div class="q-q">'+Q.q+'</div>'+(!open?'<div class="q-cta">Answer ›</div>':'')+'</div></div>';
   var h='<div class="qcard'+(open?' open':'')+'">'+top;
   if(open){
     if(!qDone){
@@ -2072,7 +2163,7 @@ function renderPlan(){
   var el=document.getElementById('homePlan');if(!el)return;
   var doneN=PLAN.filter(function(s){return s.st==='done';}).length;
   if(planOpen){
-    var h='<div class="row" style="margin:2px 2px 10px"><div class="section-t" style="margin:0">Your plan to invest for real</div><span class="plan-more" onclick="togglePlan()">Show less ▴</span></div><div class="plan">';
+    var h='<div class="row" style="margin:2px 2px 10px;justify-content:flex-end"><span class="plan-more" onclick="togglePlan()">Show less ▴</span></div><div class="plan">';
     PLAN.forEach(function(s,i){
       var ic=s.st==='done'?'✓':(i+1),click=s.go?(' onclick="'+s.go+'" style="cursor:pointer"'):'';
       h+='<div class="pstep '+s.st+'"'+click+'><div class="pstep-l"><div class="pstep-ic">'+ic+'</div>'+(i<PLAN.length-1?'<div class="pstep-line"></div>':'')+'</div><div class="pstep-b"><div class="pstep-t">'+s.t+'</div><div class="pstep-d">'+s.d+'</div></div>'+(s.st==='now'?'<div class="pstep-go">›</div>':'')+'</div>';
@@ -2089,11 +2180,14 @@ function renderPlan(){
 }
 function togglePlan(){planOpen=!planOpen;renderPlan();}
 
+loadState();
 renderOB();
 renderPortfolio();renderHoldings();sfSelect('AAPL');
 renderFc('AAPL');loadIndices();
 checkSkillUnlocks();renderLearn();
-renderQOTD();renderPlan();renderGoalCard();
+renderQOTD();renderPlan();renderGoalCard();renderProfile();
+if(onboarded)enterApp();
+refreshHeldPrices();/* load live prices up front so Home & Practice settle to the same live value at once, not only when Practice opens */
 </script>
 </body>
 </html>
