@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: fiscally-api
+    runtime: python
+    plan: free
+    rootDir: .
+    buildCommand: python3.11 -m pip install --upgrade pip && python3.11 -m pip install -r services/api/requirements.txt
+    startCommand: uvicorn services.api.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.14
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: FISCALLY_REQUIRE_SUPABASE
+        value: "true"
+      - key: FISCALLY_MARKET_DATA_PROVIDER
+        value: supabase_proxy
+      - key: FISCALLY_MARKET_INDEX_AUTO_REFRESH
+        value: "false"
+      - key: FISCALLY_MARKET_INDEX_REFRESH_LOOKBACK_DAYS
+        value: "10"
+      - key: MALLOC_ARENA_MAX
+        value: "2"
+      - key: OPENBLAS_NUM_THREADS
+        value: "1"
+      - key: OMP_NUM_THREADS
+        value: "1"
+      - key: MKL_NUM_THREADS
+        value: "1"
