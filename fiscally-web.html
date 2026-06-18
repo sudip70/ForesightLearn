@@ -914,7 +914,7 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;overflow:
             <div class="hero-row">
               <div class="s"><label>Invested</label><span class="tnum" id="homeInvested">$10,000</span></div>
               <div class="s"><label>Growth</label><span class="tnum" id="homeGrowth">+$41.67</span></div>
-              <div class="s"><label>Day</label><span class="tnum" id="homeDayStat">4 / 28</span></div>
+              <div class="s"><label>Cash</label><span class="tnum" id="homeCash">$0</span></div>
             </div>
           </div>
 
@@ -944,15 +944,10 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;overflow:
           </div>
 
           <div class="card">
-            <div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">Portfolio value · your 28-day journey</div></div>
+            <div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">Portfolio value · last 60 days</div><span class="pill pill-gry" id="pfPxSrc">Sample prices</span></div>
             <div id="journeyChart"></div>
-            <div class="journey-bar">
-              <div class="jb-top"><span class="jb-day">Day <b id="simDay">4</b> of <span id="simTotal">28</span></span><span class="jb-note" id="simNote">Press advance to move time forward</span></div>
-              <div class="jb-track"><i id="simProg" style="width:14%"></i></div>
-              <div class="jb-btns"><button class="btn btn-soft" id="advBtn" onclick="advanceDay()">Advance a day ⏭</button><button class="btn btn-pur" id="ffBtn" onclick="fastForward()">Fast-forward ▶▶</button></div>
-            </div>
             <div class="pf-stats" style="margin-top:13px">
-              <div class="pf-stat"><label>Day</label><span class="tnum" id="pfDayStat">4 / 28</span></div>
+              <div class="pf-stat"><label>Invested</label><span class="tnum" id="pfInvested">$10,000</span></div>
               <div class="pf-stat"><label>Unrealized</label><span id="pfUnreal" class="tnum up">+$0</span></div>
               <div class="pf-stat"><label>Realized</label><span id="pfReal" class="tnum">$0.00</span></div>
             </div>
@@ -1380,7 +1375,7 @@ function jTab(el,k){
 var SEED={AAPL:311,AMD:165,AMZN:205,BAC:42,COST:880,CRM:280,DIS:105,GOOGL:178,HD:360,JNJ:155,JPM:205,KO:62,MA:470,META:560,MSFT:420,NFLX:680,NVDA:132,ORCL:175,PFE:28,PG:168,TSLA:250,UNH:510,V:285,WMT:70,XOM:115,
 BND:72,DIA:420,EEM:44,EFA:82,EWC:42,GLD:240,HYG:79,IWM:220,LQD:110,QQQ:480,SLV:28,SPY:540,TLT:92,VNQ:90,VTI:270,XLE:92,XLF:42,XLK:230,XLP:82,XLV:145,XLY:200,
 'ADA-USD':0.45,'AVAX-USD':35,'BNB-USD':600,'BTC-USD':64000,'DOGE-USD':0.13,'DOT-USD':6.5,'ETH-USD':3400,'LTC-USD':85,'SOL-USD':160,'XRP-USD':0.55};
-var LIVE={},TRADE_FC={};
+var LIVE={},TRADE_FC={},HIST={};/* HIST[t] = real daily {date,price} series from the forecast endpoint */
 var START_CAPITAL=10000;
 var PF={cash:4760.00,realized:0,pos:[
   {t:'AAPL',acct:'TFSA',sh:5,avg:305.00,init:1},
@@ -1401,9 +1396,9 @@ function curPxRaw(t){return LIVE[t]||SEED[t]||100;}
 function nameOf(t){var a=ASSETS.filter(function(x){return x.t===t;})[0];return a?a.n:t;}
 function fetchLive(t,cb){
   var key=t+'_90';
-  if(SF_CACHE[key]&&SF_CACHE[key].latest_price){LIVE[t]=SF_CACHE[key].latest_price;if(SF_CACHE[key].returns)TRADE_FC[t]=SF_CACHE[key].returns;if(cb)cb();return;}
+  if(SF_CACHE[key]&&SF_CACHE[key].latest_price){LIVE[t]=SF_CACHE[key].latest_price;if(SF_CACHE[key].returns)TRADE_FC[t]=SF_CACHE[key].returns;if(SF_CACHE[key].historical_prices)HIST[t]=SF_CACHE[key].historical_prices;if(cb)cb();return;}
   wakeFetch(API+'/api/forecasts/ticker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticker:t,horizon_days:90})})
-    .then(function(d){if(d&&d.latest_price){LIVE[t]=d.latest_price;if(d.returns)TRADE_FC[t]=d.returns;}if(cb)cb();})
+    .then(function(d){if(d&&d.latest_price){LIVE[t]=d.latest_price;if(d.returns)TRADE_FC[t]=d.returns;if(d.historical_prices)HIST[t]=d.historical_prices;}if(cb)cb();})
     .catch(function(){if(cb)cb();});
 }
 var initDone=false;
@@ -1418,7 +1413,7 @@ function anchorInit(){
   var cost=0;PF.pos.forEach(function(p){cost+=p.sh*p.avg;});
   PF.cash=+(START_CAPITAL-cost).toFixed(2);initDone=true;saveState();
 }
-function refreshHeldPrices(){PF.pos.forEach(function(p){if(!LIVE[p.t])fetchLive(p.t,function(){anchorInit();renderPortfolio();var jh=document.getElementById('jHold');if(jh&&jh.style.display!=='none')renderHoldings();});});}
+function refreshHeldPrices(){PF.pos.forEach(function(p){if(!LIVE[p.t]||!HIST[p.t])fetchLive(p.t,function(){anchorInit();renderPortfolio();var jh=document.getElementById('jHold');if(jh&&jh.style.display!=='none')renderHoldings();});});}
 function money(n){return '$'+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function signed(n){return (n>=0?'+':'-')+'$'+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtSh(n){n=+n;return Number.isInteger(n)?(''+n):(''+ +n.toFixed(4));}
@@ -1508,6 +1503,29 @@ function equityChart(hist,w,h,color,labelFn){
     +lab+'<circle cx="'+ex+'" cy="'+ey+'" r="3.5" fill="'+color+'" stroke="#fff" stroke-width="1.6"/></svg>';
 }
 function renderJourneyChart(){simEnsureHistory();var c=document.getElementById('journeyChart');if(c)c.innerHTML=equityChart(SIM.history,300,150,'#7a5cae');}
+/* ── Real paper-trading portfolio history ──────────────────────────────
+   Reconstructs the portfolio's value over the last N real trading days from
+   each holding's real daily closes (HIST), so the Practice chart reflects
+   actual market moves. Falls back to a flat line at the live total offline. */
+function fmtDate(s){if(!s)return '';var d=new Date(s);return isNaN(d)?s:d.toLocaleDateString(undefined,{month:'short',day:'numeric'});}
+function pxOnOrBefore(h,date){var px=h[0].price;for(var i=0;i<h.length;i++){if(h[i].date<=date)px=h[i].price;else break;}return px;}
+function portfolioHistory(N){
+  N=N||60;
+  var T=totals();
+  var withHist=PF.pos.map(function(p){return {p:p,h:HIST[p.t]};}).filter(function(x){return x.h&&x.h.length;});
+  if(!withHist.length){return [{date:'',total:+T.total.toFixed(2)},{date:'',total:+T.total.toFixed(2)}];}
+  var axis=withHist.reduce(function(a,b){return b.h.length>a.h.length?b:a;}).h.slice(-N).map(function(r){return r.date;});
+  var noHist=PF.pos.filter(function(p){return !(HIST[p.t]&&HIST[p.t].length);});
+  var hist=axis.map(function(date){
+    var val=PF.cash;
+    withHist.forEach(function(x){val+=x.p.sh*pxOnOrBefore(x.h,date);});
+    noHist.forEach(function(p){val+=p.sh*curPx(p.t);});/* assets without history held flat at live price */
+    return {date:date,total:+val.toFixed(2)};
+  });
+  if(hist.length)hist[hist.length-1].total=+T.total.toFixed(2);/* pin the last point to the live total */
+  return hist;
+}
+function renderPortfolioChart(){var c=document.getElementById('journeyChart');if(c)c.innerHTML=equityChart(portfolioHistory(60),300,150,'#7a5cae',function(p){return fmtDate(p.date);});}
 function renderJourneyControls(){
   var dn=document.getElementById('simDay');if(dn)dn.textContent=SIM.day;
   var tt=document.getElementById('simTotal');if(tt)tt.textContent=SIM.totalDays;
@@ -1535,6 +1553,7 @@ function loadState(){
     if(d.LEARN)LEARN=d.LEARN;if(d.contrib)contrib=d.contrib;if(d.seen)seen=d.seen;
     if(typeof d.initDone==='boolean')initDone=d.initDone;
     if(d.SIM)SIM=Object.assign(SIM,d.SIM);
+    SIM.started=false;SIM.px={};/* Practice marks to real prices now; the SIM clock is scenario-only */
     onboarded=!!d.onboarded;return true;
   }catch(e){return false;}
 }
@@ -1690,17 +1709,20 @@ function renderPortfolio(){
   var u=document.getElementById('pfUnreal');u.textContent=signed(T.unreal);u.className='tnum '+(T.unreal>=0?'up':'down');
   var r=document.getElementById('pfReal');r.textContent=PF.realized?signed(PF.realized):'$0.00';r.className='tnum '+(PF.realized>0?'up':(PF.realized<0?'down':''));
   // true investment gain excludes deposited cash; % is over capital actually put in
-  var invested=START_CAPITAL+(SIM.contributed||0),gain=T.unreal+PF.realized,pct=gain/invested*100,ap=document.getElementById('pfAllPct');
+  var invested=START_CAPITAL+(PF.deposits||0),gain=T.unreal+PF.realized,pct=gain/invested*100,ap=document.getElementById('pfAllPct');
   ap.textContent=(pct>=0?'+':'')+pct.toFixed(1)+'%';ap.className='pill '+(pct>=0?'pill-grn':'pill-red');
+  var inv=document.getElementById('pfInvested');if(inv)inv.textContent=money0(invested);
+  var src=document.getElementById('pfPxSrc');if(src){var real=PF.pos.some(function(p){return LIVE[p.t]!=null;});src.textContent=real?'Real prices':'Sample prices';src.className='pill '+(real?'pill-grn':'pill-gry');}
   // Home hero mirrors the live portfolio
   var hv=document.getElementById('homeVal');
   if(hv){hv.textContent=money(T.total);
     document.getElementById('homeChg').textContent=(gain>=0?'▲ ':'▼ ')+signed(gain)+' ('+(pct>=0?'+':'')+pct.toFixed(1)+'%) all time';
     document.getElementById('homeGrowth').textContent=signed(gain);
-    var hi=document.getElementById('homeInvested');if(hi)hi.textContent=money(invested);}
+    var hi=document.getElementById('homeInvested');if(hi)hi.textContent=money(invested);
+    var hc=document.getElementById('homeCash');if(hc)hc.textContent=money(PF.cash);}
   var hs=document.getElementById('homeSpark');
-  if(hs){simEnsureHistory();hs.innerHTML=sparkline(SIM.history.map(function(p){return p.total;}),200,80,'#ffffff');}
-  renderJourneyChart();renderJourneyControls();
+  if(hs){hs.innerHTML=sparkline(portfolioHistory(40).map(function(p){return p.total;}),200,80,'#ffffff');}
+  renderPortfolioChart();
 }
 /* tiny decorative-but-real sparkline for the Home hero (stretches to fill) */
 function sparkline(vals,w,h,color){
