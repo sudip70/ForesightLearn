@@ -1012,13 +1012,21 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;overflow:
         </div>
         <div class="stack">
       <div class="section-t" style="margin-top:0">What-if scenarios</div>
-      <div class="ls-sub" style="margin:-4px 0 11px">Fast-forward your <b>real holdings</b>, risk-free. Nothing here changes your actual portfolio.</div>
-      <div class="scenario-card" data-scn="compound" onclick="runScenario('compound')">
-        <div class="sc-ico">❄️</div><div class="sc-body"><div class="sc-ttl">The Compound Effect</div><div class="sc-dsc">Hold your portfolio for 5 simulated years and watch the snowball.</div></div>
+      <div class="ls-sub" style="margin:-4px 0 11px">Replay <b>real market history</b> on your holdings, risk-free. Nothing here changes your actual portfolio.</div>
+      <div class="scenario-card" data-scn="gfc2008" onclick="runScenario('gfc2008')">
+        <div class="sc-ico">📉</div><div class="sc-body"><div class="sc-ttl">The 2008 Financial Crisis</div><div class="sc-dsc">Live through the real −57% crash, and the recovery that followed.</div></div>
         <div class="scn-chev"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
       </div>
-      <div class="scenario-card" data-scn="bear" onclick="runScenario('bear')">
-        <div class="sc-ico">🐻</div><div class="sc-body"><div class="sc-ttl">Riding a Bear Market</div><div class="sc-dsc">See how a downturn hits your holdings, and why holding on matters.</div></div>
+      <div class="scenario-card" data-scn="covid2020" onclick="runScenario('covid2020')">
+        <div class="sc-ico">🦠</div><div class="sc-body"><div class="sc-ttl">The COVID Crash, 2020</div><div class="sc-dsc">A 34% drop in five weeks, then a record-breaking rebound.</div></div>
+        <div class="scn-chev"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="scenario-card" data-scn="bull2021" onclick="runScenario('bull2021')">
+        <div class="sc-ico">🚀</div><div class="sc-body"><div class="sc-ttl">The 2020–21 Bull Run</div><div class="sc-dsc">Ride your holdings from the COVID low to an all-time high.</div></div>
+        <div class="scn-chev"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="scenario-card" data-scn="compound" onclick="runScenario('compound')">
+        <div class="sc-ico">❄️</div><div class="sc-body"><div class="sc-ttl">The Compound Effect</div><div class="sc-dsc">Hold your portfolio for 5 simulated years and watch the snowball.</div></div>
         <div class="scn-chev"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
       </div>
       <div class="scenario-card" data-scn="diversify" onclick="runScenario('diversify')">
@@ -1290,7 +1298,7 @@ function genCandles(n,start){
 }
 
 /* ── Render charts ───────────────────────────── */
-/* journeyChart is rendered by renderJourneyChart() inside renderPortfolio (needs PF/totals) */
+/* journeyChart is rendered by renderPortfolioChart() inside renderPortfolio (needs PF/totals) */
 /* scenarioChart is rendered lazily by renderScenario() when the Scenarios page opens */
 /* Stock Finder now renders a live forecast fan chart (see sfSelect) */
 renderGauge(20);renderDonut(10);onCalc();
@@ -1389,10 +1397,8 @@ var ACTIVITY=[
   {ic:'💵',main:'Opening deposit',sub:'Day 1 · Virtual cash',amt:'+$10,000.00',cls:'up'}
 ];
 var contrib={amt:100,freq:'Weekly'},tradeTicker='AAPL',tradeAction='buy',explainerShown=false;
-/* ── simulated market clock (the time engine) ── */
-var SIM={started:false,day:4,totalDays:28,px:{},history:[],peak:0,lastContribDay:4,contributed:0,graduated:false};
-function curPx(t){return (SIM.started&&SIM.px[t]!=null)?SIM.px[t]:(LIVE[t]||SEED[t]||100);}
-function curPxRaw(t){return LIVE[t]||SEED[t]||100;}
+var SIM={day:4};/* vestigial day counter, kept only for the activity-log label */
+function curPx(t){return LIVE[t]||SEED[t]||100;}/* real live price, seed fallback offline */
 function nameOf(t){var a=ASSETS.filter(function(x){return x.t===t;})[0];return a?a.n:t;}
 function fetchLive(t,cb){
   var key=t+'_90';
@@ -1419,71 +1425,8 @@ function signed(n){return (n>=0?'+':'-')+'$'+Math.abs(n).toLocaleString(undefine
 function fmtSh(n){n=+n;return Number.isInteger(n)?(''+n):(''+ +n.toFixed(4));}
 function totals(){var inv=0,val=0;PF.pos.forEach(function(p){inv+=p.sh*p.avg;val+=p.sh*curPx(p.t);});return {inv:inv,val:val,unreal:val-inv,total:val+PF.cash};}
 
-/* ═══════════ Time engine: advance days, move prices, record a real equity curve ═══════════ */
+/* standard-normal sampler, used by the scenario engine */
 function gauss(){var u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
-/* per-day volatility & drift from the live forecast (TRADE_FC), else asset-class defaults */
-function simVol(t){var fc=TRADE_FC[t];if(fc&&fc.bull!=null&&fc.bear!=null)return Math.max(0.004,Math.min(0.06,(fc.bull-fc.bear)/20));var c=lclsOf(t);return c==='crypto'?0.04:(c==='etf'?0.009:0.016);}
-function simDrift(t){var fc=TRADE_FC[t];if(fc&&fc.base!=null)return Math.max(-0.004,Math.min(0.004,fc.base/63));return 0.0002;}
-function simEnsureHistory(){
-  if(!SIM.history.length){
-    var nowTotal=totals().total,start=START_CAPITAL,d;
-    for(d=0;d<=SIM.day;d++){var f=SIM.day?d/SIM.day:1,j=(d>0&&d<SIM.day)?(Math.sin(d*1.9)*0.0045):0,v=(start+(nowTotal-start)*f)*(1+j);SIM.history.push({day:d,total:+v.toFixed(2)});}
-    SIM.peak=Math.max.apply(null,SIM.history.map(function(h){return h.total;}));
-  }
-  /* before the journey starts, keep the last point tracking the live total */
-  if(!SIM.started&&SIM.history.length)SIM.history[SIM.history.length-1].total=+totals().total.toFixed(2);
-}
-function dayStep(){
-  if(!SIM.started){SIM.started=true;SIM.lastContribDay=SIM.day;PF.pos.forEach(function(p){if(SIM.px[p.t]==null)SIM.px[p.t]=curPxRaw(p.t);});}
-  PF.pos.forEach(function(p){
-    if(SIM.px[p.t]==null)SIM.px[p.t]=curPxRaw(p.t);
-    var r=simDrift(p.t)+simVol(p.t)*gauss();r=Math.max(-0.18,Math.min(0.18,r));
-    SIM.px[p.t]=+(SIM.px[p.t]*(1+r)).toFixed(4);
-  });
-  SIM.day++;
-  var period=contrib.freq==='Weekly'?7:30;
-  if(SIM.day-SIM.lastContribDay>=period){
-    SIM.lastContribDay=SIM.day;PF.cash=+(PF.cash+contrib.amt).toFixed(2);SIM.contributed=+(SIM.contributed+contrib.amt).toFixed(2);
-    if(typeof GOAL!=='undefined')GOAL.saved=Math.min(GOAL.amt,GOAL.saved+contrib.amt);
-    ACTIVITY.unshift({ic:'💰',main:'Auto-contribution',sub:'Day '+SIM.day+' · '+contrib.freq+' deposit',amt:'+'+money(contrib.amt),cls:'up'});
-    SIM._contribFlash=true;
-  }
-  var tot=totals().total;
-  SIM.history.push({day:SIM.day,total:+tot.toFixed(2)});
-  if(SIM.history.length>240)SIM.history.shift();
-  if(tot>SIM.peak)SIM.peak=tot;
-  if(PF.pos.length&&tot<=SIM.peak*0.95)LEARN.flags.patience=true; /* rode a 5%+ dip while holding */
-}
-function advanceDay(){
-  simEnsureHistory();
-  if(SIM.day>=SIM.totalDays){graduate();return;}
-  dayStep();afterSim();
-  if(SIM._contribFlash){SIM._contribFlash=false;showToast('💰 Auto-contribution: +'+money(contrib.amt));}
-  if(SIM.day>=SIM.totalDays)graduate();
-}
-var ffTimer=null;
-function fastForward(){
-  if(ffTimer){clearInterval(ffTimer);ffTimer=null;updateFFBtn();return;}
-  simEnsureHistory();
-  if(SIM.day>=SIM.totalDays){graduate();return;}
-  updateFFBtn();
-  ffTimer=setInterval(function(){
-    if(SIM.day>=SIM.totalDays){clearInterval(ffTimer);ffTimer=null;updateFFBtn();afterSim();graduate();return;}
-    dayStep();afterSim();
-  },165);
-}
-function updateFFBtn(){var b=document.getElementById('ffBtn');if(b)b.textContent=ffTimer?'Pause ⏸':'Fast-forward ▶▶';}
-function afterSim(){renderPortfolio();var jh=document.getElementById('jHold');if(jh&&jh.style.display!=='none')renderHoldings();if(typeof renderGoalCard==='function')renderGoalCard();if(typeof refreshLearn==='function')refreshLearn();saveState();}
-function graduate(){
-  if(ffTimer){clearInterval(ffTimer);ffTimer=null;updateFFBtn();}
-  var T=totals(),tot=T.total,invested=START_CAPITAL+(SIM.contributed||0),gain=T.unreal+PF.realized,pct=gain/invested*100;
-  if(!SIM.graduated){SIM.graduated=true;if(typeof learnXP==='function')learnXP(60);}
-  renderJourneyControls();
-  var added=SIM.contributed>0?(' You added '+money(SIM.contributed)+' through auto-contributions along the way.'):'';
-  openSheet('🎓 Journey complete!','Over '+SIM.totalDays+' practice days your account grew to '+money(tot)+'.'+added+' Your investments themselves earned '+signed(gain)+' ('+(pct>=0?'+':'')+pct.toFixed(1)+'%), the ups and downs you just rode are exactly what real investing feels like, with none of the risk. Ready for another stretch?');
-  saveState();
-}
-function extendJourney(){SIM.totalDays+=28;SIM.graduated=false;afterSim();showToast('+28 more practice days, keep going!');}
 function equityChart(hist,w,h,color,labelFn){
   color=color||'#7a5cae';var pad=8,padB=20,padT=10;
   var vals=hist.map(function(p){return p.total;});
@@ -1502,7 +1445,6 @@ function equityChart(hist,w,h,color,labelFn){
     +'<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
     +lab+'<circle cx="'+ex+'" cy="'+ey+'" r="3.5" fill="'+color+'" stroke="#fff" stroke-width="1.6"/></svg>';
 }
-function renderJourneyChart(){simEnsureHistory();var c=document.getElementById('journeyChart');if(c)c.innerHTML=equityChart(SIM.history,300,150,'#7a5cae');}
 /* ── Real paper-trading portfolio history ──────────────────────────────
    Reconstructs the portfolio's value over the last N real trading days from
    each holding's real daily closes (HIST), so the Practice chart reflects
@@ -1526,19 +1468,6 @@ function portfolioHistory(N){
   return hist;
 }
 function renderPortfolioChart(){var c=document.getElementById('journeyChart');if(c)c.innerHTML=equityChart(portfolioHistory(60),300,150,'#7a5cae',function(p){return fmtDate(p.date);});}
-function renderJourneyControls(){
-  var dn=document.getElementById('simDay');if(dn)dn.textContent=SIM.day;
-  var tt=document.getElementById('simTotal');if(tt)tt.textContent=SIM.totalDays;
-  var pr=document.getElementById('simProg');if(pr)pr.style.width=Math.min(100,SIM.day/SIM.totalDays*100)+'%';
-  var ds=document.getElementById('pfDayStat');if(ds)ds.textContent=SIM.day+' / '+SIM.totalDays;
-  var hd=document.getElementById('homeDayStat');if(hd)hd.textContent=SIM.day+' / '+SIM.totalDays;
-  var note=document.getElementById('simNote');
-  if(note){var T=totals(),invested=START_CAPITAL+(SIM.contributed||0),p=(T.unreal+PF.realized)/invested*100;
-    note.textContent = SIM.day>=SIM.totalDays?'Journey complete 🎓':(Math.abs(p)<0.05?'Press advance to move time forward':(p>=0?('Up '+p.toFixed(1)+'% so far, compounding at work'):('Down '+Math.abs(p).toFixed(1)+'% so far, dips are normal')));}
-  var adv=document.getElementById('advBtn'),ff=document.getElementById('ffBtn');
-  if(adv){if(SIM.day>=SIM.totalDays){adv.textContent='Start a new 28-day stretch';adv.setAttribute('onclick','extendJourney()');if(ff)ff.style.display='none';}
-    else{adv.textContent='Advance a day ⏭';adv.setAttribute('onclick','advanceDay()');if(ff){ff.style.display='';}}}
-}
 
 /* ── Persistence (localStorage, single-file, no backend) ─────────────── */
 var STORE_KEY='fiscally.web.v1',onboarded=false;
@@ -1552,8 +1481,7 @@ function loadState(){
     if(d.PF)PF=d.PF;if(d.ACTIVITY)ACTIVITY=d.ACTIVITY;if(d.GOAL)GOAL=d.GOAL;
     if(d.LEARN)LEARN=d.LEARN;if(d.contrib)contrib=d.contrib;if(d.seen)seen=d.seen;
     if(typeof d.initDone==='boolean')initDone=d.initDone;
-    if(d.SIM)SIM=Object.assign(SIM,d.SIM);
-    SIM.started=false;SIM.px={};/* Practice marks to real prices now; the SIM clock is scenario-only */
+    if(d.SIM&&d.SIM.day!=null)SIM.day=d.SIM.day;
     onboarded=!!d.onboarded;return true;
   }catch(e){return false;}
 }
@@ -1573,10 +1501,14 @@ function enterApp(){
 /* ═══════════ Scenarios: non-destructive what-ifs run on the REAL portfolio ═══════════ */
 var SCN_CLASSMULT={stock:1,etf:0.6,crypto:2.4};
 var SCENARIOS=[
+  {id:'gfc2008',icon:'📉',title:'The 2008 Financial Crisis',regime:'gfc2008',term:'bear',endLbl:'By end 2009',
+   mia:'In 2008 the S&P 500 fell about <b>57%</b> over 17 months. Brutal, but investors who <b>held on</b> recovered, the market reached new highs years later. 📉'},
+  {id:'covid2020',icon:'🦠',title:'The COVID Crash, 2020',regime:'covid2020',term:'bear',endLbl:'By end 2020',
+   mia:'In early 2020 markets fell <b>34% in five weeks</b>, then staged one of the <b>fastest recoveries ever</b>. Crashes can mend faster than they fall. 🦠'},
+  {id:'bull2021',icon:'🚀',title:'The 2020–21 Bull Run',regime:'bull2021',term:'bull',endLbl:'At the 2022 peak',
+   mia:'From the COVID low the market <b>more than doubled</b> to a record high by January 2022. Staying invested is how you catch runs like this. 🚀'},
   {id:'compound',icon:'❄️',title:'The Compound Effect',steps:60,drift:0.0078,mktVol:0.018,idio:0.011,investAll:true,unit:'yr',stepsPer:12,term:'compound',endLbl:'In 5 years',
    mia:'Give it time and your gains start earning their own gains, that\'s <b>compounding</b>. The curve bends upward the longer you stay invested. ❄️'},
-  {id:'bear',icon:'🐻',title:'Riding a Bear Market',steps:42,drift:-0.009,mktVol:0.013,idio:0.007,recover:true,term:'bear',endLbl:'After the dip',
-   mia:'Markets fall sometimes, it feels awful. But selling locks in the loss; <b>holding on</b> is how long-term investors ride it back up. 🐻'},
   {id:'diversify',icon:'🌐',title:'Diversify with Mia',steps:45,drift:-0.003,mktVol:0.008,idio:0.018,compare:true,term:'diversification',
    mia:'Same shock, two portfolios. <b>Spreading across more types</b> (the green line) softens the swings, that\'s diversification at work. 🌐'}
 ];
@@ -1586,7 +1518,31 @@ function scnVal(h){var v=0;h.forEach(function(x){v+=x.sh*x.px;});return v;}
 /* a broadly diversified spread: many independent low-vol holdings, so idiosyncratic swings average out */
 function scnDiversified(val){var n=8,out=[],i;for(i=0;i<n;i++)out.push({sh:1,px:val/n,cls:'etf'});return out;}
 function scnStep(h,mktR,idio){h.forEach(function(x){var r=mktR+idio*(SCN_CLASSMULT[x.cls]||1)*gauss();if(r<-0.3)r=-0.3;if(r>0.3)r=0.3;x.px=x.px*(1+r);});}
+var SCN_BETA={stock:1.1,etf:0.9,crypto:1.6};/* how hard each asset class follows the broad market in a regime */
+/* Real S&P 500 closing levels for famous regimes (public market data, ~monthly anchors).
+   A scenario replays these real market moves on a COPY of the user's holdings, scaled by
+   each asset class's market beta. Strictly non-destructive — PF/SIM are never touched. */
+var REGIMES={
+  gfc2008:{label:'2008 Financial Crisis',from:'Oct 2007',to:'Dec 2009',lvl:[1565,1378,1323,1280,1166,968,752,903,826,735,677,919,1057,1115]},
+  covid2020:{label:'COVID Crash 2020',from:'Feb 2020',to:'Dec 2020',lvl:[3386,2237,2912,3044,3100,3271,3500,3363,3270,3622,3756]},
+  bull2021:{label:'2020–21 Bull Run',from:'Mar 2020',to:'Jan 2022',lvl:[2237,3100,3363,3756,3973,4298,4308,4766,4797]}
+};
+/* geometric interpolation between the monthly anchors → a smooth per-frame market return path */
+function regimeReturns(reg){var lvl=reg.lvl,out=[],FR=4,i,f;for(i=1;i<lvl.length;i++){var r=Math.pow(lvl[i]/lvl[i-1],1/FR)-1;for(f=0;f<FR;f++)out.push(r);}return out;}
+function simulateRegime(spec){
+  var reg=REGIMES[spec.regime],rets=regimeReturns(reg);
+  var A=scnSnap(),cash=PF.cash;
+  function tot(h){return scnVal(h)+cash;}
+  var cA=[{i:0,total:tot(A)}],pkA=cA[0].total,wA=0;
+  rets.forEach(function(mktR,idx){
+    A.forEach(function(x){var r=mktR*(SCN_BETA[x.cls]||1);if(r<-0.5)r=-0.5;if(r>0.5)r=0.5;x.px=x.px*(1+r);});
+    var va=tot(A);if(va>pkA)pkA=va;var da=(va-pkA)/pkA;if(da<wA)wA=da;cA.push({i:idx+1,total:+va.toFixed(2)});
+  });
+  return {id:spec.id,compare:false,curveA:cA,curveB:null,startA:cA[0].total,endA:cA[cA.length-1].total,
+    gainA:(cA[cA.length-1].total/cA[0].total-1)*100,worstA:wA*100,regime:reg};
+}
 function simulateScenario(spec){
+  if(spec.regime)return simulateRegime(spec);
   var A=scnSnap(),B=spec.compare?scnDiversified(scnVal(A)):null;
   var cash=spec.compare?0:PF.cash; /* compare = invested-only, apples to apples */
   if(spec.investAll&&cash>0){A=A.concat([{sh:1,px:cash,cls:'etf'}]);cash=0;} /* compound: put the whole balance to work so the snowball is clear */
@@ -1616,10 +1572,13 @@ function compareChart(a,b,w,h,labelFn){
     +'<path d="'+path(b)+'" fill="none" stroke="#4f9c7e" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'
     +lab+dot(a,'#9084b4')+dot(b,'#4f9c7e')+'</svg>';
 }
-var scnCur='compound',scnData=null,scnTerm='compound',scnAnim=null;
-function scnLabelFn(spec){return function(p){return spec.unit==='yr'?('Yr '+Math.round((p.i||0)/spec.stepsPer)):('Day '+(p.i||0));};}
+var scnCur='gfc2008',scnData=null,scnTerm='bear',scnAnim=null;
+function scnLabelFn(spec,d){
+  if(spec.regime){var reg=REGIMES[spec.regime],last=d?d.curveA[d.curveA.length-1].i:0;return function(p){return p.i===0?reg.from:(p.i===last?reg.to:'');};}
+  return function(p){return spec.unit==='yr'?('Yr '+Math.round((p.i||0)/spec.stepsPer)):('Day '+(p.i||0));};
+}
 function drawScenarioChart(spec,d,upto){
-  var c=document.getElementById('scenarioChart');if(!c)return;var lf=scnLabelFn(spec);
+  var c=document.getElementById('scenarioChart');if(!c)return;var lf=scnLabelFn(spec,d);
   if(spec.compare){c.innerHTML=compareChart(d.curveA.slice(0,upto),d.curveB.slice(0,upto),300,150,lf);}
   else{c.innerHTML=equityChart(d.curveA.slice(0,upto),300,150,'#7a5cae',lf);}
 }
