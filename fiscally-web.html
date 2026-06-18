@@ -939,13 +939,21 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;overflow:
           <div class="dash-hero">
             <div class="dh-top"><div class="dh-k">Practice portfolio</div><span class="pill pill-grn" id="pfAllPct">+1.0%</span></div>
             <div class="dh-val tnum" id="pfValue">$10,101.29</div>
-            <div class="dh-chg"><span id="scStatVal" class="tnum">+$101.29</span> · all time</div>
+            <div class="dh-chg"><span id="scStatVal" class="tnum">+$101.29</span> · all time<span id="pfToday"></span></div>
             <div class="dh-bp"><div class="dh-bp-l">⚡ Buying power</div><div class="dh-bp-v tnum" id="pfCash">$3,346.81</div></div>
           </div>
 
           <div class="card">
-            <div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">Portfolio value · last 60 days</div><span class="pill pill-gry" id="pfPxSrc">Sample prices</span></div>
+            <div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">Portfolio value <span id="pfRangeChg" style="font-size:12px;font-weight:700;color:var(--muted)"></span></div><span class="pill pill-gry" id="pfPxSrc">Sample prices</span></div>
             <div id="journeyChart"></div>
+            <div style="display:flex;gap:6px;margin-top:11px">
+              <button class="rt" onclick="setRange('1D',this)">1D</button>
+              <button class="rt" onclick="setRange('1W',this)">1W</button>
+              <button class="rt on" onclick="setRange('1M',this)">1M</button>
+              <button class="rt" onclick="setRange('6M',this)">6M</button>
+              <button class="rt" onclick="setRange('YTD',this)">YTD</button>
+              <button class="rt" onclick="setRange('ALL',this)">ALL</button>
+            </div>
             <div class="pf-stats" style="margin-top:13px">
               <div class="pf-stat"><label>Invested</label><span class="tnum" id="pfInvested">$10,000</span></div>
               <div class="pf-stat"><label>Unrealized</label><span id="pfUnreal" class="tnum up">+$0</span></div>
@@ -972,12 +980,14 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;overflow:
           <div class="subtabs">
             <div class="subtab active" onclick="jTab(this,'hold')">Holdings</div>
             <div class="subtab" onclick="jTab(this,'trade')">Trade</div>
+            <div class="subtab" onclick="jTab(this,'watch')">Watch</div>
             <div class="subtab" onclick="jTab(this,'act')">Activity</div>
             <div class="subtab" onclick="jTab(this,'plan')">Plan</div>
           </div>
 
           <div id="jHold"></div>
           <div id="jTrade" style="display:none"></div>
+          <div id="jWatch" style="display:none"></div>
           <div id="jAct" style="display:none"></div>
           <div id="jPlan" style="display:none"></div>
         </div>
@@ -1368,12 +1378,15 @@ function onPct(v){
 }
 
 /* ── In-screen tabs ──────────────────────────── */
+var jCur='hold';
 function jTab(el,k){
+  jCur=k;
   if(el)document.querySelectorAll('#page-journey .subtab').forEach(function(t){t.classList.remove('active');}),el.classList.add('active');
-  var map={hold:'jHold',trade:'jTrade',act:'jAct',plan:'jPlan'};
+  var map={hold:'jHold',trade:'jTrade',watch:'jWatch',act:'jAct',plan:'jPlan'};
   for(var n in map)document.getElementById(map[n]).style.display=(n===k)?'':'none';
   if(k==='hold')renderHoldings();
   if(k==='trade')renderTrade();
+  if(k==='watch')renderWatch();
   if(k==='act')renderActivity();
   if(k==='plan')renderJourneyPlan();
 }
@@ -1385,7 +1398,7 @@ BND:72,DIA:420,EEM:44,EFA:82,EWC:42,GLD:240,HYG:79,IWM:220,LQD:110,QQQ:480,SLV:2
 'ADA-USD':0.45,'AVAX-USD':35,'BNB-USD':600,'BTC-USD':64000,'DOGE-USD':0.13,'DOT-USD':6.5,'ETH-USD':3400,'LTC-USD':85,'SOL-USD':160,'XRP-USD':0.55};
 var LIVE={},TRADE_FC={},HIST={};/* HIST[t] = real daily {date,price} series from the forecast endpoint */
 var START_CAPITAL=10000;
-var PF={cash:4760.00,realized:0,pos:[
+var PF={cash:4760.00,realized:0,deposits:0,watch:['NVDA','QQQ','BTC-USD'],pos:[
   {t:'AAPL',acct:'TFSA',sh:5,avg:305.00,init:1},
   {t:'SPY',acct:'TFSA',sh:6,avg:533.00,init:1},
   {t:'GLD',acct:'RRSP',sh:2,avg:238.00,init:1}
@@ -1396,7 +1409,7 @@ var ACTIVITY=[
   {ic:'🟢',main:'Bought 5 × AAPL',sub:'Day 1 · @ $181.20',amt:'-$906.00',cls:''},
   {ic:'💵',main:'Opening deposit',sub:'Day 1 · Virtual cash',amt:'+$10,000.00',cls:'up'}
 ];
-var contrib={amt:100,freq:'Weekly'},tradeTicker='AAPL',tradeAction='buy',explainerShown=false;
+var contrib={amt:100,freq:'Weekly'},tradeTicker='AAPL',tradeAction='buy',explainerShown=false,pendingSh=0;
 var SIM={day:4};/* vestigial day counter, kept only for the activity-log label */
 function curPx(t){return LIVE[t]||SEED[t]||100;}/* real live price, seed fallback offline */
 function nameOf(t){var a=ASSETS.filter(function(x){return x.t===t;})[0];return a?a.n:t;}
@@ -1424,6 +1437,81 @@ function money(n){return '$'+Number(n).toLocaleString(undefined,{minimumFraction
 function signed(n){return (n>=0?'+':'-')+'$'+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtSh(n){n=+n;return Number.isInteger(n)?(''+n):(''+ +n.toFixed(4));}
 function totals(){var inv=0,val=0;PF.pos.forEach(function(p){inv+=p.sh*p.avg;val+=p.sh*curPx(p.t);});return {inv:inv,val:val,unreal:val-inv,total:val+PF.cash};}
+/* Asset day change from the REAL daily EOD series: latest close vs the prior close.
+   Used for the WATCHLIST, where we show the market's move on something you don't own. */
+function prevClose(t){var h=HIST[t];if(!h||h.length<2)return null;return h[h.length-2].price;}
+function barDate(t){var h=HIST[t];return (h&&h.length)?h[h.length-1].date:null;}
+function dayMove(t){var pc=prevClose(t);if(pc==null)return null;var px=curPx(t);return {abs:px-pc,pct:(px/pc-1)*100};}
+/* A POSITION's day change must reflect what YOU actually earned today, not the asset's
+   raw EOD move. If you opened the position today (p.dt === today's bar) you bought at the
+   close, so your basis is your cost (avg) → ~$0 today. Otherwise it's yesterday's close. */
+function dayBasis(p){
+  var h=HIST[p.t];if(!h||h.length<2)return null;var close=h[h.length-1].price;
+  if(p.dt!=null)return p.dt===h[h.length-1].date?p.avg:h[h.length-2].price;
+  /* legacy positions (saved before purchase-stamping): if the cost basis is essentially
+     today's close, it was opened at this close → basis is your cost, so ~$0 today. */
+  if(close&&Math.abs(p.avg-close)/close<0.0008)return p.avg;
+  return h[h.length-2].price;
+}
+function posDayMove(p){var b=dayBasis(p);if(b==null)return null;var px=curPx(p.t);return {abs:p.sh*(px-b),pct:b?(px/b-1)*100:0};}
+/* Account-level move today = Σ shares × (today's close − each position's day basis). */
+function acctDayMove(){var abs=0,base=0,have=false;PF.pos.forEach(function(p){var b=dayBasis(p);if(b==null)return;have=true;abs+=p.sh*(curPx(p.t)-b);base+=p.sh*b;});return have?{abs:abs,pct:base?abs/base*100:0}:null;}
+/* timestamp label for the activity log — real calendar date, not a synthetic day counter */
+function nowLabel(){return new Date().toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});}
+
+/* ── Watchlist (persisted, live-priced) ─────────────────────────────── */
+function inWatch(t){return PF.watch.indexOf(t)>=0;}
+function toggleWatch(t,reRenderSF){
+  var i=PF.watch.indexOf(t),bn=t.replace('-USD','');
+  if(i>=0){PF.watch.splice(i,1);showToast('Removed '+bn+' from watchlist');}
+  else{PF.watch.unshift(t);showToast('Added '+bn+' to watchlist ⭐');fetchLive(t,function(){if(jCur==='watch')renderWatch();});}
+  saveState();
+  if(jCur==='watch')renderWatch();
+  if(reRenderSF&&sfCurrent&&sfCurrent.t===t){var b=document.getElementById('sfWatchBtn');if(b)b.outerHTML=watchBtnHtml(t);}
+}
+function watchBtnHtml(t){var on=inWatch(t);
+  return '<button id="sfWatchBtn" class="btn '+(on?'btn-ghost':'btn-pur')+'" onclick="toggleWatch(\''+t+'\',true)">'+(on?'★ On your watchlist · remove':'☆ Add to Watchlist')+'</button>';
+}
+function renderWatch(){
+  var el=document.getElementById('jWatch');if(!el)return;
+  if(!PF.watch.length){el.innerHTML='<div class="card"><div class="card-t">Watchlist</div><div class="muted-note" style="text-align:left">Nothing on your watchlist yet. Open any asset in <b>Markets</b> and tap <b>☆ Add to Watchlist</b> to track it here, then trade it in one tap.</div></div>';return;}
+  var html='<div class="card"><div class="row" style="margin-bottom:13px"><div class="card-t" style="margin-bottom:0">Watchlist</div><span class="pill pill-pur">'+PF.watch.length+' tracked</span></div>';
+  PF.watch.forEach(function(t){
+    var a=ASSETS.filter(function(x){return x.t===t;})[0]||{t:t,n:t,c:'stock'},bn=t.replace('-USD',''),px=curPx(t),live=!!LIVE[t],dm=dayMove(t);
+    var dc=dm?('<div class="l-c '+(dm.abs>=0?'up':'down')+'">'+(dm.abs>=0?'+':'-')+'$'+Math.abs(dm.abs).toFixed(2)+' ('+(dm.pct>=0?'+':'')+dm.pct.toFixed(2)+'%) today</div>'):'<div class="l-s">'+(live?'':'~ est.')+'</div>';
+    html+='<div class="lrow"><div style="display:flex;align-items:center;gap:11px;min-width:0"><div class="tkr-ic">'+bn+'</div><div style="min-width:0"><div class="l-n">'+bn+' <span style="font-size:10px;color:var(--faint);font-weight:700">'+a.c+'</span></div><div class="l-s" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+a.n+'</div></div></div>'
+      +'<div style="display:flex;align-items:center;gap:10px"><div class="l-v"><div class="l-p tnum">'+money(px)+'</div>'+dc+'</div>'
+      +'<button class="adjust" onclick="watchTrade(\''+t+'\')">Trade</button>'
+      +'<button class="adjust" title="Remove" style="padding:6px 9px" onclick="toggleWatch(\''+t+'\')">✕</button></div></div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+  /* lazily pull real prices for anything we haven't fetched yet */
+  PF.watch.forEach(function(t){if(!LIVE[t])fetchLive(t,function(){if(jCur==='watch')renderWatch();});});
+}
+function watchTrade(t){tradeTicker=t;tradeAction='buy';jTab(document.querySelectorAll('#page-journey .subtab')[1],'trade');}
+
+/* ── Order review → confirm (two-step, like a real broker ticket) ───── */
+function reviewTrade(){
+  var sh=parseFloat((document.getElementById('tradeSh')||{}).value);
+  if(!sh||sh<=0){showToast('Enter how many shares');return;}
+  var t=tradeTicker,p=curPx(t),val=sh*p,bn=t.replace('-USD',''),live=!!LIVE[t];
+  if(tradeAction==='buy'&&val>PF.cash){showToast('Not enough buying power, you have '+money(PF.cash));return;}
+  if(tradeAction==='sell'){var pos=PF.pos.filter(function(x){return x.t===t;})[0];if(!pos||pos.sh<sh){showToast('You only hold '+(pos?fmtSh(pos.sh):0)+' × '+bn);return;}}
+  pendingSh=sh;
+  var after=tradeAction==='buy'?PF.cash-val:PF.cash+val;
+  function r(l,v,c){return '<div class="row" style="margin:0 0 7px"><span style="font-size:12.5px;color:var(--muted);font-weight:600">'+l+'</span><span class="tnum" style="font-weight:800'+(c?';color:'+c:'')+'">'+v+'</span></div>';}
+  var h='<div class="pretrade-card"><div class="pretrade-title" style="color:var(--purple-deep);margin-bottom:10px">Review order · '+(tradeAction==='buy'?'Buy':'Sell')+' '+bn+'</div>'
+    +r('Order type','Market')
+    +r('Shares',fmtSh(sh))
+    +r((live?'Last close price':'Est. price'),money(p))
+    +r(tradeAction==='buy'?'Estimated cost':'Estimated proceeds',money(val))
+    +'<div style="height:1px;background:var(--purple-line);margin:9px 0"></div>'
+    +r('Buying power after',money(after),after<0?'var(--red)':'')
+    +'<div class="mrow-s" style="margin:8px 0 0">Paper trade · virtual cash. Fills at '+bn+'\'s latest closing price ('+money(p)+'). Real brokers fill market orders at the next available market price.</div></div>';
+  h+='<div class="row" style="gap:10px;margin-top:12px"><button class="btn btn-ghost" style="flex:1" onclick="renderTradePanel()">Cancel</button><button class="btn btn-pur" style="flex:1.4" onclick="execTrade()">Confirm '+(tradeAction==='buy'?'buy':'sell')+'</button></div>';
+  document.getElementById('tradePanel').innerHTML=h;
+}
 
 /* standard-normal sampler, used by the scenario engine */
 function gauss(){var u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
@@ -1451,23 +1539,49 @@ function equityChart(hist,w,h,color,labelFn){
    actual market moves. Falls back to a flat line at the live total offline. */
 function fmtDate(s){if(!s)return '';var d=new Date(s);return isNaN(d)?s:d.toLocaleDateString(undefined,{month:'short',day:'numeric'});}
 function pxOnOrBefore(h,date){var px=h[0].price;for(var i=0;i<h.length;i++){if(h[i].date<=date)px=h[i].price;else break;}return px;}
-function portfolioHistory(N){
-  N=N||60;
+/* Full real portfolio value series over EVERY available trading day (≈1y from the backend),
+   valuing the CURRENT basket back through each day's real closes. Ranges slice this. */
+function portfolioSeriesFull(){
   var T=totals();
   var withHist=PF.pos.map(function(p){return {p:p,h:HIST[p.t]};}).filter(function(x){return x.h&&x.h.length;});
   if(!withHist.length){return [{date:'',total:+T.total.toFixed(2)},{date:'',total:+T.total.toFixed(2)}];}
-  var axis=withHist.reduce(function(a,b){return b.h.length>a.h.length?b:a;}).h.slice(-N).map(function(r){return r.date;});
+  var axis=withHist.reduce(function(a,b){return b.h.length>a.h.length?b:a;}).h.map(function(r){return r.date;});
   var noHist=PF.pos.filter(function(p){return !(HIST[p.t]&&HIST[p.t].length);});
-  var hist=axis.map(function(date){
+  var series=axis.map(function(date){
     var val=PF.cash;
     withHist.forEach(function(x){val+=x.p.sh*pxOnOrBefore(x.h,date);});
     noHist.forEach(function(p){val+=p.sh*curPx(p.t);});/* assets without history held flat at live price */
     return {date:date,total:+val.toFixed(2)};
   });
-  if(hist.length)hist[hist.length-1].total=+T.total.toFixed(2);/* pin the last point to the live total */
-  return hist;
+  if(series.length)series[series.length-1].total=+T.total.toFixed(2);/* pin the last point to the live total */
+  return series;
 }
-function renderPortfolioChart(){var c=document.getElementById('journeyChart');if(c)c.innerHTML=equityChart(portfolioHistory(60),300,150,'#7a5cae',function(p){return fmtDate(p.date);});}
+function portfolioHistory(N){var s=portfolioSeriesFull();return (N&&N<s.length)?s.slice(-N):s;}
+/* Slice the full series to a range by real calendar date. 1D = last two closes (EOD data has no intraday). */
+function rangeWindow(full,r){
+  if(full.length<2||!full[full.length-1].date)return full;
+  if(r==='1D')return full.slice(-2);
+  var last=new Date(full[full.length-1].date);if(isNaN(last))return full;
+  var from=new Date(last);
+  if(r==='1W')from.setDate(from.getDate()-7);
+  else if(r==='1M')from.setMonth(from.getMonth()-1);
+  else if(r==='6M')from.setMonth(from.getMonth()-6);
+  else if(r==='YTD')from=new Date(last.getFullYear(),0,1);
+  else return full;/* ALL */
+  var fromS=from.getFullYear()+'-'+('0'+(from.getMonth()+1)).slice(-2)+'-'+('0'+from.getDate()).slice(-2);
+  var out=full.filter(function(pt){return pt.date>=fromS;});
+  return out.length>=2?out:full.slice(-2);
+}
+function rangeName(r){return {'1D':'today','1W':'past week','1M':'past month','6M':'past 6 months','YTD':'year to date','ALL':'all time'}[r]||r;}
+function renderPortfolioChart(){
+  var c=document.getElementById('journeyChart');if(!c)return;
+  var win=rangeWindow(portfolioSeriesFull(),pfRange);
+  c.innerHTML=equityChart(win,300,150,'#7a5cae',function(p){return fmtDate(p.date);});
+  var lab=document.getElementById('pfRangeChg');if(!lab)return;
+  if(win.length>=2&&win[0].date){var a=win[0].total,b=win[win.length-1].total,d=b-a,pct=a?d/a*100:0;
+    lab.innerHTML='· <span class="'+(d>=0?'up':'down')+'">'+(d>=0?'+':'-')+'$'+Math.abs(d).toFixed(2)+' ('+(d>=0?'+':'')+pct.toFixed(2)+'%)</span> '+rangeName(pfRange);
+  }else lab.textContent='· '+rangeName(pfRange);
+}
 
 /* ── Persistence (localStorage, single-file, no backend) ─────────────── */
 var STORE_KEY='fiscally.web.v1',onboarded=false;
@@ -1479,6 +1593,7 @@ function loadState(){
     var raw=localStorage.getItem(STORE_KEY);if(!raw)return false;
     var d=JSON.parse(raw);if(!d)return false;
     if(d.PF)PF=d.PF;if(d.ACTIVITY)ACTIVITY=d.ACTIVITY;if(d.GOAL)GOAL=d.GOAL;
+    if(!Array.isArray(PF.watch))PF.watch=[];if(PF.deposits==null)PF.deposits=0;
     if(d.LEARN)LEARN=d.LEARN;if(d.contrib)contrib=d.contrib;if(d.seen)seen=d.seen;
     if(typeof d.initDone==='boolean')initDone=d.initDone;
     if(d.SIM&&d.SIM.day!=null)SIM.day=d.SIM.day;
@@ -1617,48 +1732,12 @@ function renderScenario(){
 }
 function runScenario(id){scnCur=id;renderScenario();var pg=document.getElementById('page-scenario');if(pg)pg.scrollTop=0;}
 
-var pfRange='3M';
-var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-function rangeLabels(r){
-  if(r==='1M')return ['4w','3w','2w','1w','now'];
-  if(r==='All')return ['2y','18mo','1y','6mo','now'];
-  var back={'3M':3,'6M':6,'1Y':12}[r]||3,nowM=5,out=[],ticks=(r==='3M')?4:5,i;
-  for(i=0;i<ticks;i++){var mAgo=Math.round(back*(1-i/(ticks-1)));out.push(i===ticks-1?'now':MONTHS[((nowM-mAgo)%12+12)%12]);}
-  return out;
+var pfRange='1M';
+function setRange(r,el){
+  pfRange=r;
+  if(el)[].forEach.call(el.parentNode.children,function(b){b.classList.toggle('on',b===el);});
+  renderPortfolioChart();
 }
-/* seeded random walk → realistic jagged series, stable per range, pinned start→end */
-function genSeries(n,start,end,seed){
-  var a=[],v=start,vol=start*0.011,s=seed||1;
-  function rnd(){s=(s*9301+49297)%233280;return s/233280;}
-  for(var i=0;i<n;i++){v=v+(end-start)/n+(rnd()-0.5)*vol*2;a.push(v);}
-  var diff=end-a[n-1];for(var j=0;j<n;j++)a[j]+=diff*(j/(n-1));
-  a[0]=start;a[n-1]=end;return a;
-}
-function chartSeries(r){var T=totals().total,M={'1M':[22,0.985,11],'3M':[64,0.96,23],'6M':[120,0.90,37],'1Y':[240,0.80,53],'All':[300,0.72,71]}[r]||[64,0.96,23];return genSeries(M[0],T*M[1],T,M[2]);}
-function lineChart(data,w,h,color,range){
-  var padX=8,padT=10,padB=20,mn=Math.min.apply(null,data),mx=Math.max.apply(null,data),rg=(mx-mn)||1,n=data.length,sx=(w-padX*2)/(n-1);
-  function X(i){return padX+i*sx;}function Y(v){return padT+(h-padT-padB)*(1-(v-mn)/rg);}
-  /* crisp straight segments, keep every data point's nuance */
-  var line=data.map(function(v,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1);}).join(' ');
-  var ex=X(n-1).toFixed(1),ey=Y(data[n-1]).toFixed(1),gid='g'+Math.round(Math.random()*1e6);
-  var base=(h-padB).toFixed(1),area=line+' L'+ex+' '+base+' L'+X(0).toFixed(1)+' '+base+' Z';
-  /* vertical gridlines + time labels */
-  var labels=rangeLabels(range||'3M'),ticks=labels.length,grid='',xlab='';
-  for(var k=0;k<ticks;k++){var gx=(padX+(w-padX*2)*(k/(ticks-1))).toFixed(1);
-    grid+='<line x1="'+gx+'" y1="'+padT+'" x2="'+gx+'" y2="'+base+'" stroke="#efeaf7" stroke-width="1"/>';
-    xlab+='<text x="'+gx+'" y="'+(h-6)+'" font-size="9" fill="#aaa4c0" font-weight="700" text-anchor="'+(k===0?'start':(k===ticks-1?'end':'middle'))+'">'+labels[k]+'</text>';}
-  /* dashed reference line at the window's starting value */
-  var ry=Y(data[0]).toFixed(1);
-  var ref='<line x1="'+padX+'" y1="'+ry+'" x2="'+(w-padX)+'" y2="'+ry+'" stroke="'+color+'" stroke-width="1" stroke-dasharray="2 4" opacity="0.45"/>';
-  return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" style="display:block">'
-    +'<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+color+'" stop-opacity="0.13"/><stop offset="0.92" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'
-    +grid+ref
-    +'<path d="'+area+'" fill="url(#'+gid+')"/>'
-    +'<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>'
-    +xlab
-    +'<circle cx="'+ex+'" cy="'+ey+'" r="3" fill="'+color+'" stroke="#fff" stroke-width="1.5"/></svg>';
-}
-function setRange(r,el){pfRange=r;if(el){[].forEach.call(el.parentNode.children,function(b){b.classList.remove('on');});el.classList.add('on');}var c=document.getElementById('journeyChart');if(c)c.innerHTML=lineChart(chartSeries(r),300,150,'#7a5cae',r);}
 function pfMix(){var by={},inv=0;PF.pos.forEach(function(p){var v=p.sh*curPx(p.t);inv+=v;var c=lclsOf(p.t);by[c]=(by[c]||0)+v;});return {by:by,inv:inv,classes:Object.keys(by).length};}
 function renderPortfolio(){
   var T=totals();
@@ -1672,6 +1751,9 @@ function renderPortfolio(){
   ap.textContent=(pct>=0?'+':'')+pct.toFixed(1)+'%';ap.className='pill '+(pct>=0?'pill-grn':'pill-red');
   var inv=document.getElementById('pfInvested');if(inv)inv.textContent=money0(invested);
   var src=document.getElementById('pfPxSrc');if(src){var real=PF.pos.some(function(p){return LIVE[p.t]!=null;});src.textContent=real?'Real prices':'Sample prices';src.className='pill '+(real?'pill-grn':'pill-gry');}
+  var td=document.getElementById('pfToday'),dm=acctDayMove();
+  if(td)td.innerHTML=dm?(' &nbsp;·&nbsp; <span class="'+(dm.abs>=0?'up':'down')+'" style="font-weight:800">'+(dm.abs>=0?'+':'-')+'$'+Math.abs(dm.abs).toFixed(2)+' ('+(dm.pct>=0?'+':'')+dm.pct.toFixed(2)+'%) today</span>'):'';
+  if(jCur==='watch')renderWatch();
   // Home hero mirrors the live portfolio
   var hv=document.getElementById('homeVal');
   if(hv){hv.textContent=money(T.total);
@@ -1710,8 +1792,9 @@ function renderHoldings(){
     html+='<div class="card"><div class="row" style="margin-bottom:13px"><div class="card-t" style="margin-bottom:0">Positions</div><span class="pill pill-pur">'+PF.pos.length+' holdings</span></div>';
     PF.pos.forEach(function(p){
       var cur=curPx(p.t),val=p.sh*cur,pl=(cur-p.avg)*p.sh,plp=(cur/p.avg-1)*100,cls=pl>=0?'up':'down',sg=pl>=0?'+':'-';
+      var dm=posDayMove(p),today=dm?' · <span class="'+(dm.pct>=0?'up':'down')+'" style="font-weight:700">'+(dm.pct>=0?'+':'')+dm.pct.toFixed(2)+'% today</span>':'';
       html+='<div class="lrow" style="cursor:pointer" onclick="openTradeFor(\''+p.t+'\')">'
-        +'<div style="display:flex;align-items:center;gap:11px"><div class="tkr-ic">'+p.t+'</div><div><div class="l-n">'+p.t+' <span style="font-size:10px;color:var(--faint);font-weight:700">'+p.acct+'</span></div><div class="l-s">'+fmtSh(p.sh)+' sh · avg '+money(p.avg)+'</div></div></div>'
+        +'<div style="display:flex;align-items:center;gap:11px"><div class="tkr-ic">'+p.t+'</div><div><div class="l-n">'+p.t+' <span style="font-size:10px;color:var(--faint);font-weight:700">'+p.acct+'</span></div><div class="l-s">'+fmtSh(p.sh)+' sh · avg '+money(p.avg)+today+'</div></div></div>'
         +'<div class="l-v"><div class="l-p tnum">'+money(val)+'</div><div class="l-c '+cls+'">'+sg+'$'+Math.abs(pl).toFixed(2)+' ('+sg+Math.abs(plp).toFixed(1)+'%)</div></div></div>';
     });
     html+='</div>';
@@ -1743,7 +1826,7 @@ function tradeFilter(){
   res.innerHTML=list.length?list.map(function(a){return '<div class="sf-item" onclick="selectTradeAsset(\''+a.t+'\')"><div class="tkr-ic">'+a.t.replace('-USD','')+'</div><div style="min-width:0"><div class="l-n">'+a.n+'</div><div class="l-s">'+a.t+'</div></div><span class="sf-cls '+a.c+'">'+a.c+'</span></div>';}).join(''):'<div class="sf-item"><span class="l-s">No asset matches that.</span></div>';
 }
 function selectTradeAsset(t){
-  tradeTicker=t;var a=ASSETS.filter(function(x){return x.t===t;})[0];
+  tradeTicker=t;pendingSh=0;var a=ASSETS.filter(function(x){return x.t===t;})[0];
   var s=document.getElementById('tradeSearch');if(s)s.value=a?a.n:t;
   var r=document.getElementById('tradeResults');if(r)r.style.display='none';
   renderTradePanel();
@@ -1753,7 +1836,7 @@ function renderTradePanel(){
   var el=document.getElementById('tradePanel');if(!el)return;var t=tradeTicker;if(!t){el.innerHTML='';return;}
   var a=ASSETS.filter(function(x){return x.t===t;})[0]||{t:t,n:t,c:'stock'},px=curPx(t),live=!!LIVE[t],bn=t.replace('-USD','');
   var have=PF.pos.filter(function(x){return x.t===t;})[0];
-  var sh=parseFloat((document.getElementById('tradeSh')||{}).value)||0;
+  var sh=parseFloat((document.getElementById('tradeSh')||{}).value)||pendingSh||0;
   var h='<div class="trade-asset"><div><div class="ta-t">'+bn+' <span class="sf-cls '+a.c+'">'+a.c+'</span></div><div class="ta-n">'+a.n+(have?' · you hold '+fmtSh(have.sh):'')+'</div></div><div class="ta-px"><div class="tnum">'+money(px)+'</div><span class="pill '+(live?'pill-grn':'pill-gry')+'" style="font-size:10px">'+(live?'● Live':'~ est.')+'</span></div></div>';
   h+='<div class="toggle" style="margin-top:13px"><button class="tg buy'+(tradeAction==='buy'?' on':'')+'" onclick="setTrade(\'buy\')">Buy</button><button class="tg sell'+(tradeAction==='sell'?' on':'')+'" onclick="setTrade(\'sell\')">Sell</button></div>';
   h+='<label class="f-label">Shares</label><input class="f-in" type="number" id="tradeSh" min="0" step="0.0001" placeholder="0" value="'+(sh||'')+'" oninput="updateCost()"/>';
@@ -1768,34 +1851,36 @@ function renderTradePanel(){
       h+='<div class="pretrade-card" style="background:var(--purple-soft);border-color:var(--purple-line)"><div class="pretrade-title" style="color:var(--purple-deep)">You hold '+fmtSh(have.sh)+' × '+bn+' · avg '+money(have.avg)+'</div><div style="font-size:12.5px;color:var(--purple-strong)">Selling '+fmtSh(sh||have.sh)+' now locks in about <b>'+signed(pl)+'</b> as realized P&amp;L, that part becomes final.</div></div>';
     }else h+='<div class="muted-note" style="text-align:left">You don\'t hold any '+bn+' yet, switch to <b>Buy</b> to start a position.</div>';
   }
-  h+='<button class="btn btn-pur" style="margin-top:12px" onclick="execTrade()">'+(tradeAction==='buy'?'Buy ':'Sell ')+bn+'</button>';
+  h+='<button class="btn btn-pur" style="margin-top:12px" onclick="reviewTrade()">Review '+(tradeAction==='buy'?'buy':'sell')+' order</button>';
   el.innerHTML=h;
 }
 function setTrade(a){tradeAction=a;renderTradePanel();}
 function updateCost(){var sh=parseFloat(document.getElementById('tradeSh').value)||0,px=curPx(tradeTicker);var cl=document.getElementById('costLbl');if(cl)cl.textContent=tradeAction==='buy'?'Estimated cost':'Estimated proceeds';var tc=document.getElementById('tradeCost');if(tc)tc.textContent=money(sh*px);}
 function openTradeFor(t){tradeTicker=t;tradeAction='sell';document.querySelectorAll('#page-journey .subtab').forEach(function(x,i){x.classList.toggle('active',i===1);});jTab(null,'trade');}
 function execTrade(){
-  var sh=parseFloat(document.getElementById('tradeSh').value);
+  /* shares come from the review ticket if present, else the live input (defensive) */
+  var inEl=document.getElementById('tradeSh');
+  var sh=parseFloat(inEl?inEl.value:pendingSh);
   if(!sh||sh<=0){showToast('Enter how many shares');return;}
   var t=tradeTicker,p=curPx(t),val=sh*p,bn=t.replace('-USD','');
   if(tradeAction==='buy'){
-    if(val>PF.cash){showToast('Not enough cash, you have '+money(PF.cash));return;}
+    if(val>PF.cash){showToast('Not enough buying power, you have '+money(PF.cash));return;}
     PF.cash-=val;
     var ex=PF.pos.filter(function(x){return x.t===t;})[0];
     if(ex){var tot=ex.sh+sh;ex.avg=(ex.sh*ex.avg+sh*p)/tot;ex.sh=tot;}
-    else PF.pos.push({t:t,acct:'TFSA',sh:sh,avg:p});
-    ACTIVITY.unshift({ic:'🟢',main:'Bought '+fmtSh(sh)+' × '+bn,sub:'Day '+SIM.day+' · @ '+money(p),amt:'-'+money(val),cls:''});
-    showToast('✓ Bought '+sh+' × '+bn);
+    else PF.pos.push({t:t,acct:'TFSA',sh:sh,avg:p,dt:barDate(t)});
+    ACTIVITY.unshift({ic:'🟢',main:'Bought '+fmtSh(sh)+' × '+bn,sub:nowLabel()+' · @ '+money(p),amt:'-'+money(val),cls:''});
+    showToast('✓ Bought '+fmtSh(sh)+' × '+bn);
   }else{
     var pos=PF.pos.filter(function(x){return x.t===t;})[0];
-    if(!pos||pos.sh<sh){showToast('You only hold '+(pos?pos.sh:0)+' × '+bn);return;}
+    if(!pos||pos.sh<sh){showToast('You only hold '+(pos?fmtSh(pos.sh):0)+' × '+bn);return;}
     var realized=(p-pos.avg)*sh;PF.cash+=val;PF.realized+=realized;pos.sh-=sh;
     if(pos.sh<=0.0001)PF.pos=PF.pos.filter(function(x){return x.t!==t;});
-    ACTIVITY.unshift({ic:'🔴',main:'Sold '+fmtSh(sh)+' × '+bn,sub:'Day '+SIM.day+' · @ '+money(p),amt:'+'+money(val),cls:realized>=0?'up':'down'});
-    showToast((realized>=0?'✓ Sold for a gain':'Sold')+' '+sh+' × '+bn);
+    ACTIVITY.unshift({ic:'🔴',main:'Sold '+fmtSh(sh)+' × '+bn,sub:nowLabel()+' · @ '+money(p),amt:'+'+money(val),cls:realized>=0?'up':'down'});
+    showToast((realized>=0?'✓ Sold for a gain':'Sold')+' '+fmtSh(sh)+' × '+bn);
     openSheet((realized>=0?'🎉 ':'')+'Trade complete, '+signed(realized)+' realized','You bought '+bn+' at an average of '+money(pos.avg)+' and sold at '+money(p)+'. That\'s a '+signed(realized)+' '+(realized>=0?'gain':'loss')+', now locked in as realized P&L. '+(realized>=0?'Nice work!':'Every trade is a lesson on the way.'));
   }
-  var shIn=document.getElementById('tradeSh');if(shIn)shIn.value='';
+  pendingSh=0;
   renderPortfolio();renderTradePanel();refreshLearn();saveState();
 }
 function renderActivity(){
@@ -1941,7 +2026,7 @@ function paintSF(a,d,p){
   // about (brief)
   var about=(pf.sector?bn+' is a '+a.c+' in the '+pf.sector+' sector'+(pf.industry?' ('+pf.industry+')':'')+'. ':'')+(d.plain_language||'');
   html+='<div class="card"><div class="card-t">About '+bn+'</div><div style="font-size:13px;color:var(--muted);line-height:1.6">'+about+' <span style="font-size:11px">These are model estimates for learning, not advice. Data as of '+(d.data_as_of||dq.as_of_date||'')+'.</span></div></div>';
-  html+='<button class="btn btn-pur" onclick="showToast(\'Added '+bn+' to watchlist ⭐\')">+ Add to Watchlist</button>';
+  html+=watchBtnHtml(a.t);
   html+='</div></div>';
   document.getElementById('sfDetail').innerHTML=html;
 }
