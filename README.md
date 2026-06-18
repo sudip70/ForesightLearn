@@ -6,23 +6,72 @@ Fiscally is a financial-literacy + paper-trading app for beginners and young lea
 
 ---
 
-## Run the prototype
+## Repository layout
 
-```bash
-python3 -m http.server 3333
-# open http://localhost:3333/fiscally-prototype.html
+```
+apps/
+  web/          Desktop app (lead surface) — modular source + single-file build
+  mobile/       Mobile prototype (single-file, key fiscally.v1)
+services/
+  api/          Slim FastAPI "fiscally-api" — forecasts, profiles, market indices
+pipelines/
+  market_refresh/  Daily yfinance → Supabase OHLCV + forecast refresh
+data/config/    Asset universe + market index config (JSON)
+db/migrations/  Supabase (PostgreSQL) schema
+docs/           Product strategy, brand, API/DB reference
+infra/          Deploy config (render.yaml for fiscally-api)
+media/          Design deck (the demo GIF is kept locally, untracked)
+legacy/         Archived Foresight code (old ML/RL backend, old web app, old prototypes)
 ```
 
-The prototype is a single-file mobile app (no build step). Use a phone-sized viewport or browser dev tools.
+## Run the web app (lead surface)
 
-**Five tabs:** Home · Learn · Practice · Explore · Profile
+```bash
+cd apps/web
+npm run dev        # serves at http://localhost:3333 — open /index.html
+```
+Dev needs no build: `index.html` loads the ordered `src/js/*.js` scripts and `src/styles/app.css`.
+Progress persists in `localStorage` under `fiscally.web.v1`.
 
-- **Learn** — guided lesson journey (5 units, 20+ lessons), Mia the AI guide, Penny the fox companion, skills that unlock by doing
-- **Practice** — paper-trading engine on live prices across 56 assets (stocks, ETFs, crypto), with pre- and post-trade coaching from Mia
-- **Explore** — Stock Finder with live uncertainty-framed forecasts, Market Today, Compound Calculator
-- **Home** — portfolio snapshot, goal progress, daily nudge, graduation plan
+Build a single deployable file:
+```bash
+cd apps/web && npm run build      # -> dist/fiscally-web.html
+```
 
-Live market data from the deployed backend; graceful mock fallback on cold starts (~30s on free tier).
+The mobile prototype is still a single file:
+```bash
+python3 -m http.server 3333
+# open http://localhost:3333/apps/mobile/
+```
+
+## Run the API locally
+
+```bash
+python3.11 -m venv .venv && source .venv/bin/activate
+pip install -r services/api/requirements.txt
+uvicorn services.api.app.main:app --reload
+# API at http://localhost:8000 · docs at /docs
+```
+Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (or use `memory://` for an empty in-memory repo).
+Endpoints: `POST /api/forecasts/ticker`, `GET /api/tickers/{ticker}/profile`, `GET /api/market/indices` (+ `/universe`, `/forecasts/market`, `/market/indices/{symbol}/history`, `/health`).
+
+## Daily data refresh
+
+```bash
+scripts/refresh_supabase_daily.sh        # runs python -m pipelines.market_refresh.supabase_refresh
+```
+Runs on a schedule via `.github/workflows/daily-market-refresh.yml`.
+
+---
+
+## Deploying the new API (cutover checklist)
+
+The prototypes currently point at the existing `foresight-backend` URL. To cut over to the slim `fiscally-api`:
+
+1. Deploy `infra/render.yaml` as a new Render service (`fiscally-api`); set `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`.
+2. Verify parity: `curl` `/api/forecasts/ticker`, `/api/tickers/{t}/profile`, `/api/market/indices` for AAPL/SPY/BTC-USD and compare to the old backend.
+3. Flip the `API` constant to the new host in `apps/web/src/js/07-tools-api.js` and `apps/mobile/index.html`.
+4. Point the boot workflow at the new URL (repo variable `FISCALLY_BACKEND_BOOT_URL`), then decommission the old service.
 
 ---
 
@@ -30,29 +79,16 @@ Live market data from the deployed backend; graceful mock fallback on cold start
 
 | Doc | What it covers |
 |---|---|
-| [`FiscallyXForesight.md`](FiscallyXForesight.md) | **Master reference** — product strategy, brand system, feature build status, backend spec, quest system, sequencing |
-| [`FISCALLY_DOCS.md`](FISCALLY_DOCS.md) | API endpoints, DB schema, ERDs, prototype ↔ backend mapping |
-| [`FISCALLY_BRAND.md`](FISCALLY_BRAND.md) | Brand & design system (colors, type, components, voice) |
-| `260602-Fiscally-Invest-screens.pdf` | Original design deck the prototype matches |
-
----
+| [`docs/FiscallyXForesight.md`](docs/FiscallyXForesight.md) | **Master reference** — product strategy, brand, feature build status, backend spec, sequencing |
+| [`docs/FISCALLY_DOCS.md`](docs/FISCALLY_DOCS.md) | API endpoints, DB schema, ERDs, prototype ↔ backend mapping |
+| [`docs/FISCALLY_BRAND.md`](docs/FISCALLY_BRAND.md) | Brand & design system (colors, type, components, voice) |
+| `media/260602-Fiscally-Invest-screens.pdf` | Original design deck the prototype matches |
 
 ## Stack
 
 | Layer | Tech |
 |---|---|
-| Prototype | Single-file HTML/CSS/JS, inline SVG charts, no build step |
-| Backend | Python 3.11, FastAPI, deployed on Render (free tier) |
+| Web app | Modular HTML/CSS/JS, inline SVG charts, dependency-free single-file build (esbuild optional) |
+| API | Python 3.11, FastAPI, deployed on Render (free tier) |
 | Database | Supabase (PostgreSQL) — market data, forecasts, OHLCV |
 | Data | yfinance → daily OHLCV refresh via GitHub Actions |
-
-## Run the backend locally
-
-```bash
-python3.11 -m venv .venv && source .venv/bin/activate
-pip install -r requirements-dev.txt
-uvicorn backend.app.main:app --reload
-# API at http://localhost:8000 · docs at /docs
-```
-
-Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in your environment, or the backend falls back to live yfinance fetches.
