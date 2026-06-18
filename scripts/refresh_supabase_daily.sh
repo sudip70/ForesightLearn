@@ -37,4 +37,4 @@ if [[ "$DRY_RUN" == "true" ]]; then
   args+=("--dry-run")
 fi
 
-python offline/supabase_refresh.py "${args[@]}" "$@"
+python -m pipelines.market_refresh.supabase_refresh "${args[@]}" "$@"

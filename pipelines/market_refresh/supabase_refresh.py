@@ -11,18 +11,18 @@ import uuid
 from typing import Any
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from backend.app.core.config import get_settings
-from backend.app.market.forecasting import SupabaseForecastEngine
-from backend.app.market.repository import (
+from services.api.app.core.config import get_settings
+from services.api.app.data.forecasting import SupabaseForecastEngine
+from services.api.app.data.repository import (
     InMemoryMarketDataRepository,
     SupabaseMarketDataRepository,
 )
-from backend.app.ml.errors import ArtifactValidationError
-from offline.market_data_providers import MarketDataProvider, build_provider
+from services.api.app.data.errors import ArtifactValidationError
+from pipelines.market_refresh.market_data_providers import MarketDataProvider, build_provider
 
 
 DEFAULT_HORIZONS = (30, 90, 180, 300)
@@ -421,7 +421,7 @@ def build_parser() -> ArgumentParser:
     parser = ArgumentParser(description="Refresh Foresight Supabase market data.")
     parser.add_argument(
         "--universe-path",
-        default=str(REPO_ROOT / "config" / "asset_universe.v1.json"),
+        default=str(REPO_ROOT / "data" / "config" / "asset_universe.v1.json"),
     )
     parser.add_argument(
         "--macro-path",
@@ -429,7 +429,7 @@ def build_parser() -> ArgumentParser:
     )
     parser.add_argument(
         "--indices-path",
-        default=str(REPO_ROOT / "config" / "market_indices.v1.json"),
+        default=str(REPO_ROOT / "data" / "config" / "market_indices.v1.json"),
     )
     parser.add_argument(
         "--provider",
