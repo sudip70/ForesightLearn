@@ -3,12 +3,12 @@
 .env
 .env.*
 
-# Python
+# Python (anchored to root so apps/web/dist is NOT ignored)
 __pycache__/
 *.py[cod]
 *.egg-info/
-dist/
-build/
+/dist/
+/build/
 
 # Test / lint caches
 .pytest_cache/
@@ -24,6 +24,10 @@ datasets/
 
 # Supabase local
 supabase/.temp/
+db/.temp/
+
+# Heavy media (kept locally under media/, not version-tracked)
+media/*.gif
 
 # Tools
 .DS_Store
