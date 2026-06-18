@@ -1,0 +1,70 @@
+/* ── Navigation ──────────────────────────────── */
+var TAB_OF={home:'home',learn:'learn',tools:'tools',social:'social',journey:'journey',scenario:'journey',risk:'tools',stockfinder:'tools'};
+var TITLES={home:"Fiscally",learn:'Learn',tools:'Explore',social:'Profile',journey:'Practice',scenario:'Scenarios',risk:'Risk Level',stockfinder:'Stock Finder'};
+var stack=['home'];
+function show(id){
+  closeL();closeTipBtn();/* never leave a lesson/term sheet floating over a new tab */
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('page-'+id).classList.add('active');
+  if(id==='learn')renderLearn();
+  if(id==='journey')refreshHeldPrices();
+  if(id==='scenario')renderScenario();
+  if(id==='social')renderProfile();
+  var tab=TAB_OF[id];
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});
+  var isSub=['scenario','risk','stockfinder'].indexOf(id)>=0;
+  document.getElementById('hBack').classList.toggle('show',isSub);
+  document.getElementById('hTitle').innerHTML=isSub?TITLES[id]:"Let's <b>Invest</b>".replace('Invest',TITLES[id]==="Let's Invest"?'Invest':TITLES[id]);
+  document.getElementById('hTitle').innerHTML = isSub ? TITLES[id] : (id==='home'?"Home":TITLES[id]);
+  document.getElementById('pages').scrollTop=0;
+  var pg=document.getElementById('page-'+id);pg.scrollTop=0;
+  syncTopbar();
+}
+function syncTopbar(){var s=document.getElementById('tbStreak');if(s&&typeof LEARN!=='undefined')s.textContent=LEARN.streak;var l=document.getElementById('tbLevel');if(l&&typeof LEARN!=='undefined')l.textContent='Lvl '+LEARN.level;}
+function goTab(id){stack=[id];show(id);}
+function push(id){stack.push(id);show(id);}
+function back(){stack.pop();show(stack[stack.length-1]||'home');}
+
+/* ── Onboarding ──────────────────────────────── */
+var obStep=1,OB_MAX=6;
+(function initDots(){var h='';for(var i=1;i<=OB_MAX;i++)h+='<div class="ob-dot'+(i===1?' on':'')+'"></div>';document.getElementById('obDots').innerHTML=h;})();
+function renderOB(){
+  document.querySelectorAll('.ob-screen').forEach(function(s){s.classList.toggle('active',+s.dataset.ob===obStep);});
+  document.querySelectorAll('.ob-dot').forEach(function(d,i){d.classList.toggle('on',i===obStep-1);});
+  document.getElementById('obNextBtn').textContent=obStep===OB_MAX?"Let's Start! 🚀":'Next';
+  document.querySelector('.ob-body').scrollTop=0;
+}
+function obNext(){if(obStep<OB_MAX){obStep++;renderOB();}else finishOB();}
+function finishOB(){
+  onboarded=true;saveState();
+  enterApp();
+  setTimeout(function(){showToast('🎉 Your journey has begun!');},400);
+}
+function startWelcome(){
+  var w=document.getElementById('welcome');
+  w.style.transition='opacity .4s ease';w.style.opacity='0';
+  setTimeout(function(){w.classList.add('hidden');w.style.opacity='';w.style.transition='';},400);
+}
+function restartOnboarding(){obStep=1;renderOB();document.getElementById('welcome').classList.remove('hidden');document.getElementById('onboarding').classList.remove('hidden');document.getElementById('appHeader').classList.add('hidden');document.getElementById('appNav').classList.add('hidden');}
+function pickExp(el,v){document.querySelectorAll('.exp-card').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');}
+function pickWhy(el){document.querySelectorAll('.why').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');}
+function onPct(v){
+  renderDonut(+v);
+  document.getElementById('donutHi').textContent='$'+(v*300).toLocaleString();
+  document.getElementById('donutLo').textContent='$'+(v*30).toLocaleString();
+}
+
+/* ── In-screen tabs ──────────────────────────── */
+var jCur='hold';
+function jTab(el,k){
+  jCur=k;
+  if(el)document.querySelectorAll('#page-journey .subtab').forEach(function(t){t.classList.remove('active');}),el.classList.add('active');
+  var map={hold:'jHold',trade:'jTrade',watch:'jWatch',act:'jAct',plan:'jPlan'};
+  for(var n in map)document.getElementById(map[n]).style.display=(n===k)?'':'none';
+  if(k==='hold')renderHoldings();
+  if(k==='trade')renderTrade();
+  if(k==='watch')renderWatch();
+  if(k==='act')renderActivity();
+  if(k==='plan')renderJourneyPlan();
+}
+
