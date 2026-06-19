@@ -205,22 +205,10 @@
       </div>
 
       <div class="section-t" style="margin-top:6px">Manage your money</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px">
-        <div class="menu-card" style="margin:0" onclick="push('budget')">
-          <div class="mc-ico">💰</div>
-          <div class="mc-b"><div class="mc-t">Budget</div><div class="mc-d" id="mtBudget">Plan your month</div></div>
-          <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-        </div>
-        <div class="menu-card" style="margin:0" onclick="push('spending')">
-          <div class="mc-ico">🧾</div>
-          <div class="mc-b"><div class="mc-t">Spending</div><div class="mc-d" id="mtSpend">Track expenses</div></div>
-          <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-        </div>
-        <div class="menu-card" style="margin:0" onclick="push('networth')">
-          <div class="mc-ico">📊</div>
-          <div class="mc-b"><div class="mc-t">Net Worth</div><div class="mc-d" id="mtNW">Assets minus debts</div></div>
-          <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-        </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px">
+        <div id="tileBudget"></div>
+        <div id="tileSpending"></div>
+        <div id="tileNetworth"></div>
       </div>
     </div>
 

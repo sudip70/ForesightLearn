@@ -204,10 +204,61 @@ function addNW(kind){
 }
 function delNW(kind,i){NETWORTH[kind].splice(i,1);saveState();renderNetworth();}
 
-/* Home toolkit cards reflect a tiny live summary */
+/* ── Home tiles (informational, like the Practice / My Goals tiles) ──── */
+var MONEY_PALETTE=['#6f659a','#5b8def','#4f9c7e','#e0a92f','#cf5a40','#9084b4'];
+function miniDonut(segs,size,centerTop,centerSub){
+  size=size||92;var r=size/2-8,C=2*Math.PI*r,cx=size/2,cy=size/2,off=0;
+  var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#f0edfa" stroke-width="13"/>';
+  segs.forEach(function(g){var len=C*Math.max(0,Math.min(1,g.v));if(len<=0)return;
+    s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+g.c+'" stroke-width="13" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
+    off+=len;});
+  return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" style="display:block">'+s
+    +'<text x="'+cx+'" y="'+(cy-1)+'" text-anchor="middle" font-size="16" font-weight="800" fill="#4b4470">'+centerTop+'</text>'
+    +'<text x="'+cx+'" y="'+(cy+12)+'" text-anchor="middle" font-size="8" font-weight="700" fill="#9a93b3">'+(centerSub||'')+'</text></svg>';
+}
 function renderMoneyHome(){
-  var b=document.getElementById('mtBudget');if(b)b.textContent=money0(BUDGET.income-monthTotal())+' left to spend';
-  var g=document.getElementById('mtGoals');if(g){var s=GOALS.reduce(function(a,x){return a+numVal(x.saved);},0);g.textContent=GOALS.length+' goals · '+money0(s)+' saved';}
-  var s=document.getElementById('mtSpend');if(s)s.textContent=money0(monthTotal())+' this month';
-  var n=document.getElementById('mtNW');if(n)n.textContent=money0(networthRows().net)+' net worth';
+  /* ── Budget tile: donut of how income is allocated across categories ── */
+  var bt=document.getElementById('tileBudget');
+  if(bt){
+    var income=numVal(BUDGET.income),planned=BUDGET.categories.reduce(function(a,c){return a+numVal(c.limit);},0);
+    var spent=monthTotal(),left=income-spent;
+    var pctBudg=income>0?Math.round(planned/income*100):0;
+    var cats=BUDGET.categories.slice().sort(function(a,b){return numVal(b.limit)-numVal(a.limit);});
+    var segs=cats.slice(0,6).map(function(c,i){return {v:planned>0?numVal(c.limit)/planned:0,c:MONEY_PALETTE[i%MONEY_PALETTE.length]};});
+    var legend=cats.slice(0,3).map(function(c,i){
+      return '<div class="row" style="margin:0 0 3px"><span style="font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:'+MONEY_PALETTE[i%MONEY_PALETTE.length]+'"></span>'+c.name+'</span><span class="tnum" style="font-size:11px;color:var(--muted)">'+money0(c.limit)+'</span></div>';
+    }).join('')||'<div class="muted-note" style="text-align:left">No categories yet.</div>';
+    bt.innerHTML='<div class="card" style="cursor:pointer;margin:0;height:100%" onclick="push(\'budget\')">'
+      +'<div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">💰 Budget</div><span class="pill '+(left>=0?'pill-grn':'pill-red')+'">'+money0(left)+' left</span></div>'
+      +'<div style="display:flex;gap:13px;align-items:center"><div style="flex:0 0 auto">'+miniDonut(segs,92,pctBudg+'%','budgeted')+'</div>'
+      +'<div style="flex:1;min-width:0">'+legend+'<div class="muted-note" style="text-align:left;margin:6px 0 0">'+money0(spent)+' spent of '+money0(income)+'</div></div></div></div>';
+  }
+  /* ── Spending tile ── */
+  var st=document.getElementById('tileSpending');
+  if(st){
+    var inc=numVal(BUDGET.income),tot=monthTotal(),m=thisMonth();
+    var rows=SPENDING.filter(function(x){return (x.date||'').slice(0,7)===m;});
+    var byCat={};rows.forEach(function(x){byCat[x.category]=(byCat[x.category]||0)+numVal(x.amount);});
+    var top=Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a];})[0];
+    var sp=inc>0?Math.min(100,Math.round(tot/inc*100)):0;
+    st.innerHTML='<div class="card" style="cursor:pointer;margin:0;height:100%" onclick="push(\'spending\')">'
+      +'<div class="row" style="margin-bottom:8px"><div class="card-t" style="margin-bottom:0">🧾 Spending</div><span class="pill pill-pur">this month</span></div>'
+      +'<div class="tnum" style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--ink)">'+money(tot)+'</div>'
+      +'<div class="muted-note" style="text-align:left;margin-top:2px">'+rows.length+' transaction'+(rows.length===1?'':'s')+(top?' · top: '+top:'')+'</div>'
+      +'<div class="bar" style="margin-top:10px"><div class="bar-fill" style="width:'+sp+'%"></div></div>'
+      +'<div class="muted-note" style="text-align:left;margin-top:4px">'+sp+'% of '+money0(inc)+' income</div></div>';
+  }
+  /* ── Net Worth tile ── */
+  var nt=document.getElementById('tileNetworth');
+  if(nt){
+    var t=networthRows(),tot2=t.assets+t.debts,aw=tot2>0?Math.round(t.assets/tot2*100):0,dw=100-aw;
+    nt.innerHTML='<div class="card" style="cursor:pointer;margin:0;height:100%" onclick="push(\'networth\')">'
+      +'<div class="row" style="margin-bottom:8px"><div class="card-t" style="margin-bottom:0">📊 Net Worth</div></div>'
+      +'<div class="tnum" style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--ink)">'+money(t.net)+'</div>'
+      +'<div style="display:flex;gap:16px;margin-top:7px">'
+      +'<div><div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.4px">ASSETS</div><div class="tnum" style="font-weight:800;font-size:13px">'+money0(t.assets)+'</div></div>'
+      +'<div><div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.4px">DEBTS</div><div class="tnum down" style="font-weight:800;font-size:13px">'+money0(t.debts)+'</div></div></div>'
+      +'<div style="display:flex;height:7px;border-radius:4px;overflow:hidden;margin-top:10px;background:#f0edfa">'
+      +'<div style="width:'+aw+'%;background:var(--green)"></div><div style="width:'+dw+'%;background:var(--red)"></div></div></div>';
+  }
 }
