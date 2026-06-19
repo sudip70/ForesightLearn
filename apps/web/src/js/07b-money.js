@@ -109,18 +109,19 @@ function renderGoals(){
   });
   el.innerHTML=h;
 }
+function syncGoalHome(){if(typeof renderGoalCard==='function')renderGoalCard();}
 function addGoal(){
   var n=(document.getElementById('goName')||{}).value||'',t=(document.getElementById('goTarget')||{}).value||'';
   n=n.trim();if(!n){showToast('Name your goal');return;}
-  GOALS.push({id:moneyUid(),what:n,target:numVal(t),saved:0,account:'TFSA'});saveState();renderGoals();showToast('🎯 Goal added');
+  GOALS.push({id:moneyUid(),what:n,target:numVal(t),saved:0,account:'TFSA'});saveState();renderGoals();syncGoalHome();showToast('🎯 Goal added');
 }
 function goalContribute(id){
   var inp=document.getElementById('gc_'+id),amt=numVal(inp&&inp.value);if(amt<=0){showToast('Enter an amount');return;}
   var g=GOALS.filter(function(x){return x.id===id;})[0];if(!g)return;
-  g.saved=numVal(g.saved)+amt;saveState();renderGoals();
+  g.saved=numVal(g.saved)+amt;saveState();renderGoals();syncGoalHome();
   showToast(numVal(g.saved)>=numVal(g.target)?'🏆 Goal reached!':'✓ Added '+money0(amt));
 }
-function delGoal(id){GOALS=GOALS.filter(function(x){return x.id!==id;});saveState();renderGoals();}
+function delGoal(id){GOALS=GOALS.filter(function(x){return x.id!==id;});saveState();renderGoals();syncGoalHome();}
 
 /* ── Spending / Expenses ─────────────────────── */
 function renderSpending(){

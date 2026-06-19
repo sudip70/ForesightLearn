@@ -196,29 +196,19 @@
             </div>
           </div>
 
-          <div class="section-t">My Plan</div>
-          <div id="homePlan"></div>
         </div>
 
         <div class="stack">
           <div class="section-t">My Goals</div>
           <div id="homeGoal"></div>
-
-          <div class="section-t">Question of the Day</div>
-          <div id="homeQuestion"></div>
         </div>
       </div>
 
       <div class="section-t" style="margin-top:6px">Manage your money</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px">
         <div class="menu-card" style="margin:0" onclick="push('budget')">
           <div class="mc-ico">💰</div>
           <div class="mc-b"><div class="mc-t">Budget</div><div class="mc-d" id="mtBudget">Plan your month</div></div>
-          <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-        </div>
-        <div class="menu-card" style="margin:0" onclick="push('goals')">
-          <div class="mc-ico">🎯</div>
-          <div class="mc-b"><div class="mc-t">Goals</div><div class="mc-d" id="mtGoals">Save with purpose</div></div>
           <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
         <div class="menu-card" style="margin:0" onclick="push('spending')">

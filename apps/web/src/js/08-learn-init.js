@@ -29,13 +29,30 @@ function lring(val,max){var r=11,c=2*Math.PI*r,off=c*(1-Math.min(1,val/max));ret
 function ldonutSVG(pct){var r=34,c=2*Math.PI*r,off=c*(1-Math.min(1,pct/20));return '<svg width="120" height="120" viewBox="0 0 90 90"><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#e7e1f4" stroke-width="11"/><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#6f659a" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 45 45)"/></svg>';}
 function ldonutInner(pct,m){return ldonutSVG(pct)+'<div class="ldonut-c"><div class="ldonut-a">'+money0(m)+'</div><div class="ldonut-k">/month · '+pct+'%</div></div>';}
 function goalTitle(g){return 'Save '+money0(g.amt)+' for '+g.what;}
+/* Home "My Goals" now reflects the unified GOALS list (see 07b-money.js) and opens the Goals page. */
 function renderGoalCard(){
   var el=document.getElementById('homeGoal');if(!el)return;
-  var g=GOAL,gpct=Math.min(100,Math.round(g.saved/g.amt*100));
-  el.innerHTML='<div class="goal-card" onclick="openGoalSetup()" style="cursor:pointer">'
-    +'<div class="row"><div style="font-size:14px;font-weight:800">🎯 '+goalTitle(g)+'</div><span class="pill pill-pur">'+gpct+'%</span></div>'
-    +'<div class="bar"><div class="bar-fill" style="width:'+gpct+'%"></div></div>'
-    +'<div class="row"><span style="font-size:11px;color:var(--muted)">'+money0(g.saved)+' of '+money0(g.amt)+'</span><span style="font-size:11px;color:var(--purple-strong);font-weight:700">'+g.years+'-yr plan · ✏️ adjust</span></div></div>';
+  var list=(typeof GOALS!=='undefined'&&GOALS)?GOALS:[];
+  if(!list.length){
+    el.innerHTML='<div class="goal-card" onclick="push(\'goals\')" style="cursor:pointer">'
+      +'<div class="row"><div style="font-size:14px;font-weight:800">🎯 Set a savings goal</div><span class="pill pill-pur">+ Add</span></div>'
+      +'<div class="muted-note" style="text-align:left;margin-top:4px">Tap to create your first goal and track it here.</div></div>';
+    return;
+  }
+  var saved=0,target=0;list.forEach(function(g){saved+=(+g.saved||0);target+=(+g.target||0);});
+  var pct=target>0?Math.min(100,Math.round(saved/target*100)):0;
+  var h='<div class="goal-card" onclick="push(\'goals\')" style="cursor:pointer">'
+    +'<div class="row"><div style="font-size:14px;font-weight:800">🎯 My Goals</div><span class="pill pill-pur">'+pct+'%</span></div>';
+  list.slice(0,3).forEach(function(g){
+    var gp=(+g.target>0)?Math.min(100,Math.round((+g.saved||0)/(+g.target)*100)):0;
+    h+='<div style="margin-top:9px"><div class="row" style="margin-bottom:4px"><span style="font-size:12px;font-weight:700">'+g.what+'</span>'
+      +'<span style="font-size:11px;color:var(--muted)" class="tnum">'+money0(g.saved)+' / '+money0(g.target)+'</span></div>'
+      +'<div class="bar"><div class="bar-fill" style="width:'+gp+'%"></div></div></div>';
+  });
+  var more=list.length>3?(' · +'+(list.length-3)+' more'):'';
+  h+='<div class="row" style="margin-top:10px"><span style="font-size:11px;color:var(--muted)">'+money0(saved)+' of '+money0(target)+' saved'+more+'</span>'
+    +'<span style="font-size:11px;color:var(--purple-strong);font-weight:700">View all ›</span></div></div>';
+  el.innerHTML=h;
 }
 function lrow(n,v,p){return '<div class="lz-row"><div class="row"><span class="lz-n">'+n+'</span><span class="lz-v tnum">'+v+'</span></div><div class="lz-p">'+p+'</div></div>';}
 var LESSONS_L={

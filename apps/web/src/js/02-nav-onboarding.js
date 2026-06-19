@@ -10,7 +10,7 @@ function show(id){
   if(id==='journey')refreshHeldPrices();
   if(id==='scenario')renderScenario();
   if(id==='social')renderProfile();
-  if(id==='home')renderMoneyHome();
+  if(id==='home'){renderMoneyHome();renderGoalCard();}
   if(id==='budget')renderBudget();
   if(id==='goals')renderGoals();
   if(id==='spending')renderSpending();
