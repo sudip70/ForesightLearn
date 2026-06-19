@@ -1,11 +1,9 @@
 name: Market-hours Supabase refresh
 
+# Scheduled runs are disabled: market data is loaded by another repo, so the daily
+# auto-refresh here is intentionally turned off to avoid duplicating the work.
+# Manual runs are still available via "Run workflow" (workflow_dispatch).
 on:
-  schedule:
-    # GitHub schedules use UTC. During the current EDT market season these run
-    # at 9:35 AM and 4:15 PM America/Toronto, shortly after open and close.
-    - cron: "35 13 * * 1-5"
-    - cron: "15 20 * * 1-5"
   workflow_dispatch:
     inputs:
       mode:
