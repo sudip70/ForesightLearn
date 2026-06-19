@@ -1,6 +1,6 @@
 /* ── Navigation ──────────────────────────────── */
-var TAB_OF={home:'home',learn:'learn',tools:'tools',social:'social',journey:'journey',scenario:'journey',risk:'tools',stockfinder:'tools'};
-var TITLES={home:"Fiscally",learn:'Learn',tools:'Explore',social:'Profile',journey:'Practice',scenario:'Scenarios',risk:'Risk Level',stockfinder:'Stock Finder'};
+var TAB_OF={home:'home',learn:'learn',tools:'tools',social:'social',journey:'journey',scenario:'journey',risk:'tools',stockfinder:'tools',budget:'home',goals:'home',spending:'home',networth:'home'};
+var TITLES={home:"Fiscally",learn:'Learn',tools:'Explore',social:'Profile',journey:'Practice',scenario:'Scenarios',risk:'Risk Level',stockfinder:'Stock Finder',budget:'Budget',goals:'Savings Goals',spending:'Spending',networth:'Net Worth'};
 var stack=['home'];
 function show(id){
   closeL();closeTipBtn();/* never leave a lesson/term sheet floating over a new tab */
@@ -10,9 +10,14 @@ function show(id){
   if(id==='journey')refreshHeldPrices();
   if(id==='scenario')renderScenario();
   if(id==='social')renderProfile();
+  if(id==='home')renderMoneyHome();
+  if(id==='budget')renderBudget();
+  if(id==='goals')renderGoals();
+  if(id==='spending')renderSpending();
+  if(id==='networth')renderNetworth();
   var tab=TAB_OF[id];
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});
-  var isSub=['scenario','risk','stockfinder'].indexOf(id)>=0;
+  var isSub=['scenario','risk','stockfinder','budget','goals','spending','networth'].indexOf(id)>=0;
   document.getElementById('hBack').classList.toggle('show',isSub);
   document.getElementById('hTitle').innerHTML=isSub?TITLES[id]:"Let's <b>Invest</b>".replace('Invest',TITLES[id]==="Let's Invest"?'Invest':TITLES[id]);
   document.getElementById('hTitle').innerHTML = isSub ? TITLES[id] : (id==='home'?"Home":TITLES[id]);

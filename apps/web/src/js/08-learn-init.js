@@ -489,6 +489,6 @@ renderOB();
 renderPortfolio();renderHoldings();sfSelect('AAPL');
 renderFc('AAPL');loadIndices();
 checkSkillUnlocks();renderLearn();
-renderQOTD();renderPlan();renderGoalCard();renderProfile();
+renderQOTD();renderPlan();renderGoalCard();renderProfile();renderMoneyHome();
 if(onboarded)enterApp();
 refreshHeldPrices();/* load live prices up front so Home & Practice settle to the same live value at once, not only when Practice opens */

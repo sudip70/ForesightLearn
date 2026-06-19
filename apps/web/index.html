@@ -208,6 +208,52 @@
           <div id="homeQuestion"></div>
         </div>
       </div>
+
+      <div class="section-t" style="margin-top:6px">Manage your money</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+        <div class="menu-card" style="margin:0" onclick="push('budget')">
+          <div class="mc-ico">💰</div>
+          <div class="mc-b"><div class="mc-t">Budget</div><div class="mc-d" id="mtBudget">Plan your month</div></div>
+          <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="menu-card" style="margin:0" onclick="push('goals')">
+          <div class="mc-ico">🎯</div>
+          <div class="mc-b"><div class="mc-t">Goals</div><div class="mc-d" id="mtGoals">Save with purpose</div></div>
+          <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="menu-card" style="margin:0" onclick="push('spending')">
+          <div class="mc-ico">🧾</div>
+          <div class="mc-b"><div class="mc-t">Spending</div><div class="mc-d" id="mtSpend">Track expenses</div></div>
+          <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="menu-card" style="margin:0" onclick="push('networth')">
+          <div class="mc-ico">📊</div>
+          <div class="mc-b"><div class="mc-t">Net Worth</div><div class="mc-d" id="mtNW">Assets minus debts</div></div>
+          <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── MONEY TOOLS (sub) ─── -->
+    <div class="page" id="page-budget">
+      <div class="page-title" style="margin-top:2px">Budget</div>
+      <div class="page-sub">Plan where your money goes each month.</div>
+      <div id="budgetBody"></div>
+    </div>
+    <div class="page" id="page-goals">
+      <div class="page-title" style="margin-top:2px">Savings Goals</div>
+      <div class="page-sub">Set goals and watch your savings grow toward them.</div>
+      <div id="goalsBody"></div>
+    </div>
+    <div class="page" id="page-spending">
+      <div class="page-title" style="margin-top:2px">Spending</div>
+      <div class="page-sub">Log expenses and see where your money goes.</div>
+      <div id="spendBody"></div>
+    </div>
+    <div class="page" id="page-networth">
+      <div class="page-title" style="margin-top:2px">Net Worth</div>
+      <div class="page-sub">What you own minus what you owe.</div>
+      <div id="nwBody"></div>
     </div>
 
     <!-- ─── JOURNEY (sub) ─── -->
@@ -485,6 +531,7 @@
 <script src="src/js/05-portfolio-scenarios.js"></script>
 <script src="src/js/06-stock-finder.js"></script>
 <script src="src/js/07-tools-api.js"></script>
+<script src="src/js/07b-money.js"></script>
 <script src="src/js/08-learn-init.js"></script>
 <!--/BUILD:SCRIPTS-->
 </body>
