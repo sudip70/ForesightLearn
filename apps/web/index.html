@@ -147,7 +147,7 @@
         <div class="fab"><svg viewBox="0 0 24 24" fill="none"><path d="M4 16l5-5 3 3 7-8"/><path d="M14 6h5v5"/></svg></div><span>Practice</span>
       </button>
       <button class="nav-btn" data-tab="tools" onclick="goTab('tools')">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>Explore</span>
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Tools</span>
       </button>
       <button class="nav-btn" data-tab="social" onclick="goTab('social')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profile</span>
@@ -386,12 +386,49 @@
 
     <!-- ─── TOOLS ─── -->
     <div class="page" id="page-tools">
-      <div class="page-title">Explore</div>
-      <div class="page-sub">Look up any asset, check the markets, and run the numbers.</div>
+      <div class="page-title">Tools</div>
+      <div class="page-sub">Run the numbers, look up any asset, and learn money the fun way.</div>
 
+      <div class="section-t">Play &amp; Learn</div>
+      <div class="page-sub" style="margin-top:-8px">Quick games that teach real money skills, one round at a time.</div>
+      <div class="game-grid">
+        <div class="game-tile" style="--bg:#e7e4ee" onclick="push('game-wordle')">
+          <div class="gt-ico"><svg viewBox="0 0 64 64"><rect x="3" y="3" width="17" height="17" rx="4" fill="#4f9c7e"/><rect x="23" y="3" width="17" height="17" rx="4" fill="#c19a34"/><rect x="43" y="3" width="17" height="17" rx="4" fill="#b3acc6"/></svg></div>
+          <div class="gt-txt"><div class="gt-t">Wordle</div><div class="gt-d">Guess today's money word</div></div></div>
+        <div class="game-tile" style="--bg:#d9efe4" onclick="push('game-wnb')">
+          <div class="gt-ico" style="background:#28a565;color:#fff;font-size:22px">✓</div>
+          <div class="gt-txt"><div class="gt-t">Wants vs Needs</div><div class="gt-d">Sort spending smart</div></div></div>
+
+        <div class="game-tile wide" style="--bg:#dbe6fb" onclick="push('game-xword')">
+          <div class="gt-txt"><div class="gt-t big">The Mini Crossword</div><div class="gt-d">Fill the grid with money terms.</div><div class="gt-meta">Today's puzzle · 7×7</div></div>
+          <div class="gt-graphic"><svg viewBox="0 0 64 64" width="74" height="74"><rect x="2" y="2" width="28" height="28" rx="6" fill="#2b2b3a"/><rect x="34" y="2" width="28" height="28" rx="6" fill="#fff"/><rect x="2" y="34" width="28" height="28" rx="6" fill="#fff"/><rect x="34" y="34" width="28" height="28" rx="6" fill="#2b2b3a"/></svg></div></div>
+
+        <div class="game-tile" style="--bg:#ede7f9" onclick="push('game-swipe')">
+          <div class="gt-ico" style="font-size:24px">🃏</div>
+          <div class="gt-txt"><div class="gt-t">Budget Swipe</div><div class="gt-d">Keep needs, cut wants</div></div></div>
+        <div class="game-tile" style="--bg:#f7ddd5" onclick="push('game-scam')">
+          <div class="gt-ico" style="font-size:24px">🚨</div>
+          <div class="gt-txt"><div class="gt-t">Scammer Scanner</div><div class="gt-d">Spot the red flags</div></div></div>
+
+        <div class="game-tile wide" style="--bg:#f6eccf" onclick="push('game-quiz')">
+          <div class="gt-txt"><div class="gt-t big">Quick Count</div><div class="gt-d">Beat the clock at money math.</div><div class="gt-meta">8 questions · 15s each</div></div>
+          <div class="gt-graphic"><svg viewBox="0 0 64 64" width="64" height="64"><rect x="4" y="4" width="56" height="56" rx="13" fill="#fff"/><text x="19" y="31" font-size="20" font-weight="800" fill="#c19a34" font-family="'Plus Jakarta Sans',sans-serif">1</text><text x="40" y="31" font-size="20" font-weight="800" fill="#cf5a40" font-family="'Plus Jakarta Sans',sans-serif">2</text><text x="29" y="53" font-size="20" font-weight="800" fill="#4f9c7e" font-family="'Plus Jakarta Sans',sans-serif">3</text></svg></div></div>
+      </div>
+
+      <div class="section-t" style="margin-top:22px">Financial Tools</div>
       <div class="menu-card mc-tools" onclick="push('stockfinder')">
         <div class="mc-ico">🔍</div>
         <div class="mc-b"><div class="mc-t">Stock Finder</div><div class="mc-d">Explore any of 56 assets with live charts and a clear forecast range</div></div>
+        <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="menu-card mc-tools" onclick="push('loan-calc')">
+        <div class="mc-ico">💳</div>
+        <div class="mc-b"><div class="mc-t">Loan Calculator</div><div class="mc-d">See the true cost of a loan once interest is added in</div></div>
+        <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="menu-card mc-tools" onclick="push('mortgage-calc')">
+        <div class="mc-ico">🏠</div>
+        <div class="mc-b"><div class="mc-t">Mortgage Calculator</div><div class="mc-d">Estimate a monthly home payment and total interest</div></div>
         <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
       </div>
 
@@ -447,6 +484,18 @@
 
       <div id="sfDetail"></div>
     </div>
+
+    <!-- ─── CALCULATORS (sub) ─── -->
+    <div class="page" id="page-loan-calc"><div id="loanBody"></div></div>
+    <div class="page" id="page-mortgage-calc"><div id="mortBody"></div></div>
+
+    <!-- ─── GAMES (sub) ─── -->
+    <div class="page" id="page-game-swipe"><div id="bsBody"></div></div>
+    <div class="page" id="page-game-wnb"><div id="wnbBody"></div></div>
+    <div class="page" id="page-game-scam"><div id="scamBody"></div></div>
+    <div class="page" id="page-game-wordle"><div id="wordleBody"></div></div>
+    <div class="page" id="page-game-xword"><div id="xwordBody"></div></div>
+    <div class="page" id="page-game-quiz"><div id="qcBody"></div></div>
 
     <!-- ─── SOCIAL ─── -->
     <div class="page" id="page-social">
@@ -511,6 +560,7 @@
 <script src="src/js/07-tools-api.js"></script>
 <script src="src/js/07b-money.js"></script>
 <script src="src/js/08-learn-init.js"></script>
+<script src="src/js/09-tools-games.js"></script>
 <!--/BUILD:SCRIPTS-->
 </body>
 </html>

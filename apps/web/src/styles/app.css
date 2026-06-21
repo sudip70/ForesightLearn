@@ -655,6 +655,176 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;overflow:
 .learn-rail .skills{grid-template-columns:1fr 1fr}
 @media(max-width:960px){.learn-grid{grid-template-columns:1fr;max-width:580px}.learn-rail{position:static}}
 
+/* ════ Tools & Games ════ */
+/* hub: NYT-style mosaic of varied-size game tiles */
+.game-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px}
+.game-tile{position:relative;display:flex;flex-direction:column;background:var(--bg);border-radius:18px;padding:17px;cursor:pointer;min-height:158px;overflow:hidden;transition:transform .15s ease,box-shadow .15s ease}
+.game-tile:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.game-tile .gt-ico{width:46px;height:46px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 2px 7px rgba(50,46,68,.10);flex-shrink:0}
+.game-tile .gt-ico svg{width:30px;height:30px}
+.game-tile .gt-txt{margin-top:auto}
+.game-tile .gt-t{font-size:19px;font-weight:800;letter-spacing:-.4px;color:var(--ink);line-height:1.12}
+.game-tile .gt-t.big{font-size:23px}
+.game-tile .gt-d{font-size:12.5px;color:var(--purple-deep);opacity:.72;margin-top:4px;font-weight:600}
+.game-tile .gt-meta{font-size:12px;font-weight:800;color:var(--ink);margin-top:9px}
+.game-tile.wide{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;min-height:128px}
+.game-tile.wide .gt-txt{margin-top:0}
+.game-tile.wide .gt-graphic{flex-shrink:0;margin-left:16px;line-height:0}
+
+/* shared game chrome */
+#bsBody,#wnbBody,#scamBody,#wordleBody,#xwordBody,#qcBody,#loanBody,#mortBody{max-width:640px;margin:0 auto}
+.game-head{display:flex;align-items:center;gap:12px;margin:2px 0 16px}
+.game-head .gh-ico{width:48px;height:48px;border-radius:14px;background:var(--purple-soft);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.game-head .gh-t{font-size:20px;font-weight:800;letter-spacing:-.4px}
+.game-head .gh-s{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4}
+.game-head .gh-s b{color:var(--purple-strong)}
+.game-result{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 18px;text-align:center;margin-bottom:13px}
+.gr-grade{font-size:54px;font-weight:800;letter-spacing:-2px;line-height:1}
+.gr-label{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.gr-rows{margin-top:16px;display:flex;flex-direction:column;gap:9px;max-width:300px;margin-left:auto;margin-right:auto}
+.gr-row{display:flex;justify-content:space-between;font-size:14px}
+.gr-row span{color:var(--muted);font-weight:600}.gr-row b{font-weight:800}
+.game-head+.btn,.game-result+.btn,.mia+.btn{margin-top:4px}
+
+/* Budget Swipe */
+.bs-meter{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:13px 15px;margin-bottom:8px}
+.bs-count{text-align:center;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px}
+.swipe-stack{position:relative;display:flex;justify-content:center;margin-bottom:18px}
+.swipe-card{width:100%;max-width:340px;background:linear-gradient(150deg,#fff,#f3effb);border-radius:22px;box-shadow:var(--shadow-lg);padding:34px 22px;text-align:center;transition:transform .18s ease,opacity .18s ease}
+.swipe-card.fly-l{transform:translateX(-120%) rotate(-12deg);opacity:0}
+.swipe-card.fly-r{transform:translateX(120%) rotate(12deg);opacity:0}
+.swipe-emoji{font-size:58px;line-height:1}
+.swipe-name{font-size:21px;font-weight:800;letter-spacing:-.3px;margin-top:12px}
+.swipe-amt{font-size:30px;font-weight:800;color:var(--purple-deep);margin-top:6px}
+.swipe-amt span{font-size:14px;font-weight:700;color:var(--muted)}
+.swipe-actions{display:flex;gap:14px}
+.swipe-btn{flex:1;border:none;border-radius:16px;padding:15px;font-size:16px;font-weight:800;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s}
+.swipe-btn span{font-size:20px}
+.swipe-btn:active{transform:scale(.97)}
+.swipe-btn.cut{background:var(--red-soft);color:var(--red)}
+.swipe-btn.keep{background:var(--green-soft);color:var(--green)}
+.bs-recap{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:13px 15px;margin-bottom:11px}
+.bs-recap+.bs-recap{margin-top:-2px}
+.bsr-h{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.bsr-row{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;padding:3px 0}
+.bsr-row b{font-weight:800}
+
+/* Wants vs Needs */
+.wnb-legend{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:11px;text-align:center}
+.wnb-legend .wnb-key{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:800;margin:0 1px}
+.wnb-legend .wnb-key.want{background:#fdeef4;color:#c14d7e}
+.wnb-legend .wnb-key.need{background:var(--green-soft);color:var(--green)}
+.wnb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px;margin-bottom:14px}
+.wnb-item{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:13px;text-align:center;cursor:pointer;transition:all .14s}
+.wnb-item .wnb-e{font-size:30px;line-height:1}
+.wnb-item .wnb-n{font-size:14px;font-weight:800;margin-top:6px}
+.wnb-item .wnb-tag{font-size:11px;font-weight:800;color:var(--faint);margin-top:5px;letter-spacing:.4px}
+.wnb-item.want{border-color:#db6090;background:#fdeef4}.wnb-item.want .wnb-tag{color:#c14d7e}
+.wnb-item.need{border-color:var(--green);background:var(--green-soft)}.wnb-item.need .wnb-tag{color:var(--green)}
+.wnb-item.rev{cursor:default}
+.wnb-item.rev.ok{border-color:var(--green);background:var(--green-soft)}
+.wnb-item.rev.no{border-color:var(--red);background:var(--red-soft)}
+.wnb-item.rev.ok .wnb-tag{color:var(--green)}.wnb-item.rev.no .wnb-tag{color:var(--red)}
+.wnb-why{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.4}
+
+/* Scammer Scanner */
+.scam-count{text-align:center;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px}
+.scam-msg{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);padding:15px;margin-bottom:13px;border:1px solid var(--line)}
+.scam-from{display:flex;align-items:center;gap:10px;padding-bottom:11px;border-bottom:1px solid var(--line);margin-bottom:11px}
+.scam-ico{width:40px;height:40px;border-radius:11px;background:var(--surface-soft);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.scam-name{font-size:14px;font-weight:800}.scam-kind{font-size:11px;color:var(--muted)}
+.scam-body{font-size:14px;line-height:1.55;color:var(--ink)}
+.scam-choose{display:flex;gap:12px;margin-bottom:6px}
+.scam-decide{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;border:2px solid var(--line);border-radius:15px;padding:16px;font-size:15px;font-weight:800;font-family:var(--font);color:var(--ink);background:var(--surface);cursor:pointer;transition:all .12s}
+.scam-decide span{font-size:14px}
+.scam-decide:active{transform:scale(.97)}
+.scam-decide.scam:hover{border-color:var(--red);background:var(--red-soft);color:var(--red)}
+.scam-decide.legit:hover{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.scam-verdict{border-radius:13px;padding:13px 15px;font-size:14px;font-weight:700;margin-bottom:12px;line-height:1.4}
+.scam-verdict.ok{background:var(--green-soft);color:var(--green)}
+.scam-verdict.no{background:var(--red-soft);color:var(--red)}
+.scam-verdict b{font-weight:800}
+.scam-tells{display:flex;flex-direction:column;gap:8px;margin-bottom:13px}
+.scam-tell{display:flex;align-items:flex-start;gap:10px;border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.45;font-weight:600}
+.scam-tell .st-ico{font-size:15px;flex-shrink:0;line-height:1.4}
+.scam-tell.is-flag{background:var(--red-soft);color:#8c3a26}
+.scam-tell.is-safe{background:var(--green-soft);color:#2c6b54}
+
+/* Finance Wordle */
+.wordle-grid{display:flex;flex-direction:column;gap:7px;align-items:center;margin-bottom:18px}
+.wordle-row{display:flex;gap:7px}
+.wordle-tile{width:54px;height:54px;border:2px solid var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;text-transform:uppercase;color:var(--ink);background:var(--surface)}
+.wordle-tile.filled{border-color:var(--purple-line)}
+.wordle-tile.correct{background:var(--green);border-color:var(--green);color:#fff}
+.wordle-tile.present{background:var(--amber);border-color:var(--amber);color:#fff}
+.wordle-tile.absent{background:#b3acc6;border-color:#b3acc6;color:#fff}
+.wordle-kbd{display:flex;flex-direction:column;gap:7px;align-items:center}
+.wkb-row{display:flex;gap:5px}
+.wkb-key{min-width:30px;height:48px;padding:0 6px;border:none;border-radius:7px;background:var(--surface-soft);color:var(--ink);font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:all .1s}
+.wkb-key:active{transform:scale(.94)}
+.wkb-key.wide{min-width:54px;font-size:12px}
+.wkb-key.correct{background:var(--green);color:#fff}
+.wkb-key.present{background:var(--amber);color:#fff}
+.wkb-key.absent{background:#cdc6dc;color:#fff}
+.hint-btn{display:inline-block;margin-top:9px;background:var(--purple-soft);color:var(--purple-deep);border:none;border-radius:20px;padding:6px 13px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:var(--font)}
+.hint-btn:hover{filter:brightness(.97)}
+.wordle-done{background:var(--purple-soft);color:var(--purple-deep);border-radius:13px;padding:13px 15px;font-size:13.5px;font-weight:600;text-align:center;margin-bottom:11px}
+.wordle-done b{font-weight:800}
+
+/* Finance Crossword */
+.xword-grid{display:grid;gap:3px;max-width:360px;margin:0 auto 16px;aspect-ratio:1}
+.xword-cell{position:relative;background:var(--surface);border:1.4px solid var(--purple-line);border-radius:4px;aspect-ratio:1}
+.xword-cell.blk{background:transparent;border:none}
+.xword-cell input{position:absolute;inset:0;width:100%;height:100%;border:none;background:none;text-align:center;font-family:var(--font);font-size:18px;font-weight:800;text-transform:uppercase;color:var(--ink);border-radius:4px;padding:0}
+.xword-cell input:focus{outline:none}
+.xword-cell input.hl{background:var(--purple-soft)}
+.xword-cell.ok{background:var(--green-soft);border-color:var(--green)}
+.xword-cell.no{background:var(--red-soft);border-color:var(--red)}
+.xw-num{position:absolute;top:1px;left:2px;font-size:9px;font-weight:800;color:var(--muted);pointer-events:none;z-index:1}
+.xword-clues{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
+.xwc-h{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--purple-strong);margin-bottom:8px}
+.xwc-clue{font-size:12.5px;line-height:1.4;color:var(--ink);padding:5px 7px;border-radius:7px;cursor:pointer;transition:background .1s}
+.xwc-clue:hover{background:var(--surface-soft)}
+.xwc-clue b{color:var(--purple-deep);margin-right:3px}
+@media(max-width:520px){.xword-clues{grid-template-columns:1fr}}
+
+/* Quick Count */
+.qc-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800;margin-bottom:8px}
+.qc-count{color:var(--muted)}.qc-score{color:var(--purple-deep)}
+.qc-secs{color:var(--amber);font-variant-numeric:tabular-nums}
+.qc-timer{height:8px;background:var(--surface-soft);border-radius:6px;overflow:hidden;margin-bottom:18px}
+.qc-bar{height:100%;background:linear-gradient(90deg,var(--amber),var(--red));border-radius:6px;transition:width .1s linear}
+.qc-q{font-size:18px;font-weight:800;letter-spacing:-.3px;line-height:1.35;margin-bottom:16px}
+.quiz-choices{display:flex;flex-direction:column;gap:10px;margin-bottom:13px}
+.quiz-choice{background:var(--surface);border:2px solid var(--line);border-radius:13px;padding:15px 16px;font-size:16px;font-weight:800;font-family:var(--font);color:var(--ink);text-align:left;cursor:pointer;transition:all .12s}
+.quiz-choice:hover:not(:disabled){border-color:var(--purple);background:var(--purple-soft)}
+.quiz-choice.right{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.quiz-choice.wrong{border-color:var(--red);background:var(--red-soft);color:var(--red)}
+
+/* Calculators */
+.calc-out{text-align:center}
+.co-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.co-big{font-size:42px;font-weight:800;letter-spacing:-1.4px;color:var(--purple-deep);line-height:1.05;margin:4px 0 14px}
+.co-split{display:flex;justify-content:space-around;gap:10px;text-align:center;margin-bottom:14px}
+.co-split .cs label,.md-rows .cs label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.co-split .cs b{font-size:16px;font-weight:800}
+.split-bar{display:flex;height:14px;border-radius:8px;overflow:hidden;margin-bottom:8px}
+.split-bar .sb-p{background:var(--purple-strong)}.split-bar .sb-i{background:var(--red)}
+.split-key{display:flex;justify-content:center;gap:18px;font-size:12px;font-weight:700;color:var(--muted)}
+.split-key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.split-key .dot-p{background:var(--purple-strong)}.split-key .dot-i{background:var(--red)}
+.calc-form .cf-row{display:flex;justify-content:space-between;align-items:center;margin:14px 0 7px}
+.calc-form .cf-row:first-child{margin-top:0}
+.calc-form label{font-size:13px;font-weight:700;color:var(--ink)}
+.calc-form .cf-val{font-size:16px;font-weight:800;color:var(--purple-deep)}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.calc-chip{padding:8px 15px;border-radius:11px;border:1.6px solid var(--line);background:var(--surface);font-size:13px;font-weight:800;color:var(--muted);cursor:pointer;transition:all .12s}
+.calc-chip.on{border-color:var(--purple);background:var(--purple-soft);color:var(--purple-deep)}
+.mort-donut{display:flex;align-items:center;gap:18px;text-align:left}
+.mort-donut svg{flex-shrink:0}
+.md-rows{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.md-rows .cs b{font-size:15px;font-weight:800}
+
 /* Explore: three equal tool cards in a row */
 .explore-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start}
 #page-tools .menu-card{margin-bottom:18px}
