@@ -205,6 +205,9 @@ Contextual message above the trail — changes based on active lesson and portfo
 #### Penny the fox companion ✅
 Idle bob animation; jumps on lesson completion (`LEARN.petJump = true`). Positioned next to the active node on the trail. **Learn tab only** — never appears on other tabs.
 
+#### Learning trail — the winding path ✅
+Lesson nodes are laid out on a serpentine path (Duolingo-style). A single SVG "road" is drawn behind the nodes connecting them: a soft track, an accent-colored overlay that **fills in as you complete lessons** (per unit color), and a dotted centerline. Between every pair of nodes the road adds a **bow waypoint** that swings out to the side near each node, so the trail routes *around* the lesson titles rather than crossing them. Built with Catmull-Rom → bézier curves and `vector-effect:non-scaling-stroke` for constant width (`renderUnitPath`/`trailSVG`/`trailPoints` in `08-learn-init.js`).
+
 #### Glossary section ✅
 10 terms rendered as tappable chips at the bottom of Learn. "Concepts explored" counter.
 
@@ -266,6 +269,22 @@ Four sub-tabs: **Holdings · Trade · Activity · Plan**
 | Forecast chart colors | Brand palette | 🔄 Uses Foresight colors (bull=blue, base=green, bear=red); should match Fiscally brand |
 
 **Overlap fix needed:** Scenario Forecast in Explore and Stock Finder both serve the Understand loop. Per the "no feature in two places" rule, Scenario Forecast should be reduced to a quick 4-ticker comparison chip row (useful for "how do these stack up?") while Stock Finder owns the full detail view.
+
+#### Play & Learn — Tools games ✅
+
+The Tools tab opens with a **"Play & Learn"** grid of bite-sized financial-literacy games. Each is a self-contained JS mini-app (state → render → inline `onclick`) in `09-tools-games.js`, awards XP into the shared Learn system via `gameXP()`, and registers as a sub-page in `02-nav-onboarding.js`.
+
+| Game | What it teaches | Status |
+|---|---|---|
+| Finance Wordle | Daily + practice money word | ✅ |
+| Wants vs Needs | Sort spending into wants/needs | ✅ |
+| Mini Crossword | Money-term crossword (daily + practice) | ✅ |
+| Budget Swipe | Keep needs, cut wants, stay under budget | ✅ |
+| Scammer Scanner | Spot scam vs legit messages | ✅ |
+| Quick Count | Timed money-math quiz | ✅ |
+| **Debtor's Tower** | **Finance-term hangman** — guess the term before the 5-floor tower collapses (floors crumble green→amber→red on each wrong guess; 5 wrong = 💀 BANKRUPT). Win or lose, **Mia explains the term** with its definition + a real-world "In practice" example, so every round teaches a word. 22-term bank with clue, category, definition and example. | ✅ |
+
+Below the games sit the **Financial Tools** (Stock Finder, plus Loan and Mortgage calculators).
 
 ---
 
