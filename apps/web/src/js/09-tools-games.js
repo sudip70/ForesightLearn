@@ -816,3 +816,90 @@ function renderMortgageCalc(){
   h+=miaSays(tip);
   el.innerHTML=h;
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+ *  DEBTOR'S TOWER — finance-term Hangman. Each wrong guess collapses a floor
+ *  of the tower; five wrong = bankruptcy. Win or lose, Mia explains the word so
+ *  every round teaches a term. Reuses gameHead()/miaSays()/gameXP().
+ * ════════════════════════════════════════════════════════════════════════ */
+var HM_WORDS=[
+  {w:'DIVIDEND',  cat:'Stock Market',  clue:'Companies pay this to shareholders',          def:"A slice of a company's profit paid out to shareholders, passive income from owning stock.",more:"For example, own 100 shares of a company that pays a $2 dividend and you'd collect $200, just for holding it. Many investors reinvest dividends to buy more shares and compound faster over time."},
+  {w:'INFLATION', cat:'Economics',     clue:'Makes $100 buy less over time',               def:'The gradual rise in prices over time, which erodes the purchasing power of cash.',more:"At about 3% a year, a $5 coffee becomes roughly $6.70 in ten years. That's why cash sitting idle slowly loses value, and why people invest to try to stay ahead of it."},
+  {w:'PORTFOLIO', cat:'Investing',     clue:'Your collection of investments',              def:'The full set of assets (stocks, ETFs, bonds, cash) that you own.',more:"A healthy portfolio is usually a mix, maybe some stock ETFs, a few bonds, and a cash cushion, so a drop in one part doesn't sink the whole thing."},
+  {w:'LIQUIDITY', cat:'Finance Basics',clue:'How quickly you can turn it into cash',       def:'How fast an asset can become cash without losing value. Savings are liquid; a house is not.',more:"Cash in your chequing account is the most liquid, you can spend it instantly. A house is the opposite: selling it can take months. Keep enough liquid savings for surprises."},
+  {w:'COMPOUND',  cat:'Investing',     clue:'Earning returns on your returns',             def:'Compound interest means your gains earn gains, a snowball effect that rewards patience.',more:"Invest $1,000 at 8% and leave it untouched: it grows to about $2,160 in ten years and over $10,000 in thirty, without adding a cent. Time does the heavy lifting, so start early."},
+  {w:'LEVERAGE',  cat:'Risk',          clue:'Borrowing to amplify a bet',                  def:'Using borrowed money to increase potential gains, and losses. High leverage = high risk.',more:"Borrowing to invest can double your gains, but it doubles your losses too. A big drop on a leveraged position can wipe you out entirely, which is why beginners should be very cautious with it."},
+  {w:'MORTGAGE',  cat:'Real Estate',   clue:'A loan secured by a property',                def:'A long-term loan used to buy property, where the property itself is the collateral.',more:"Stop paying and the bank can take the house, that's what 'secured by the property' means. The trade-off is much lower interest than an unsecured loan, since the lender takes on less risk."},
+  {w:'RECESSION', cat:'Economics',     clue:'The economy shrinks for two quarters',        def:'A period of economic decline, usually two consecutive quarters of negative GDP growth.',more:"Recessions are a normal part of the economic cycle, they come and go. Long-term investors usually ride them out rather than panic-sell near the bottom and lock in losses."},
+  {w:'COLLATERAL',cat:'Lending',       clue:'An asset pledged against a loan',             def:'Property or assets offered as security for a loan. If you default, the lender takes it.',more:"A car loan uses the car as collateral; a mortgage uses the house. Because the lender can seize the asset if you don't pay, these secured loans usually charge lower interest."},
+  {w:'VOLATILITY',cat:'Markets',       clue:'How wildly a price swings',                   def:'The degree of price fluctuation in an asset, high volatility = big swings up and down.',more:"Crypto is highly volatile, it can swing 10% in a single day. A government bond barely moves. Higher volatility means higher potential reward but a much bumpier ride."},
+  {w:'BANKRUPT',  cat:'Finance Basics',clue:'Unable to repay what you owe',                def:'A legal state where a person or company cannot repay debts, triggering a court process.',more:"Bankruptcy isn't quite the end, it's a legal reset for debts that truly can't be repaid. But it badly damages your credit for years, so it's a last resort, not a strategy."},
+  {w:'DEFICIT',   cat:'Economics',     clue:'Spending more than you earn',                 def:'When spending exceeds income, a negative balance. The opposite of a surplus.',more:"If you (or a government) spend $1.10 for every $1 that comes in, you run a deficit and must borrow the difference. Repeated deficits pile up into debt over time."},
+  {w:'CAPITAL',   cat:'Finance Basics',clue:'Money used to make more money',               def:'Wealth in the form of money or assets that can be invested or used to grow a business.',more:"Your savings become capital the moment you put them to work, buying stocks, starting a side business, or funding a project that can earn a return."},
+  {w:'INTEREST',  cat:'Lending',       clue:'The cost of borrowing money',                 def:'The fee paid for borrowing money (or earned for lending it), shown as a percentage rate.',more:"Interest cuts both ways: you earn it in a savings account, but you pay it on a credit card, often 20%+. Clearing high-interest debt is one of the best guaranteed 'returns' there is."},
+  {w:'PREMIUM',   cat:'Insurance',     clue:'Your regular insurance payment',              def:'The periodic payment made to keep an insurance policy active.',more:"You pay a premium each month or year so that if something goes wrong, a crash, a fire, an illness, the insurer covers the big bill instead of you. It's trading a small known cost for protection."},
+  {w:'EQUITY',    cat:'Investing',     clue:'Your ownership stake in something',           def:"An asset's value minus what you owe on it. In stocks, equity is your ownership share.",more:"If your home is worth $400k and you still owe $250k on the mortgage, you have $150k of equity, the part you truly own. It grows as you pay down debt or the value rises."},
+  {w:'REVENUE',   cat:'Business',      clue:'Total money coming into a business',          def:'The total income a business earns before expenses are taken out, the "top line".',more:"Revenue isn't profit. A company with huge revenue can still lose money if its costs are even higher, which is why investors look at the bottom line too, not just sales."},
+  {w:'RETIREMENT',cat:'Planning',      clue:'When you stop working and live off savings',  def:'The phase when you leave work and draw income from savings, pensions, or investments.',more:"The earlier you start saving for it, the less you need to set aside each month, because compounding does more of the work the longer your money has to grow."},
+  {w:'DEDUCTIBLE',cat:'Insurance',     clue:'What you pay before insurance kicks in',      def:'The amount you pay out of pocket on a claim before your insurance starts paying.',more:"With a $500 deductible on a $2,000 claim, you pay the first $500 and the insurer covers $1,500. Choosing a higher deductible usually lowers your monthly premium."},
+  {w:'DIVERSIFY', cat:'Investing',     clue:"Don't put all eggs in one basket",            def:'Spreading investments across different assets or sectors to reduce risk.',more:"Instead of betting everything on one stock, you spread across many, so if a single company stumbles, the others can cushion the blow. An ETF does this for you in one purchase."},
+  {w:'SOLVENCY',  cat:'Finance Basics',clue:'Able to meet all your financial obligations', def:'The ability to pay all debts when they come due. The opposite of insolvency.',more:"You're solvent when your assets and income comfortably cover what you owe. Lose that balance for too long and insolvency, and possibly bankruptcy, can follow."},
+  {w:'BUDGET',    cat:'Finance Basics',clue:'A plan for your income and expenses',         def:'A financial plan that splits your income across needs, wants, and savings goals.',more:"A popular starting point is 50/30/20: half your income to needs, 30% to wants, and 20% to savings and debt. Adjust the mix until it fits your real life."}
+];
+var hmState=null;
+function initHangman(){
+  var pool=hmState?HM_WORDS.filter(function(x){return x.w!==hmState.word;}):HM_WORDS;
+  var p=pool[Math.floor(Math.random()*pool.length)];
+  hmState={word:p.w,cat:p.cat,clue:p.clue,def:p.def,more:p.more,guessed:[],wrong:0,maxWrong:5,done:false,won:false,_xpGiven:false};
+  hmRender();
+}
+/* Five stacked floors, top floor crumbles first; bottom-up colours go safe→warn→danger.
+ * Floor f (max=top … 1=bottom) has fallen once `wrong` reaches its rank from the top. */
+function hmTower(wrong,max,live){
+  var h='<div class="hm-tower">';
+  for(var f=max;f>=1;f--){
+    var rank=max-f+1;/* 1=top, max=bottom */
+    var fallen=wrong>=rank,cracking=(live&&wrong>0&&rank===wrong+1);/* top standing floor wobbles as a warning */
+    var color=rank<=2?'safe':(rank<=4?'warn':'danger');
+    h+='<div class="hm-floor '+color+(fallen?' fallen':'')+(cracking?' cracking':'')+'"><span class="hm-floor-label">FLOOR '+f+'</span></div>';
+  }
+  h+='<div class="hm-base'+(wrong>=max?' bust':'')+'">'+(wrong>=max?'💀 BANKRUPT':'🏦 FISCALLY BANK')+'</div></div>';
+  return h;
+}
+function hmRender(){
+  var s=hmState,el=document.getElementById('hmBody');if(!el)return;
+  var letters=s.word.split('').map(function(l){
+    var got=s.guessed.indexOf(l)>=0;
+    return got?'<span class="hm-l revealed">'+l+'</span>':'<span class="hm-l blank">'+(s.done?l:'')+'</span>';
+  }).join('');
+  var keyboard='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(function(l){
+    var picked=s.guessed.indexOf(l)>=0,hit=picked&&s.word.indexOf(l)>=0,miss=picked&&s.word.indexOf(l)<0;
+    return '<button class="hm-key'+(hit?' hit':'')+(miss?' miss':'')+'"'+((picked||s.done)?' disabled':'')+' onclick="hmGuess(\''+l+'\')">'+l+'</button>';
+  }).join('');
+  var end='';
+  if(s.done){
+    var name=s.word.charAt(0)+s.word.slice(1).toLowerCase();
+    var intro=s.won?"Nicely done! Here's the term you just spelled:":"No worries, every collapse teaches you something. Here's the word:";
+    end='<div class="hm-end '+(s.won?'win':'lose')+'">'+(s.won?'🎉 You saved the tower!':'💸 The tower collapsed!')+'</div>'
+      +miaSays(intro+'<br><br><b>'+name+'</b> — '+s.def+(s.more?'<br><br>💡 <b>In practice:</b> '+s.more:''));
+  }
+  el.innerHTML=gameHead('🏦',"Debtor's Tower",s.cat+' · '+(s.maxWrong-s.wrong)+' mistakes left')
+    +hmTower(s.wrong,s.maxWrong,!s.done)
+    +'<div class="hm-clue">💡 '+s.clue+'</div>'
+    +'<div class="hm-word">'+letters+'</div>'
+    +end
+    +(s.done?'':'<div class="hm-keys">'+keyboard+'</div>')
+    +(s.done?'<button class="btn btn-pur hm-replay" onclick="initHangman()">Play again ↻</button>':'');
+  if(s.done)gameXP(s,s.won?1:0.3,s.won?'Word solved!':'Tower fell, but you learned a word');
+}
+function hmGuess(l){
+  if(!hmState||hmState.done||hmState.guessed.indexOf(l)>=0)return;
+  hmState.guessed.push(l);
+  if(hmState.word.indexOf(l)<0){
+    hmState.wrong++;
+    if(hmState.wrong>=hmState.maxWrong)hmState.done=true;
+  }else if(hmState.word.split('').every(function(c){return hmState.guessed.indexOf(c)>=0;})){
+    hmState.won=true;hmState.done=true;
+  }
+  hmRender();
+}

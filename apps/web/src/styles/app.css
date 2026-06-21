@@ -699,6 +699,35 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;overflow:
 .gr-row span{color:var(--muted);font-weight:600}.gr-row b{font-weight:800}
 .game-head+.btn,.game-result+.btn,.mia+.btn{margin-top:4px}
 
+/* Debtor's Tower (finance hangman) */
+.hm-tower{display:flex;flex-direction:column;align-items:center;gap:4px;width:178px;margin:8px auto 18px}
+.hm-floor{width:100%;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800;letter-spacing:.6px;position:relative;transition:opacity .3s,transform .3s}
+.hm-floor.safe{background:linear-gradient(100deg,var(--green),#3c8268);box-shadow:0 3px 0 #2d6b55}
+.hm-floor.warn{background:linear-gradient(100deg,var(--amber),#a8841f);box-shadow:0 3px 0 #836718}
+.hm-floor.danger{background:linear-gradient(100deg,#d56549,#a8402c);box-shadow:0 3px 0 #7a2f20}
+.hm-floor .hm-floor-label{opacity:.92}
+.hm-floor.fallen{opacity:.16;transform:scale(.94);box-shadow:none;animation:hmfall .45s ease-out}
+.hm-floor.cracking{animation:hmcrack .55s ease-in-out infinite}
+.hm-base{width:104%;height:38px;border-radius:9px;background:var(--purple-deep);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800;letter-spacing:.6px;margin-top:2px;transition:background .3s}
+.hm-base.bust{background:#7a2f20}
+@keyframes hmfall{0%{transform:scale(1) translateX(0) rotate(0);opacity:1}45%{transform:scale(1.03) translateX(10px) rotate(2deg)}100%{transform:scale(.94) translateX(0);opacity:.16}}
+@keyframes hmcrack{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.hm-clue{font-size:13px;font-weight:700;color:var(--muted);text-align:center;background:var(--surface-soft);border-radius:12px;padding:10px 14px;margin:0 0 4px}
+.hm-word{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:16px 0;min-height:46px}
+.hm-l{display:flex;align-items:flex-end;justify-content:center;width:24px;font-size:21px;font-weight:800;letter-spacing:-.5px;border-bottom:2.5px solid var(--purple-soft2);padding-bottom:3px;line-height:1}
+.hm-l.revealed{color:var(--purple-deep);border-color:var(--purple-deep);animation:pop .22s ease}
+.hm-l.blank{color:var(--faint)}
+.hm-keys{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:344px;margin:14px auto 6px}
+.hm-key{width:34px;height:38px;border-radius:9px;border:none;background:var(--surface-soft);color:var(--ink);font-size:13px;font-weight:800;cursor:pointer;transition:transform .07s,background .12s}
+.hm-key:active:not([disabled]){transform:scale(.88)}
+.hm-key.hit{background:var(--green);color:#fff}
+.hm-key.miss{background:#cf5a40;color:#fff;opacity:.55}
+.hm-key[disabled]{cursor:default}
+.hm-end{text-align:center;font-size:16px;font-weight:800;padding:13px;border-radius:14px;margin:4px 0 12px}
+.hm-end.win{background:var(--green-soft);color:#2c6e54}
+.hm-end.lose{background:#fbeae6;color:#cf5a40}
+.hm-replay{width:100%;margin-top:4px}
+
 /* Budget Swipe */
 .bs-meter{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:13px 15px;margin-bottom:8px}
 .bs-count{text-align:center;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px}
