@@ -181,13 +181,14 @@ header.hidden{display:none}
 .sf-item .sf-cls{margin-left:auto}
 .sf-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;font-weight:700;color:var(--muted);padding:9px 4px 0}
 .sf-legend i{display:inline-block;width:11px;height:3px;border-radius:2px;margin-right:4px;vertical-align:middle}
-/* hover readout over the forecast chart */
-.sf-tip{position:absolute;z-index:6;pointer-events:none;background:rgba(36,31,52,.93);color:#fff;border-radius:11px;padding:9px 11px;min-width:128px;box-shadow:0 8px 22px rgba(40,30,70,.30);font-weight:700}
-.sf-tip-d{font-size:12.5px;font-weight:800;letter-spacing:.2px;margin-bottom:6px}
-.sf-tip-r{display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:1.5}
-.sf-tip-sw{width:11px;height:11px;border-radius:3px;flex:0 0 auto;box-shadow:0 0 0 1.5px rgba(255,255,255,.35) inset}
-.sf-tip-l{color:rgba(255,255,255,.82)}
-.sf-tip-v{margin-left:auto;font-weight:800}
+/* hover readout shared by the interactive charts (Practice + Stock Finder) */
+.chart-tip{position:absolute;z-index:6;pointer-events:none;background:rgba(36,31,52,.93);color:#fff;border-radius:11px;padding:9px 11px;min-width:128px;box-shadow:0 8px 22px rgba(40,30,70,.30);font-weight:700}
+.chart-tip-d{font-size:12.5px;font-weight:800;letter-spacing:.2px;margin-bottom:6px}
+.chart-tip-r{display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:1.5}
+.chart-tip-sw{width:11px;height:11px;border-radius:3px;flex:0 0 auto;box-shadow:0 0 0 1.5px rgba(255,255,255,.35) inset}
+.chart-tip-l{color:rgba(255,255,255,.82)}
+.chart-tip-v{margin-left:auto;font-weight:800}
+.chart-hint{font-size:10.5px;color:var(--faint);font-weight:600;text-align:center;margin-top:8px}
 .sf-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border-radius:12px;overflow:hidden}
 .sf-stat{background:var(--surface);padding:11px 13px}
 .sf-stat label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:3px}

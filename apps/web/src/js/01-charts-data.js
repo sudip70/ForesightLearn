@@ -104,6 +104,120 @@ function genCandles(n,start){
   return d;
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+ *  Interactive time-series charts — shared engine
+ *  One implementation powers the Practice portfolio chart and the Stock Finder
+ *  forecast chart: hover readout (date + values), scroll/pinch zoom centred on
+ *  the cursor, drag to pan, double-click to reset. A chart is described by a
+ *  `cfg` (see renderPortfolioChart / paintSF) and re-renders itself in place as
+ *  the view window changes. Donuts/gauges/sparklines are static by design.
+ * ───────────────────────────────────────────────────────────────────────── */
+var CHARTS={};
+function clampViewSpan(v){
+  var full=v.n-1,minSpan=Math.max(3,full*0.05);if(minSpan>full)minSpan=full;
+  if(v.hi-v.lo<minSpan){var c=(v.lo+v.hi)/2;v.lo=c-minSpan/2;v.hi=c+minSpan/2;}
+  if(v.lo<0){v.hi-=v.lo;v.lo=0;}
+  if(v.hi>full){v.lo-=(v.hi-full);v.hi=full;}
+  if(v.lo<0)v.lo=0;
+  return v;
+}
+function interactiveChart(id,cfg){
+  var el=document.getElementById(id);if(!el)return;
+  var w=cfg.w,h=cfg.h,pad=8,padT=10,padB=20,plotW=w-pad*2,plotH=h-padT-padB;
+  var v=cfg.view,baseY=h-padB,span=(v.hi-v.lo)||1;
+  var yr=cfg.yRange(v),mn=yr[0],mx=yr[1],rg=(mx-mn)||1;
+  function X(i){return pad+(i-v.lo)/span*plotW;}
+  function Y(val){return padT+plotH*(1-(val-mn)/rg);}
+  var clip='clip_'+id;
+  var content=cfg.draw(X,Y,v,baseY);
+  var labs=cfg.xLabels?cfg.xLabels(v):[];
+  var labSvg=labs.map(function(L){return '<text x="'+X(L.i).toFixed(1)+'" y="'+(h-6)+'" font-size="9" fill="#aaa4c0" font-weight="700" text-anchor="'+L.a+'">'+L.t+'</text>';}).join('');
+  var maxM=cfg.maxMarkers||3,dots='';
+  for(var k=0;k<maxM;k++)dots+='<circle id="'+id+'_hd'+k+'" r="3.4" fill="#7a5cae" stroke="#fff" stroke-width="1.5" style="display:none"/>';
+  var svg='<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" style="display:block;touch-action:none">'
+    +'<defs><clipPath id="'+clip+'"><rect x="'+pad+'" y="0" width="'+plotW+'" height="'+h+'"/></clipPath></defs>'
+    +'<g clip-path="url(#'+clip+')">'+content+'</g>'
+    +labSvg
+    +'<g id="'+id+'_hl" style="opacity:0;pointer-events:none"><line id="'+id+'_hv" y1="'+padT+'" y2="'+baseY+'" stroke="#b9add6" stroke-width="1" stroke-dasharray="2 3"/>'+dots+'</g>'
+    +'<rect x="0" y="0" width="'+w+'" height="'+h+'" fill="transparent" style="cursor:crosshair;touch-action:none" '
+      +'onwheel="chartWheel(\''+id+'\',event)" onpointerdown="chartDown(\''+id+'\',event)" onmousemove="chartHover(\''+id+'\',event)" onmouseleave="chartHoverOff(\''+id+'\')" ondblclick="chartReset(\''+id+'\')"></rect>'
+    +'</svg>';
+  el.style.position='relative';
+  el.innerHTML=svg+'<div id="'+id+'_tip" class="chart-tip" style="display:none"></div>';
+  CHARTS[id]={id:id,cfg:cfg,view:v,w:w,h:h,pad:pad,plotW:plotW,X:X,Y:Y,baseY:baseY,maxM:maxM};
+}
+function chartScale(c){var svg=document.querySelector('#'+c.id+' svg');if(!svg)return null;var r=svg.getBoundingClientRect();return r.width?{r:r,scale:r.width/c.w}:null;}
+function chartIdxAtClient(c,clientX){var s=chartScale(c);if(!s)return null;var vbx=(clientX-s.r.left)/s.scale;return c.view.lo+(vbx-c.pad)/c.plotW*((c.view.hi-c.view.lo)||1);}
+function chartRerender(id){var c=CHARTS[id];if(c){c.cfg.view=c.view;interactiveChart(id,c.cfg);}}
+function chartWheel(id,e){
+  var c=CHARTS[id];if(!c)return;e.preventDefault();
+  var ctr=chartIdxAtClient(c,e.clientX);if(ctr==null)ctr=(c.view.lo+c.view.hi)/2;
+  var f=e.deltaY>0?1.15:0.87,v=c.view;
+  v.lo=ctr-(ctr-v.lo)*f;v.hi=ctr+(v.hi-ctr)*f;clampViewSpan(v);chartRerender(id);
+}
+function chartReset(id){var c=CHARTS[id];if(!c)return;c.view.lo=0;c.view.hi=c.view.n-1;chartRerender(id);}
+/* pointer gestures: 1 finger = pan, 2 fingers = pinch-zoom */
+var gesture=null;
+function gptDist(p){var k=Object.keys(p);var a=p[k[0]],b=p[k[1]];return Math.hypot(a.x-b.x,a.y-b.y);}
+function gptMidX(p){var k=Object.keys(p);return (p[k[0]].x+p[k[1]].x)/2;}
+function chartDown(id,e){
+  var c=CHARTS[id];if(!c)return;
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  if(!gesture||gesture.id!==id)gesture={id:id,ptrs:{}};
+  gesture.ptrs[e.pointerId]={x:e.clientX,y:e.clientY};
+  var n=Object.keys(gesture.ptrs).length;
+  if(n===1){gesture.mode='pan';gesture.lastX=e.clientX;}
+  else if(n===2){gesture.mode='pinch';gesture.startDist=gptDist(gesture.ptrs);gesture.startLo=c.view.lo;gesture.startHi=c.view.hi;gesture.ctr=chartIdxAtClient(c,gptMidX(gesture.ptrs));}
+  chartHoverOff(id);
+  window.addEventListener('pointermove',chartGmove);
+  window.addEventListener('pointerup',chartGup);window.addEventListener('pointercancel',chartGup);
+  e.preventDefault();
+}
+function chartGmove(e){
+  if(!gesture)return;var c=CHARTS[gesture.id];if(!c)return;
+  if(!(e.pointerId in gesture.ptrs))return;
+  gesture.ptrs[e.pointerId]={x:e.clientX,y:e.clientY};
+  var s=chartScale(c);if(!s)return;var v=c.view;
+  if(gesture.mode==='pinch'&&Object.keys(gesture.ptrs).length>=2){
+    var f=gesture.startDist/(gptDist(gesture.ptrs)||1),ctr=gesture.ctr;
+    v.lo=ctr-(ctr-gesture.startLo)*f;v.hi=ctr+(gesture.startHi-ctr)*f;clampViewSpan(v);chartRerender(gesture.id);
+  }else if(gesture.mode==='pan'){
+    var dxVbx=(e.clientX-gesture.lastX)/s.scale;gesture.lastX=e.clientX;
+    var span=v.hi-v.lo,dIdx=-dxVbx/c.plotW*span;v.lo+=dIdx;v.hi+=dIdx;
+    if(v.lo<0){v.lo=0;v.hi=span;}if(v.hi>v.n-1){v.hi=v.n-1;v.lo=v.n-1-span;}if(v.lo<0)v.lo=0;
+    chartRerender(gesture.id);
+  }
+}
+function chartGup(e){
+  if(!gesture)return;delete gesture.ptrs[e.pointerId];
+  var n=Object.keys(gesture.ptrs).length;
+  if(n===0){window.removeEventListener('pointermove',chartGmove);window.removeEventListener('pointerup',chartGup);window.removeEventListener('pointercancel',chartGup);gesture=null;}
+  else if(n===1){gesture.mode='pan';gesture.lastX=gesture.ptrs[Object.keys(gesture.ptrs)[0]].x;}
+}
+function chartHover(id,e){
+  if(gesture)return;var c=CHARTS[id];if(!c)return;
+  var fi=chartIdxAtClient(c,e.clientX);if(fi==null)return;
+  var idx=Math.round(fi);
+  idx=Math.max(0,Math.min(c.view.n-1,idx));
+  idx=Math.max(Math.ceil(c.view.lo-1e-6),Math.min(Math.floor(c.view.hi+1e-6),idx));
+  var pt=c.cfg.pointAt(idx),lx=c.X(idx);
+  document.getElementById(id+'_hv').setAttribute('x1',lx);
+  document.getElementById(id+'_hv').setAttribute('x2',lx);
+  for(var k=0;k<c.maxM;k++){var d=document.getElementById(id+'_hd'+k);if(!d)continue;
+    if(k<pt.rows.length){d.style.display='';d.setAttribute('cx',lx);d.setAttribute('cy',c.Y(pt.rows[k].value));d.setAttribute('fill',pt.rows[k].color);}
+    else d.style.display='none';}
+  var g=document.getElementById(id+'_hl');if(g)g.style.opacity='1';
+  var tip=document.getElementById(id+'_tip');if(!tip)return;
+  tip.innerHTML='<div class="chart-tip-d">'+(pt.date||'—')+'</div>'+pt.rows.map(function(r){return '<div class="chart-tip-r"><span class="chart-tip-sw" style="background:'+r.color+'"></span><span class="chart-tip-l">'+r.label+'</span><span class="chart-tip-v tnum">'+r.disp+'</span></div>';}).join('');
+  tip.style.display='block';
+  var s=chartScale(c);if(!s)return;var cx=lx*s.scale,tw=tip.offsetWidth,th=tip.offsetHeight;
+  var ay=c.Y(pt.anchorVal!=null?pt.anchorVal:pt.rows[0].value);
+  var left=cx+14;if(left+tw>s.r.width)left=cx-tw-14;if(left<0)left=2;
+  var top=ay*s.scale-th/2;top=Math.max(2,Math.min(s.r.height-th-2,top));
+  tip.style.left=Math.round(left)+'px';tip.style.top=Math.round(top)+'px';
+}
+function chartHoverOff(id){var g=document.getElementById(id+'_hl');if(g)g.style.opacity='0';var t=document.getElementById(id+'_tip');if(t)t.style.display='none';}
+
 /* ── Render charts ───────────────────────────── */
 /* journeyChart is rendered by renderPortfolioChart() inside renderPortfolio (needs PF/totals) */
 /* scenarioChart is rendered lazily by renderScenario() when the Scenarios page opens */

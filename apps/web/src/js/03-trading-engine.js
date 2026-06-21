@@ -180,10 +180,29 @@ function rangeWindow(full,r){
   return out.length>=2?out:full.slice(-2);
 }
 function rangeName(r){return {'1D':'today','1W':'past week','1M':'past month','6M':'past 6 months','YTD':'year to date','ALL':'all time'}[r]||r;}
+/* The Practice chart is interactive (hover/zoom/pan) via the shared interactiveChart
+ * engine; the static equityChart above stays in use for the animated Scenarios chart. */
 function renderPortfolioChart(){
   var c=document.getElementById('journeyChart');if(!c)return;
   var win=rangeWindow(portfolioSeriesFull(),pfRange);
-  c.innerHTML=equityChart(win,300,150,'#7a5cae',function(p){return fmtDate(p.date);});
+  if(win.length<2)win=win.concat(win.slice(-1));
+  var n=win.length;
+  interactiveChart('journeyChart',{w:300,h:150,maxMarkers:1,view:{lo:0,hi:n-1,n:n},
+    yRange:function(v){var lo=Math.max(0,Math.floor(v.lo)),hi=Math.min(n-1,Math.ceil(v.hi)),mn=Infinity,mx=-Infinity;for(var i=lo;i<=hi;i++){var t=win[i].total;if(t<mn)mn=t;if(t>mx)mx=t;}if(!isFinite(mn)){mn=0;mx=1;}if(mn===mx){mx=mn+1;}var p=(mx-mn)*0.08;return [mn-p,mx+p];},
+    draw:function(X,Y,v,baseY){
+      var gid='eqg'+Math.round(Math.random()*1e6);
+      var line=win.map(function(p,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(p.total).toFixed(1);}).join(' ');
+      var area=line+' L'+X(n-1).toFixed(1)+' '+baseY+' L'+X(0).toFixed(1)+' '+baseY+' Z';
+      var refY=Y(win[0].total).toFixed(1),ex=X(n-1).toFixed(1),ey=Y(win[n-1].total).toFixed(1);
+      return '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5cae" stop-opacity="0.16"/><stop offset="0.92" stop-color="#7a5cae" stop-opacity="0"/></linearGradient></defs>'
+        +'<line x1="8" y1="'+refY+'" x2="292" y2="'+refY+'" stroke="#7a5cae" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>'
+        +'<path d="'+area+'" fill="url(#'+gid+')"/>'
+        +'<path d="'+line+'" fill="none" stroke="#7a5cae" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+        +'<circle cx="'+ex+'" cy="'+ey+'" r="3.5" fill="#7a5cae" stroke="#fff" stroke-width="1.6"/>';
+    },
+    xLabels:function(v){var lo=Math.max(0,Math.ceil(v.lo)),hi=Math.min(n-1,Math.floor(v.hi)),mid=Math.round((lo+hi)/2);return [{i:lo,a:'start',t:fmtDate(win[lo].date)},{i:mid,a:'middle',t:fmtDate(win[mid].date)},{i:hi,a:'end',t:fmtDate(win[hi].date)}];},
+    pointAt:function(idx){return {date:fmtDate(win[idx].date)||('Point '+(idx+1)),anchorVal:win[idx].total,rows:[{color:'#7a5cae',label:'Value',value:win[idx].total,disp:money(win[idx].total)}]};}
+  });
   var lab=document.getElementById('pfRangeChg');if(!lab)return;
   if(win.length>=2&&win[0].date){var a=win[0].total,b=win[win.length-1].total,d=b-a,pct=a?d/a*100:0;
     lab.innerHTML='· <span class="'+(d>=0?'up':'down')+'">'+(d>=0?'+':'-')+'$'+Math.abs(d).toFixed(2)+' ('+(d>=0?'+':'')+pct.toFixed(2)+'%)</span> '+rangeName(pfRange);

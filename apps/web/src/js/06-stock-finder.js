@@ -37,100 +37,60 @@ function loadSF(){
 function sfMoney(n){return n>=1000?'$'+n.toLocaleString(undefined,{maximumFractionDigits:0}):(n>=1?'$'+n.toFixed(2):'$'+n.toFixed(4));}
 function fmtCap(n){if(!n)return 'n/a';if(n>=1e12)return '$'+(n/1e12).toFixed(2)+'T';if(n>=1e9)return '$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return '$'+(n/1e6).toFixed(2)+'M';return '$'+n.toFixed(0);}
 function fmtVol(n){if(!n)return 'n/a';if(n>=1e9)return (n/1e9).toFixed(2)+'B';if(n>=1e6)return (n/1e6).toFixed(2)+'M';if(n>=1e3)return (n/1e3).toFixed(1)+'K';return ''+n;}
-/* Forecast fan chart — wears the same skin as the Practice/Home charts: a purple
- * line with the app's signature gradient fill under the real history, then a soft
- * purple confidence band fanning out from "now" with a dashed most-likely (purple,
- * the thread continues), an upside edge (green = the app's gain colour) and a
- * downside edge (red = the app's loss colour). Padded + labelled like equityChart. */
-var sfChartModel=null;
-function forecastChart(hist,bear,base,bull,w,h,opts){
-  var pad=8,padT=10,padB=20,nH=hist.length,nF=base.length,all=hist.concat(bear,base,bull);
-  var mn=Math.min.apply(null,all),mx=Math.max.apply(null,all),rg=(mx-mn)||1;
-  var stepX=(w-pad*2)/(nH+nF-1);
-  function X(i){return pad+i*stepX;}function Y(v){return padT+(h-padT-padB)*(1-(v-mn)/rg);}
-  function path(arr,s){return arr.map(function(v,i){return (i?'L':'M')+X(s+i).toFixed(1)+' '+Y(v).toFixed(1);}).join(' ');}
-  var s=nH-1,histP=path(hist,0),bearP=path(bear,s),baseP=path(base,s),bullP=path(bull,s);
-  // confidence band, upside edge down to downside edge
-  var band='M'+X(s).toFixed(1)+' '+Y(bull[0]).toFixed(1);
-  for(var i=1;i<bull.length;i++)band+=' L'+X(s+i).toFixed(1)+' '+Y(bull[i]).toFixed(1);
-  for(var j=bear.length-1;j>=0;j--)band+=' L'+X(s+j).toFixed(1)+' '+Y(bear[j]).toFixed(1);
-  band+=' Z';
-  // gradient area fill beneath the real history (the app's signature look)
-  var baseY=(h-padB).toFixed(1),tx=X(s).toFixed(1),gid='fc'+Math.round(Math.random()*1e6);
-  var histArea=histP+' L'+tx+' '+baseY+' L'+X(0).toFixed(1)+' '+baseY+' Z';
-  function dot(arr,col){return '<circle cx="'+X(nH+arr.length-2).toFixed(1)+'" cy="'+Y(arr[arr.length-1]).toFixed(1)+'" r="3.5" fill="'+col+'" stroke="#fff" stroke-width="1.6"/>';}
-  function tick(x,a,t){return '<text x="'+x+'" y="'+(h-6)+'" font-size="9" fill="#aaa4c0" font-weight="700" text-anchor="'+a+'">'+t+'</text>';}
-  // stash everything the hover handler needs to map cursor → index → values/pixels
-  var histDates=(opts&&opts.histDates)||[],fcDates=(opts&&opts.fcDates)||[];
-  var maxI=nH+nF-2;
-  sfChartModel={w:w,h:h,pad:pad,stepX:stepX,nH:nH,nF:nF,s:s,maxI:maxI,baseTop:padT,baseBot:+baseY,
-    hist:hist,bear:bear,base:base,bull:bull,X:X,Y:Y,
-    dateAt:function(i){return i<s?(histDates[i]||''):(fcDates[i-s]||'');}};
-  return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" style="display:block">'
-    +'<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5cae" stop-opacity="0.16"/><stop offset="0.92" stop-color="#7a5cae" stop-opacity="0"/></linearGradient></defs>'
-    +'<path d="'+band+'" fill="rgba(122,92,174,.10)"/>'
-    +'<path d="'+histArea+'" fill="url(#'+gid+')"/>'
-    +'<line x1="'+tx+'" y1="'+padT+'" x2="'+tx+'" y2="'+baseY+'" stroke="#cdc4e4" stroke-width="1" stroke-dasharray="2 4" opacity="0.8"/>'
-    +'<path d="'+histP+'" fill="none" stroke="#7a5cae" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'
-    +'<path d="'+baseP+'" fill="none" stroke="#7a5cae" stroke-width="1.9" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
-    +'<path d="'+bullP+'" fill="none" stroke="#4f9c7e" stroke-width="1.7" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
-    +'<path d="'+bearP+'" fill="none" stroke="#cf5a40" stroke-width="1.7" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
-    +dot(bear,'#cf5a40')+dot(bull,'#4f9c7e')+dot(base,'#7a5cae')
-    +tick(X(0).toFixed(1),'start','past')+tick(tx,'middle','now')+tick(X(nH+nF-2).toFixed(1),'end','ahead')
-    // hover layer (markers, updated in place by sfHover) + a transparent capture rect on top
-    +'<g id="sfHL" style="opacity:0;pointer-events:none">'
-      +'<line id="sfHLv" y1="'+padT+'" y2="'+baseY+'" stroke="#b9add6" stroke-width="1" stroke-dasharray="2 3"/>'
-      +'<circle id="sfHLbull" r="3.4" fill="#4f9c7e" stroke="#fff" stroke-width="1.5"/>'
-      +'<circle id="sfHLbase" r="3.4" fill="#7a5cae" stroke="#fff" stroke-width="1.5"/>'
-      +'<circle id="sfHLbear" r="3.4" fill="#cf5a40" stroke="#fff" stroke-width="1.5"/>'
-      +'<circle id="sfHLhist" r="3.4" fill="#7a5cae" stroke="#fff" stroke-width="1.5"/>'
-    +'</g>'
-    +'<rect x="0" y="0" width="'+w+'" height="'+h+'" fill="transparent" style="cursor:crosshair" '
-      +'onmousemove="sfHover(event)" onmouseleave="sfHoverOff()" ontouchstart="sfHover(event)" ontouchmove="sfHover(event)" ontouchend="sfHoverOff()"></rect>'
-    +'</svg>';
-}
-/* ── Interactive hover: cursor → nearest day → date + Bull/Base/Bear readout ── */
 function addDaysISO(iso,days){var p=(''+iso).slice(0,10).split('-');if(p.length<3)return iso||'';var d=new Date(+p[0],(+p[1])-1,+p[2]);if(isNaN(d))return iso||'';d.setDate(d.getDate()+Math.round(days));return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
-function sfTipRow(col,lab,val){return '<div class="sf-tip-r"><span class="sf-tip-sw" style="background:'+col+'"></span><span class="sf-tip-l">'+lab+'</span><span class="sf-tip-v tnum">'+sfMoney(val)+'</span></div>';}
-function sfHLset(id,a,v){var el=document.getElementById(id);if(el)el.setAttribute(a,v);}
-function sfHLshow(id,on){var el=document.getElementById(id);if(el)el.style.display=on?'':'none';}
-function sfHover(e){
-  var m=sfChartModel;if(!m)return;
-  var svg=document.querySelector('#sfChart svg');if(!svg)return;
-  var rect=svg.getBoundingClientRect();if(!rect.width)return;
-  var scale=rect.width/m.w;
-  var pt=(e.touches&&e.touches[0])?e.touches[0]:e;
-  var vbx=(pt.clientX-rect.left)/scale;
-  var idx=Math.round((vbx-m.pad)/m.stepX);
-  idx=Math.max(0,Math.min(m.maxI,idx));
-  var inFc=idx>=m.s,lx=m.X(idx);
-  sfHLset('sfHLv','x1',lx);sfHLset('sfHLv','x2',lx);
-  var rows,anchorY;
-  if(inFc){
-    var fi=idx-m.s,vbu=m.bull[fi],vba=m.base[fi],vbe=m.bear[fi];
-    sfHLset('sfHLbull','cx',lx);sfHLset('sfHLbull','cy',m.Y(vbu));
-    sfHLset('sfHLbase','cx',lx);sfHLset('sfHLbase','cy',m.Y(vba));
-    sfHLset('sfHLbear','cx',lx);sfHLset('sfHLbear','cy',m.Y(vbe));
-    sfHLshow('sfHLbull',1);sfHLshow('sfHLbase',1);sfHLshow('sfHLbear',1);sfHLshow('sfHLhist',0);
-    rows=sfTipRow('#4f9c7e','Bull',vbu)+sfTipRow('#7a5cae','Base',vba)+sfTipRow('#cf5a40','Bear',vbe);
-    anchorY=m.Y(vba);
-  }else{
-    var hv=m.hist[idx];
-    sfHLset('sfHLhist','cx',lx);sfHLset('sfHLhist','cy',m.Y(hv));
-    sfHLshow('sfHLhist',1);sfHLshow('sfHLbull',0);sfHLshow('sfHLbase',0);sfHLshow('sfHLbear',0);
-    rows=sfTipRow('#7a5cae','Price',hv);
-    anchorY=m.Y(hv);
-  }
-  var g=document.getElementById('sfHL');if(g)g.style.opacity='1';
-  var tip=document.getElementById('sfTip');if(!tip)return;
-  tip.innerHTML='<div class="sf-tip-d">'+(m.dateAt(idx)||'—')+'</div>'+rows;
-  tip.style.display='block';
-  var cx=lx*scale,tw=tip.offsetWidth,th=tip.offsetHeight;
-  var left=cx+14;if(left+tw>rect.width)left=cx-tw-14;if(left<0)left=2;
-  var top=anchorY*scale-th/2;top=Math.max(2,Math.min(rect.height-th-2,top));
-  tip.style.left=Math.round(left)+'px';tip.style.top=Math.round(top)+'px';
+/* Forecast fan chart — wears the same skin as the Practice/Home charts (purple line +
+ * gradient fill under the real history) plus a soft purple confidence band fanning out
+ * from "now": dashed most-likely (purple), upside edge (green = gain), downside edge
+ * (red = loss). Driven by the shared interactiveChart engine, so it hovers, zooms (scroll/
+ * pinch), pans (drag) and resets (double-click). Combined index space: history 0..nH-1,
+ * forecast continues from the seam s=nH-1. */
+function renderForecastChart(id,hist,bear,base,bull,histDates,fcDates){
+  var nH=hist.length,nF=base.length,s=nH-1,n=nH+nF-1;
+  function dateAt(i){return i<s?(histDates[i]||''):(fcDates[i-s]||'');}
+  var cfg={w:300,h:152,maxMarkers:3,view:{lo:0,hi:n-1,n:n},
+    yRange:function(v){
+      var lo=Math.max(0,Math.floor(v.lo)),hi=Math.min(n-1,Math.ceil(v.hi)),mn=Infinity,mx=-Infinity;
+      for(var i=lo;i<=hi;i++){
+        if(i<nH){if(hist[i]<mn)mn=hist[i];if(hist[i]>mx)mx=hist[i];}
+        if(i>=s){var fi=i-s;[bull[fi],base[fi],bear[fi]].forEach(function(x){if(x<mn)mn=x;if(x>mx)mx=x;});}
+      }
+      if(!isFinite(mn)){mn=0;mx=1;}if(mn===mx){mx=mn+1;}
+      var p=(mx-mn)*0.08;return [mn-p,mx+p];
+    },
+    draw:function(X,Y,v,baseY){
+      function pathArr(arr,off){return arr.map(function(val,i){return (i?'L':'M')+X(off+i).toFixed(1)+' '+Y(val).toFixed(1);}).join(' ');}
+      var histP=pathArr(hist,0),baseP=pathArr(base,s),bullP=pathArr(bull,s),bearP=pathArr(bear,s);
+      var band='M'+X(s).toFixed(1)+' '+Y(bull[0]).toFixed(1);
+      for(var i=1;i<bull.length;i++)band+=' L'+X(s+i).toFixed(1)+' '+Y(bull[i]).toFixed(1);
+      for(var j=bear.length-1;j>=0;j--)band+=' L'+X(s+j).toFixed(1)+' '+Y(bear[j]).toFixed(1);
+      band+=' Z';
+      var tx=X(s).toFixed(1),gid='fc'+Math.round(Math.random()*1e6);
+      var histArea=histP+' L'+tx+' '+baseY+' L'+X(0).toFixed(1)+' '+baseY+' Z';
+      function dot(arr,off,col){return '<circle cx="'+X(off+arr.length-1).toFixed(1)+'" cy="'+Y(arr[arr.length-1]).toFixed(1)+'" r="3.5" fill="'+col+'" stroke="#fff" stroke-width="1.6"/>';}
+      return '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5cae" stop-opacity="0.16"/><stop offset="0.92" stop-color="#7a5cae" stop-opacity="0"/></linearGradient></defs>'
+        +'<path d="'+band+'" fill="rgba(122,92,174,.10)"/>'
+        +'<path d="'+histArea+'" fill="url(#'+gid+')"/>'
+        +'<line x1="'+tx+'" y1="10" x2="'+tx+'" y2="'+baseY+'" stroke="#cdc4e4" stroke-width="1" stroke-dasharray="2 4" opacity="0.8"/>'
+        +'<path d="'+histP+'" fill="none" stroke="#7a5cae" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'
+        +'<path d="'+baseP+'" fill="none" stroke="#7a5cae" stroke-width="1.9" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
+        +'<path d="'+bullP+'" fill="none" stroke="#4f9c7e" stroke-width="1.7" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
+        +'<path d="'+bearP+'" fill="none" stroke="#cf5a40" stroke-width="1.7" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
+        +dot(bear,s,'#cf5a40')+dot(bull,s,'#4f9c7e')+dot(base,s,'#7a5cae');
+    },
+    xLabels:function(v){
+      var lo=Math.max(0,Math.ceil(v.lo)),hi=Math.min(n-1,Math.floor(v.hi)),mid=Math.round((lo+hi)/2);
+      return [{i:lo,a:'start',t:dateAt(lo)},{i:mid,a:'middle',t:dateAt(mid)},{i:hi,a:'end',t:dateAt(hi)}];
+    },
+    pointAt:function(idx){
+      if(idx>=s){var fi=idx-s;return {date:dateAt(idx),anchorVal:base[fi],rows:[
+        {color:'#4f9c7e',label:'Bull',value:bull[fi],disp:sfMoney(bull[fi])},
+        {color:'#7a5cae',label:'Base',value:base[fi],disp:sfMoney(base[fi])},
+        {color:'#cf5a40',label:'Bear',value:bear[fi],disp:sfMoney(bear[fi])}]};}
+      return {date:dateAt(idx),anchorVal:hist[idx],rows:[{color:'#7a5cae',label:'Price',value:hist[idx],disp:sfMoney(hist[idx])}]};
+    }
+  };
+  interactiveChart(id,cfg);
 }
-function sfHoverOff(){var g=document.getElementById('sfHL');if(g)g.style.opacity='0';var t=document.getElementById('sfTip');if(t)t.style.display='none';}
 function hWords(h){return h>=365?'year':(h>=180?'6 months':(h>=90?'3 months':h+' days'));}
 function hChipLabel(h){return h>=365?'1 year':(h>=180?'6 months':'3 months');}
 function bouncyWord(v){return v<18?'fairly steady':(v<35?'moderately bouncy':(v<60?'quite bouncy':'very bouncy'));}
@@ -155,7 +115,8 @@ function paintSF(a,d,p){
   html+='<div class="card">'
     +'<div class="row" style="margin-bottom:11px"><div><div style="font-size:19px;font-weight:800">'+bn+'</div><div class="l-s">'+a.n+(pf.sector?' · '+pf.sector:'')+'</div></div><div style="text-align:right"><div style="font-size:18px;font-weight:800" class="tnum">'+sfMoney(d.latest_price)+'</div><span class="sf-cls '+a.c+'">'+a.c+'</span></div></div>'
     +'<div class="hz-row">'+hChips+'<span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:600">next '+hWords(H)+'</span></div>'
-    +'<div id="sfChart" style="position:relative">'+forecastChart(hist,bear,base,bull,300,152,{histDates:histDates,fcDates:fcDates})+'<div id="sfTip" class="sf-tip" style="display:none"></div></div>'
+    +'<div id="sfChart"></div>'
+    +'<div class="chart-hint">Hover for values · scroll to zoom · drag to pan · double-click to reset</div>'
     +'<div class="sf-legend"><span><i style="background:#7a5cae"></i>Past &amp; most likely</span><span><i style="background:#4f9c7e"></i>If it goes well</span><span><i style="background:#cf5a40"></i>If it goes poorly</span><span style="color:var(--faint)">┊ now</span></div>'
     +'</div>';
   // Mia verdict, the gist in plain words
@@ -198,6 +159,7 @@ function paintSF(a,d,p){
   html+=watchBtnHtml(a.t);
   html+='</div></div>';
   document.getElementById('sfDetail').innerHTML=html;
+  renderForecastChart('sfChart',hist,bear,base,bull,histDates,fcDates);
 }
 
 /* ── Forecast ────────────────────────────────── */
