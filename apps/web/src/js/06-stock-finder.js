@@ -37,27 +37,40 @@ function loadSF(){
 function sfMoney(n){return n>=1000?'$'+n.toLocaleString(undefined,{maximumFractionDigits:0}):(n>=1?'$'+n.toFixed(2):'$'+n.toFixed(4));}
 function fmtCap(n){if(!n)return 'n/a';if(n>=1e12)return '$'+(n/1e12).toFixed(2)+'T';if(n>=1e9)return '$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return '$'+(n/1e6).toFixed(2)+'M';return '$'+n.toFixed(0);}
 function fmtVol(n){if(!n)return 'n/a';if(n>=1e9)return (n/1e9).toFixed(2)+'B';if(n>=1e6)return (n/1e6).toFixed(2)+'M';if(n>=1e3)return (n/1e3).toFixed(1)+'K';return ''+n;}
+/* Forecast fan chart — wears the same skin as the Practice/Home charts: a purple
+ * line with the app's signature gradient fill under the real history, then a soft
+ * purple confidence band fanning out from "now" with a dashed most-likely (purple,
+ * the thread continues), an upside edge (green = the app's gain colour) and a
+ * downside edge (red = the app's loss colour). Padded + labelled like equityChart. */
 function forecastChart(hist,bear,base,bull,w,h){
-  var pad=8,nH=hist.length,nF=base.length,all=hist.concat(bear,base,bull);
+  var pad=8,padT=10,padB=20,nH=hist.length,nF=base.length,all=hist.concat(bear,base,bull);
   var mn=Math.min.apply(null,all),mx=Math.max.apply(null,all),rg=(mx-mn)||1;
   var stepX=(w-pad*2)/(nH+nF-1);
-  function X(i){return pad+i*stepX;}function Y(v){return pad+(h-pad*2)*(1-(v-mn)/rg);}
+  function X(i){return pad+i*stepX;}function Y(v){return padT+(h-padT-padB)*(1-(v-mn)/rg);}
   function path(arr,s){return arr.map(function(v,i){return (i?'L':'M')+X(s+i).toFixed(1)+' '+Y(v).toFixed(1);}).join(' ');}
   var s=nH-1,histP=path(hist,0),bearP=path(bear,s),baseP=path(base,s),bullP=path(bull,s);
+  // confidence band, upside edge down to downside edge
   var band='M'+X(s).toFixed(1)+' '+Y(bull[0]).toFixed(1);
   for(var i=1;i<bull.length;i++)band+=' L'+X(s+i).toFixed(1)+' '+Y(bull[i]).toFixed(1);
   for(var j=bear.length-1;j>=0;j--)band+=' L'+X(s+j).toFixed(1)+' '+Y(bear[j]).toFixed(1);
   band+=' Z';
-  var tx=X(s).toFixed(1);
-  function dot(arr,col){return '<circle cx="'+X(nH+arr.length-2).toFixed(1)+'" cy="'+Y(arr[arr.length-1]).toFixed(1)+'" r="3" fill="'+col+'" stroke="#fff" stroke-width="1.4"/>';}
+  // gradient area fill beneath the real history (the app's signature look)
+  var baseY=(h-padB).toFixed(1),tx=X(s).toFixed(1),gid='fc'+Math.round(Math.random()*1e6);
+  var histArea=histP+' L'+tx+' '+baseY+' L'+X(0).toFixed(1)+' '+baseY+' Z';
+  function dot(arr,col){return '<circle cx="'+X(nH+arr.length-2).toFixed(1)+'" cy="'+Y(arr[arr.length-1]).toFixed(1)+'" r="3.5" fill="'+col+'" stroke="#fff" stroke-width="1.6"/>';}
+  function tick(x,a,t){return '<text x="'+x+'" y="'+(h-6)+'" font-size="9" fill="#aaa4c0" font-weight="700" text-anchor="'+a+'">'+t+'</text>';}
   return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" style="display:block">'
-    +'<path d="'+band+'" fill="rgba(110,143,214,.10)"/>'
-    +'<line x1="'+tx+'" y1="'+pad+'" x2="'+tx+'" y2="'+(h-pad)+'" stroke="#cdc4e4" stroke-width="1" stroke-dasharray="3 3"/>'
-    +'<path d="'+histP+'" fill="none" stroke="#4f9c7e" stroke-width="2.4" stroke-linejoin="round"/>'
-    +'<path d="'+baseP+'" fill="none" stroke="#4f9c7e" stroke-width="1.9" stroke-dasharray="5 4" stroke-linejoin="round"/>'
-    +'<path d="'+bullP+'" fill="none" stroke="#5b8def" stroke-width="1.9" stroke-dasharray="5 4" stroke-linejoin="round"/>'
-    +'<path d="'+bearP+'" fill="none" stroke="#cf5a40" stroke-width="1.9" stroke-dasharray="5 4" stroke-linejoin="round"/>'
-    +dot(bear,'#cf5a40')+dot(bull,'#5b8def')+dot(base,'#4f9c7e')+'</svg>';
+    +'<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5cae" stop-opacity="0.16"/><stop offset="0.92" stop-color="#7a5cae" stop-opacity="0"/></linearGradient></defs>'
+    +'<path d="'+band+'" fill="rgba(122,92,174,.10)"/>'
+    +'<path d="'+histArea+'" fill="url(#'+gid+')"/>'
+    +'<line x1="'+tx+'" y1="'+padT+'" x2="'+tx+'" y2="'+baseY+'" stroke="#cdc4e4" stroke-width="1" stroke-dasharray="2 4" opacity="0.8"/>'
+    +'<path d="'+histP+'" fill="none" stroke="#7a5cae" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'
+    +'<path d="'+baseP+'" fill="none" stroke="#7a5cae" stroke-width="1.9" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
+    +'<path d="'+bullP+'" fill="none" stroke="#4f9c7e" stroke-width="1.7" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
+    +'<path d="'+bearP+'" fill="none" stroke="#cf5a40" stroke-width="1.7" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
+    +dot(bear,'#cf5a40')+dot(bull,'#4f9c7e')+dot(base,'#7a5cae')
+    +tick(X(0).toFixed(1),'start','past')+tick(tx,'middle','now')+tick(X(nH+nF-2).toFixed(1),'end','ahead')
+    +'</svg>';
 }
 function hWords(h){return h>=365?'year':(h>=180?'6 months':(h>=90?'3 months':h+' days'));}
 function hChipLabel(h){return h>=365?'1 year':(h>=180?'6 months':'3 months');}
@@ -79,7 +92,7 @@ function paintSF(a,d,p){
     +'<div class="row" style="margin-bottom:11px"><div><div style="font-size:19px;font-weight:800">'+bn+'</div><div class="l-s">'+a.n+(pf.sector?' · '+pf.sector:'')+'</div></div><div style="text-align:right"><div style="font-size:18px;font-weight:800" class="tnum">'+sfMoney(d.latest_price)+'</div><span class="sf-cls '+a.c+'">'+a.c+'</span></div></div>'
     +'<div class="hz-row">'+hChips+'<span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:600">next '+hWords(H)+'</span></div>'
     +'<div id="sfChart">'+forecastChart(hist,bear,base,bull,300,152)+'</div>'
-    +'<div class="sf-legend"><span><i style="background:#4f9c7e"></i>Past &amp; likely</span><span><i style="background:#5b8def"></i>If it goes well</span><span><i style="background:#cf5a40"></i>If it goes poorly</span><span style="color:var(--faint)">┊ today</span></div>'
+    +'<div class="sf-legend"><span><i style="background:#7a5cae"></i>Past &amp; most likely</span><span><i style="background:#4f9c7e"></i>If it goes well</span><span><i style="background:#cf5a40"></i>If it goes poorly</span><span style="color:var(--faint)">┊ now</span></div>'
     +'</div>';
   // Mia verdict, the gist in plain words
   html+='<div class="mia"><div class="face">'+avatar()+'</div><div><div class="bubble">Nobody can predict this, but over the next <b>'+hWords(H)+'</b>, '+bn+' could realistically land anywhere from ~'+sfMoney(d.target_prices.bear)+' to ~'+sfMoney(d.target_prices.bull)+', most likely near <b>'+sfMoney(d.target_prices.base)+'</b> ('+pc(d.returns.base)+').</div><button class="whats" onclick="openSheet(\'Why three numbers?\',\''+(lit.bear_base_bull||'Bear, base and bull are scenario ranges, not guaranteed prices.').replace(/'/g,"\\'")+'\')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>Why three numbers?</button></div></div>';

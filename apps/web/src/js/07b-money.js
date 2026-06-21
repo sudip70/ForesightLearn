@@ -216,7 +216,21 @@ function miniDonut(segs,size,centerTop,centerSub){
     +'<text x="'+cx+'" y="'+(cy-1)+'" text-anchor="middle" font-size="16" font-weight="800" fill="#4b4470">'+centerTop+'</text>'
     +'<text x="'+cx+'" y="'+(cy+12)+'" text-anchor="middle" font-size="8" font-weight="700" fill="#9a93b3">'+(centerSub||'')+'</text></svg>';
 }
+/* Home greeting reflects the real streak + live portfolio, so the top of Home
+ * always matches the topbar and the Practice numbers (no more hardcoded copy). */
+function renderHomeGreet(){
+  var el=document.getElementById('homeGreet');if(!el)return;
+  var days=(typeof LEARN!=='undefined'&&LEARN.streak)?LEARN.streak:1;
+  var dayWord='<b>'+days+' day'+(days===1?'':'s')+'</b> in';
+  var T=totals(),invested=START_CAPITAL+(PF.deposits||0),gain=T.unreal+PF.realized;
+  var line;
+  if(gain>0.5)line="You're "+dayWord+", and your portfolio's <b>up "+signed(gain)+"</b>. Here's where things stand.";
+  else if(gain<-0.5)line="You're "+dayWord+". Your portfolio's <b>down "+signed(gain).replace('-','')+"</b> right now — markets wobble, that's normal.";
+  else line="You're "+dayWord+", and your portfolio's right where you started. Ready when you are.";
+  el.innerHTML=line;
+}
 function renderMoneyHome(){
+  renderHomeGreet();
   /* ── Budget tile: donut of how income is allocated across categories ── */
   var bt=document.getElementById('tileBudget');
   if(bt){

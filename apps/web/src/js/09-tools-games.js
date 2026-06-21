@@ -11,6 +11,21 @@ function gameHead(emoji,title,sub){
   return '<div class="game-head"><div class="gh-ico">'+emoji+'</div><div><div class="gh-t">'+title+'</div><div class="gh-s">'+sub+'</div></div></div>';
 }
 
+/* Feed a finished game into the same XP/level/streak system the Learn tab uses,
+ * so progress earned here shows up on the topbar and Profile. `frac` (0–1) is how
+ * well you did; a completion is always worth at least the base. Guarded by a flag
+ * on the game's state object so re-renders (or re-checks) never double-count — a
+ * genuine "Play again" makes a fresh state object and can earn again. */
+function gameXP(state,frac,label){
+  if(!state||state._xpGiven)return 0;
+  state._xpGiven=true;
+  var xp=10+Math.round(Math.max(0,Math.min(1,frac))*20);
+  if(typeof learnXP==='function')learnXP(xp);
+  if(typeof syncTopbar==='function')syncTopbar();
+  if(typeof showToast==='function')showToast('🎮 '+label+' · +'+xp+' XP');
+  return xp;
+}
+
 /* ════════════════════════════════════════════════════════════════════════
  *  BUDGET SWIPE — keep the needs, cut the wants, stay under budget
  * ════════════════════════════════════════════════════════════════════════ */
@@ -95,6 +110,7 @@ function bsEnd(){
   if(keptWants.length){recap+='<div class="bs-recap"><div class="bsr-h" style="color:var(--amber)">Wants you kept</div>';
     keptWants.forEach(function(d){recap+='<div class="bsr-row"><span>'+d.e+' '+d.n+'</span><b class="tnum">'+money0(d.amt)+'</b></div>';});recap+='</div>';}
   if(!cutNeeds.length&&!keptWants.length)recap='<div class="bs-recap"><div class="bsr-h" style="color:var(--green)">✓ Spot on, every need kept and no wants over-spent.</div></div>';
+  gameXP(s,score/100,'Budget Swipe');
   el.innerHTML=gameHead('🃏','Budget Swipe','Round complete')
     +'<div class="game-result"><div class="gr-grade" style="color:'+gc+'">'+grade+'</div>'
       +'<div class="gr-label">Budget health</div>'
@@ -156,6 +172,7 @@ function wnbRender(){
         +'<div class="wnb-why">'+it.why+'</div></div>';
     });
     h+='</div>';
+    gameXP(s,correct/WNB_ITEMS.length,'Wants vs Needs');
     var tip=correct===WNB_ITEMS.length?"Perfect sort! You've got a sharp eye for what's essential."
       :correct>=9?"Strong work, "+correct+"/12. The tricky ones are 'comfortable' wants that feel like needs."
       :"You got "+correct+"/12. A need keeps you safe, housed, fed or working, everything else is a want.";
@@ -397,6 +414,7 @@ function scamEnd(){
   var pct=Math.round(s.score/n*100);
   var label=pct>=90?'Scam-proof 🛡️':pct>=70?'Sharp eye 👀':pct>=50?'Getting there':'Stay careful';
   var col=pct>=70?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+  gameXP(s,s.score/n,'Scammer Scanner');
   el.innerHTML=gameHead('🚨','Scammer Scanner','Scan complete')
     +'<div class="game-result"><div class="gr-grade" style="color:'+col+'">'+s.score+'/'+n+'</div><div class="gr-label">'+label+'</div></div>'
     +miaSays("Most scams share four tells: <b>urgency</b>, <b>secrecy</b>, <b>guaranteed money</b>, and <b>pay or wire first</b>. Spot any one and slow right down — that pause is your best defence.")
@@ -462,7 +480,11 @@ function wordleEnter(){
     var ch=guess[i];var rank={absent:0,present:1,correct:2};
     if(rank[st]>(rank[s.best[ch]]||-1))s.best[ch]=st;
   });
-  if(guess===s.answer||s.guesses.length>=6)s.done=true;
+  if(guess===s.answer||s.guesses.length>=6){
+    s.done=true;
+    var won=guess===s.answer;
+    gameXP(s,won?(7-s.guesses.length)/6:0,'Finance Wordle');
+  }
   wordleRender();
 }
 function scoreWordle(guess){
@@ -637,7 +659,10 @@ function xwCheck(){
     if(v===s.sol[r+'_'+c]){el.parentNode.classList.add('ok');right++;}
     else if(v)el.parentNode.classList.add('no');
   }
-  if(right===total)showToast('🎉 Solved! Every clue correct.');
+  if(right===total){
+    if(!s._xpGiven)gameXP(s,1,'Finance Crossword');/* toast doubles as the solve celebration */
+    else showToast('🎉 Solved! Every clue correct.');
+  }
   else showToast(right+' of '+total+' letters correct');
 }
 
@@ -710,6 +735,7 @@ function qcEnd(){
   var s=qcState;var el=document.getElementById('qcBody');
   var label=s.score>=7?'Finance Expert 🧠':s.score>=5?'Money Pro':s.score>=3?'Getting Savvy':'Rookie';
   var col=s.score>=7?'var(--green)':s.score>=5?'var(--purple-deep)':s.score>=3?'var(--amber)':'var(--muted)';
+  gameXP(s,s.score/QC_Q.length,'Quick Count');
   el.innerHTML=gameHead('⚡','Quick Count','Time\'s up!')
     +'<div class="game-result"><div class="gr-grade" style="color:'+col+'">'+s.score+'/'+QC_Q.length+'</div><div class="gr-label">'+label+'</div></div>'
     +miaSays("Quick money math, what's 30% of your pay, what 5% earns, is a real superpower. The more you practise, the more it becomes instinct.")

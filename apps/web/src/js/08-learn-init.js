@@ -363,7 +363,26 @@ function openMilestone(done){
   if(done){openL('<div class="ls-tag">Milestone · done</div><div class="ls-h">🧺 Spread across 3+ types</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><p class="ls-p" style="margin-top:10px">You\'re holding <b>3+ asset types</b> in your practice portfolio, earned by <b>doing</b>. '+PET.name+' is proud of you! 🦊</p><button class="btn-ghost-l" onclick="closeL()">Nice</button>');return;}
   openL('<div class="ls-tag">Milestone · do it to unlock</div><div class="ls-h">🧺 Hold 3+ asset types</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><p class="ls-p" style="margin-top:10px">This one unlocks by <b>doing</b>: hold at least 3 different asset types (a stock, an ETF, a crypto) at once. You hold <b>'+pfClasses()+'</b> right now.</p><button class="btn btn-pur" style="width:100%;margin-top:6px" onclick="closeL();goTab(\'journey\')">Go to Trade</button><button class="btn-ghost-l" onclick="closeL()">Later</button>');
 }
-function openGoalSetup(){GOAL_DRAFT=JSON.parse(JSON.stringify(GOAL));openL(goalSheet());}
+/* ── One goal, everywhere ──────────────────────────────────────────────
+ * The Learn "Set your goal" sheet and the Practice → Plan tab speak through the
+ * rich GOAL object; Home "My Goals" and the Savings Goals page speak through the
+ * GOALS array (see 07b-money.js). GOALS[0] is the single source of truth — this
+ * mirrors it into GOAL so a goal you set/contribute to in one place shows up in
+ * all of them. The extra planning fields (pct/years/why/income) ride along on
+ * GOALS[0] so nothing is lost. */
+function syncPrimaryGoal(){
+  if(typeof GOALS==='undefined'||!GOALS.length)return;/* no primary goal yet — keep GOAL's defaults */
+  var g0=GOALS[0];
+  GOAL.what=g0.what;
+  GOAL.amt=numVal(g0.target);
+  GOAL.saved=numVal(g0.saved);
+  if(g0.account)GOAL.account=g0.account;
+  if(g0.pct!=null)GOAL.pct=g0.pct;
+  if(g0.years!=null)GOAL.years=g0.years;
+  if(g0.why!=null)GOAL.why=g0.why;
+  if(g0.income!=null)GOAL.income=g0.income;
+}
+function openGoalSetup(){syncPrimaryGoal();GOAL_DRAFT=JSON.parse(JSON.stringify(GOAL));openL(goalSheet());}
 function goalSheet(){
   var d=GOAL_DRAFT,m=Math.round((d.income||2500)*d.pct/100);
   var h='<div class="ls-tag">Your goal · the "why"</div><div class="ls-h">Set your goal</div>';
@@ -385,7 +404,17 @@ function pickWhyG(el,i){GOAL_DRAFT.why=WHYS[i];el.parentNode.querySelectorAll('.
 function pickAcctG(el,i){GOAL_DRAFT.account=ACCTS[i].k;el.parentNode.querySelectorAll('.acct').forEach(function(x){x.classList.remove('sel-acct');x.style.opacity='.65';});el.classList.add('sel-acct');el.style.opacity='1';}
 function setGAmt(v){GOAL_DRAFT.amt=parseInt((''+v).replace(/[^0-9]/g,''))||0;}
 function setGPct(v){GOAL_DRAFT.pct=v;var el=document.getElementById('ldonut');if(el)el.innerHTML=ldonutInner(v,Math.round((GOAL_DRAFT.income||2500)*v/100));}
-function saveGoal(){GOAL=Object.assign(GOAL,GOAL_DRAFT);closeL();learnXP(20);showToast('🎯 Goal saved · +20 XP');renderGoalCard();renderLearn();saveState();}
+function saveGoal(){
+  GOAL=Object.assign(GOAL,GOAL_DRAFT);
+  /* write the edit back to the unified GOALS list (creating the primary goal if needed) */
+  if(typeof GOALS!=='undefined'){
+    if(!GOALS.length)GOALS.unshift({id:moneyUid(),saved:0});
+    var g0=GOALS[0];
+    g0.what=GOAL.what;g0.target=GOAL.amt;if(g0.saved==null)g0.saved=GOAL.saved||0;g0.account=GOAL.account;
+    g0.pct=GOAL.pct;g0.years=GOAL.years;g0.why=GOAL.why;g0.income=GOAL.income;
+  }
+  closeL();learnXP(20);showToast('🎯 Goal saved · +20 XP');renderGoalCard();renderLearn();saveState();
+}
 function openL(html){document.getElementById('lsheetInner').innerHTML=html;document.getElementById('lsheetOv').classList.add('open');var sh=document.querySelector('#lsheetOv .sheet');if(sh)sh.scrollTop=0;}
 function closeL(){document.getElementById('lsheetOv').classList.remove('open');}
 function renderLearn(){
@@ -502,6 +531,7 @@ function renderPlan(){
 function togglePlan(){planOpen=!planOpen;renderPlan();}
 
 loadState();
+syncPrimaryGoal();
 renderOB();
 renderPortfolio();renderHoldings();sfSelect('AAPL');
 renderFc('AAPL');loadIndices();

@@ -276,7 +276,8 @@ function renderActivity(){
 }
 function renderJourneyPlan(){
   var el=document.getElementById('jPlan');if(!el)return;
-  var g=GOAL,gpct=Math.min(100,Math.round(g.saved/g.amt*100));
+  if(typeof syncPrimaryGoal==='function')syncPrimaryGoal();/* mirror GOALS[0] → GOAL so Plan matches Home/Savings */
+  var g=GOAL,gpct=g.amt>0?Math.min(100,Math.round(g.saved/g.amt*100)):0;
   el.innerHTML=
     '<div class="card"><div class="card-t">Auto-contribution</div>'
     +'<div class="row" style="margin-bottom:0"><span style="font-size:13px;font-weight:700">Amount</span><span style="font-size:17px;font-weight:800;color:var(--purple-deep)" id="contribAmt">$'+contrib.amt+'</span></div>'
