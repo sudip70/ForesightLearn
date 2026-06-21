@@ -42,7 +42,8 @@ function fmtVol(n){if(!n)return 'n/a';if(n>=1e9)return (n/1e9).toFixed(2)+'B';if
  * purple confidence band fanning out from "now" with a dashed most-likely (purple,
  * the thread continues), an upside edge (green = the app's gain colour) and a
  * downside edge (red = the app's loss colour). Padded + labelled like equityChart. */
-function forecastChart(hist,bear,base,bull,w,h){
+var sfChartModel=null;
+function forecastChart(hist,bear,base,bull,w,h,opts){
   var pad=8,padT=10,padB=20,nH=hist.length,nF=base.length,all=hist.concat(bear,base,bull);
   var mn=Math.min.apply(null,all),mx=Math.max.apply(null,all),rg=(mx-mn)||1;
   var stepX=(w-pad*2)/(nH+nF-1);
@@ -59,6 +60,12 @@ function forecastChart(hist,bear,base,bull,w,h){
   var histArea=histP+' L'+tx+' '+baseY+' L'+X(0).toFixed(1)+' '+baseY+' Z';
   function dot(arr,col){return '<circle cx="'+X(nH+arr.length-2).toFixed(1)+'" cy="'+Y(arr[arr.length-1]).toFixed(1)+'" r="3.5" fill="'+col+'" stroke="#fff" stroke-width="1.6"/>';}
   function tick(x,a,t){return '<text x="'+x+'" y="'+(h-6)+'" font-size="9" fill="#aaa4c0" font-weight="700" text-anchor="'+a+'">'+t+'</text>';}
+  // stash everything the hover handler needs to map cursor → index → values/pixels
+  var histDates=(opts&&opts.histDates)||[],fcDates=(opts&&opts.fcDates)||[];
+  var maxI=nH+nF-2;
+  sfChartModel={w:w,h:h,pad:pad,stepX:stepX,nH:nH,nF:nF,s:s,maxI:maxI,baseTop:padT,baseBot:+baseY,
+    hist:hist,bear:bear,base:base,bull:bull,X:X,Y:Y,
+    dateAt:function(i){return i<s?(histDates[i]||''):(fcDates[i-s]||'');}};
   return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" style="display:block">'
     +'<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5cae" stop-opacity="0.16"/><stop offset="0.92" stop-color="#7a5cae" stop-opacity="0"/></linearGradient></defs>'
     +'<path d="'+band+'" fill="rgba(122,92,174,.10)"/>'
@@ -70,8 +77,60 @@ function forecastChart(hist,bear,base,bull,w,h){
     +'<path d="'+bearP+'" fill="none" stroke="#cf5a40" stroke-width="1.7" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
     +dot(bear,'#cf5a40')+dot(bull,'#4f9c7e')+dot(base,'#7a5cae')
     +tick(X(0).toFixed(1),'start','past')+tick(tx,'middle','now')+tick(X(nH+nF-2).toFixed(1),'end','ahead')
+    // hover layer (markers, updated in place by sfHover) + a transparent capture rect on top
+    +'<g id="sfHL" style="opacity:0;pointer-events:none">'
+      +'<line id="sfHLv" y1="'+padT+'" y2="'+baseY+'" stroke="#b9add6" stroke-width="1" stroke-dasharray="2 3"/>'
+      +'<circle id="sfHLbull" r="3.4" fill="#4f9c7e" stroke="#fff" stroke-width="1.5"/>'
+      +'<circle id="sfHLbase" r="3.4" fill="#7a5cae" stroke="#fff" stroke-width="1.5"/>'
+      +'<circle id="sfHLbear" r="3.4" fill="#cf5a40" stroke="#fff" stroke-width="1.5"/>'
+      +'<circle id="sfHLhist" r="3.4" fill="#7a5cae" stroke="#fff" stroke-width="1.5"/>'
+    +'</g>'
+    +'<rect x="0" y="0" width="'+w+'" height="'+h+'" fill="transparent" style="cursor:crosshair" '
+      +'onmousemove="sfHover(event)" onmouseleave="sfHoverOff()" ontouchstart="sfHover(event)" ontouchmove="sfHover(event)" ontouchend="sfHoverOff()"></rect>'
     +'</svg>';
 }
+/* ── Interactive hover: cursor → nearest day → date + Bull/Base/Bear readout ── */
+function addDaysISO(iso,days){var p=(''+iso).slice(0,10).split('-');if(p.length<3)return iso||'';var d=new Date(+p[0],(+p[1])-1,+p[2]);if(isNaN(d))return iso||'';d.setDate(d.getDate()+Math.round(days));return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function sfTipRow(col,lab,val){return '<div class="sf-tip-r"><span class="sf-tip-sw" style="background:'+col+'"></span><span class="sf-tip-l">'+lab+'</span><span class="sf-tip-v tnum">'+sfMoney(val)+'</span></div>';}
+function sfHLset(id,a,v){var el=document.getElementById(id);if(el)el.setAttribute(a,v);}
+function sfHLshow(id,on){var el=document.getElementById(id);if(el)el.style.display=on?'':'none';}
+function sfHover(e){
+  var m=sfChartModel;if(!m)return;
+  var svg=document.querySelector('#sfChart svg');if(!svg)return;
+  var rect=svg.getBoundingClientRect();if(!rect.width)return;
+  var scale=rect.width/m.w;
+  var pt=(e.touches&&e.touches[0])?e.touches[0]:e;
+  var vbx=(pt.clientX-rect.left)/scale;
+  var idx=Math.round((vbx-m.pad)/m.stepX);
+  idx=Math.max(0,Math.min(m.maxI,idx));
+  var inFc=idx>=m.s,lx=m.X(idx);
+  sfHLset('sfHLv','x1',lx);sfHLset('sfHLv','x2',lx);
+  var rows,anchorY;
+  if(inFc){
+    var fi=idx-m.s,vbu=m.bull[fi],vba=m.base[fi],vbe=m.bear[fi];
+    sfHLset('sfHLbull','cx',lx);sfHLset('sfHLbull','cy',m.Y(vbu));
+    sfHLset('sfHLbase','cx',lx);sfHLset('sfHLbase','cy',m.Y(vba));
+    sfHLset('sfHLbear','cx',lx);sfHLset('sfHLbear','cy',m.Y(vbe));
+    sfHLshow('sfHLbull',1);sfHLshow('sfHLbase',1);sfHLshow('sfHLbear',1);sfHLshow('sfHLhist',0);
+    rows=sfTipRow('#4f9c7e','Bull',vbu)+sfTipRow('#7a5cae','Base',vba)+sfTipRow('#cf5a40','Bear',vbe);
+    anchorY=m.Y(vba);
+  }else{
+    var hv=m.hist[idx];
+    sfHLset('sfHLhist','cx',lx);sfHLset('sfHLhist','cy',m.Y(hv));
+    sfHLshow('sfHLhist',1);sfHLshow('sfHLbull',0);sfHLshow('sfHLbase',0);sfHLshow('sfHLbear',0);
+    rows=sfTipRow('#7a5cae','Price',hv);
+    anchorY=m.Y(hv);
+  }
+  var g=document.getElementById('sfHL');if(g)g.style.opacity='1';
+  var tip=document.getElementById('sfTip');if(!tip)return;
+  tip.innerHTML='<div class="sf-tip-d">'+(m.dateAt(idx)||'—')+'</div>'+rows;
+  tip.style.display='block';
+  var cx=lx*scale,tw=tip.offsetWidth,th=tip.offsetHeight;
+  var left=cx+14;if(left+tw>rect.width)left=cx-tw-14;if(left<0)left=2;
+  var top=anchorY*scale-th/2;top=Math.max(2,Math.min(rect.height-th-2,top));
+  tip.style.left=Math.round(left)+'px';tip.style.top=Math.round(top)+'px';
+}
+function sfHoverOff(){var g=document.getElementById('sfHL');if(g)g.style.opacity='0';var t=document.getElementById('sfTip');if(t)t.style.display='none';}
 function hWords(h){return h>=365?'year':(h>=180?'6 months':(h>=90?'3 months':h+' days'));}
 function hChipLabel(h){return h>=365?'1 year':(h>=180?'6 months':'3 months');}
 function bouncyWord(v){return v<18?'fairly steady':(v<35?'moderately bouncy':(v<60?'quite bouncy':'very bouncy'));}
@@ -79,10 +138,15 @@ function classContext(c,v){if(c==='crypto')return 'Big swings like this are norm
 function toggleSFNumbers(){sfShowNumbers=!sfShowNumbers;var el=document.getElementById('sfNumbers'),b=document.getElementById('sfNumBtn');if(el)el.style.display=sfShowNumbers?'block':'none';if(b)b.textContent=sfShowNumbers?'Hide the numbers ▴':'See all the numbers ▾';}
 function paintSF(a,d,p){
   var nH=Math.min(90,d.historical_prices.length);
-  var hist=d.historical_prices.slice(-nH).map(function(x){return x.price;});
-  var bear=d.forecast_paths.bear.map(function(x){return x.price;}),base=d.forecast_paths.base.map(function(x){return x.price;}),bull=d.forecast_paths.bull.map(function(x){return x.price;});
+  var histPts=d.historical_prices.slice(-nH);
+  var hist=histPts.map(function(x){return x.price;});
+  var histDates=histPts.map(function(x){return x.date||'';});
+  var bearPts=d.forecast_paths.bear,basePts=d.forecast_paths.base,bullPts=d.forecast_paths.bull;
+  var bear=bearPts.map(function(x){return x.price;}),base=basePts.map(function(x){return x.price;}),bull=bullPts.map(function(x){return x.price;});
   var rm=d.risk_metrics||{},lit=d.literacy||{},dq=d.data_quality||{},fc=d.forecast_change||{},pf=(p&&p.fields)||{};
   var H=d.horizon_days||sfHorizon,bn=a.t.replace('-USD','');
+  var lastDate=histDates[histDates.length-1]||'';
+  var fcDates=basePts.map(function(x,i){return x.date||addDaysISO(lastDate,H*(base.length>1?i/(base.length-1):0));});
   var volPct=(rm.annualized_volatility||0)*100,ddPct=(rm.max_historical_drawdown||0)*100,conf=Math.round(d.confidence*100);
   function pc(v){return (v>=0?'+':'')+(v*100).toFixed(1)+'%';}
   var hChips=[90,180,365].map(function(h){return '<div class="hz '+(sfHorizon===h?'on':'')+'" onclick="setHorizon('+h+')">'+hChipLabel(h)+'</div>';}).join('');
@@ -91,7 +155,7 @@ function paintSF(a,d,p){
   html+='<div class="card">'
     +'<div class="row" style="margin-bottom:11px"><div><div style="font-size:19px;font-weight:800">'+bn+'</div><div class="l-s">'+a.n+(pf.sector?' · '+pf.sector:'')+'</div></div><div style="text-align:right"><div style="font-size:18px;font-weight:800" class="tnum">'+sfMoney(d.latest_price)+'</div><span class="sf-cls '+a.c+'">'+a.c+'</span></div></div>'
     +'<div class="hz-row">'+hChips+'<span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:600">next '+hWords(H)+'</span></div>'
-    +'<div id="sfChart">'+forecastChart(hist,bear,base,bull,300,152)+'</div>'
+    +'<div id="sfChart" style="position:relative">'+forecastChart(hist,bear,base,bull,300,152,{histDates:histDates,fcDates:fcDates})+'<div id="sfTip" class="sf-tip" style="display:none"></div></div>'
     +'<div class="sf-legend"><span><i style="background:#7a5cae"></i>Past &amp; most likely</span><span><i style="background:#4f9c7e"></i>If it goes well</span><span><i style="background:#cf5a40"></i>If it goes poorly</span><span style="color:var(--faint)">┊ now</span></div>'
     +'</div>';
   // Mia verdict, the gist in plain words
