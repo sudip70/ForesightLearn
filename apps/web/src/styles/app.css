@@ -407,7 +407,7 @@ svg.duo .duo-s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round
 .start-bubble{position:absolute;top:-33px;background:#fff;color:var(--purple-deep);font-weight:800;font-size:11px;padding:6px 12px;border-radius:11px;box-shadow:var(--shadow-lg);animation:bob 1.4s ease-in-out infinite;letter-spacing:.6px;pointer-events:none}
 .start-bubble:after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#fff}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.node-label{font-size:11px;font-weight:800;color:var(--muted);text-align:center;margin-top:8px;max-width:108px;line-height:1.25}
+.node-label{font-size:11px;font-weight:800;color:var(--muted);text-align:center;margin-top:8px;max-width:90px;line-height:1.2}
 .node-btn.lock+.node-label,.node-btn.milelock+.node-label{color:var(--faint)}
 .skills{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .skill{background:var(--surface);border-radius:16px;padding:13px;box-shadow:var(--shadow);position:relative;border:1.5px solid transparent}
@@ -445,8 +445,13 @@ svg.duo .duo-s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round
 .btn-ghost-l{width:100%;background:transparent;color:var(--muted);border:none;font-weight:800;font-size:14px;padding:13px;cursor:pointer;margin-top:4px}
 /* ── connecting trail + pet + Mia guide + fun lessons ── */
 .path{position:relative;padding:0}
-.pnode{position:absolute;width:120px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
-.pdot{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--purple-soft2);transform:translate(-50%,-50%)}
+.pnode{position:absolute;width:120px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;z-index:1}
+/* winding road linking the lesson nodes — painted behind the nodes */
+.path-trail{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}
+.path-trail path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.path-trail .pt-track{stroke:var(--purple-soft2);stroke-width:24px;vector-effect:non-scaling-stroke}
+.path-trail .pt-lit{stroke:color-mix(in srgb,var(--acc),#fff 30%);stroke-width:24px;vector-effect:non-scaling-stroke}
+.path-trail .pt-dash{stroke:#fff;stroke-width:3px;stroke-dasharray:0.1 16;vector-effect:non-scaling-stroke;opacity:.85}
 .node-ring{left:21px}
 .start-bubble{left:50%}
 @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-4px)}}

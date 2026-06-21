@@ -261,10 +261,54 @@ function lessonStates(){
 }
 function unitDone(u){return u.lessons.every(function(l){return l.mile?pfClasses()>=3:!!LEARN.done[l.id];});}
 function unitActive(u,st){return u.lessons.some(function(l){var s=st.map[l.id];return s==='active'||s==='mileopen';});}
-var PCT=[50,63,71,63,50,37,29,37],PSTEP=104,PTOP=12;
+var PCT=[50,63,71,63,50,37,29,37],PSTEP=126,PTOP=12,BOW=18;
 function pcy(i){return PTOP+i*PSTEP+33;}
+/* ── winding "road" that links the lesson nodes (Duolingo-style trail) ──
+ * Drawn as one SVG behind the nodes. x is a 0–100 percentage, y is in px, so the
+ * viewBox is 0 0 100 H with preserveAspectRatio="none"; vector-effect keeps the
+ * road a constant width despite the non-uniform scale. Catmull-Rom → bézier gives
+ * a smooth curve, and the finished part glows in the unit colour, the locked part
+ * stays soft.
+ *
+ * Each lesson label sits in the gap directly below its node, so between two nodes
+ * we add a "bow" waypoint that swings the road out to the node's outer side, high
+ * up near the node — the road peels off sideways and loops *around* the title
+ * instead of running through it. */
+function _f(n){return Math.round(n*10)/10;}
+function trailSeg(pts,i){
+  var p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||pts[i+1],t=0.17;
+  var c1x=p1.x+(p2.x-p0.x)*t,c1y=p1.y+(p2.y-p0.y)*t,c2x=p2.x-(p3.x-p1.x)*t,c2y=p2.y-(p3.y-p1.y)*t;
+  return 'M'+_f(p1.x)+' '+_f(p1.y)+'C'+_f(c1x)+' '+_f(c1y)+' '+_f(c2x)+' '+_f(c2y)+' '+_f(p2.x)+' '+_f(p2.y);
+}
+/* node points interleaved with bow waypoints: [node0, bow0, node1, bow1, …, nodeN-1].
+ * Segment k therefore belongs to lesson gap floor(k/2) (k even = node→bow, odd = bow→node). */
+function trailPoints(nodes){
+  var pts=[];
+  for(var i=0;i<nodes.length;i++){
+    pts.push(nodes[i]);
+    if(i<nodes.length-1){
+      var xi=nodes[i].x,xn=nodes[i+1].x,dir=(xi<50)?-1:(xi>50)?1:(xn>=xi?1:-1);
+      pts.push({x:Math.max(8,Math.min(92,xi+dir*BOW)),y:nodes[i].y+PSTEP*0.34});/* swing out high, near the node, to clear its label */
+    }
+  }
+  return pts;
+}
+function trailSVG(u,st,pts,H){
+  if(pts.length<2)return '';
+  var full='',lit='';
+  for(var k=0;k<pts.length-1;k++){
+    var d=trailSeg(pts,k);full+=d;
+    var l=u.lessons[Math.floor(k/2)];if(l&&st.map[l.id]==='done')lit+=d;/* trail "fills in" up to where you've reached */
+  }
+  return '<svg class="path-trail" viewBox="0 0 100 '+H+'" preserveAspectRatio="none" style="--acc:'+u.acc+'">'
+    +'<path class="pt-track" d="'+full+'"/>'
+    +(lit?'<path class="pt-lit" d="'+lit+'"/>':'')
+    +'<path class="pt-dash" d="'+full+'"/></svg>';
+}
 function renderUnitPath(u,st){
   var N=u.lessons.length,H=PTOP+(N-1)*PSTEP+96,html='<div class="path" style="height:'+H+'px">';
+  var nodes=u.lessons.map(function(l,i){return {x:PCT[i%8],y:PTOP+i*PSTEP+33};});
+  html+=trailSVG(u,st,trailPoints(nodes),H);
   var ai=-1;
   u.lessons.forEach(function(l,i){
     var stt=st.map[l.id],locked=(stt==='lock'),mile=!!l.mile;
