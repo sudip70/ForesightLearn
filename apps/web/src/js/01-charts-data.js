@@ -222,7 +222,7 @@ function chartHoverOff(id){var g=document.getElementById(id+'_hl');if(g)g.style.
 /* journeyChart is rendered by renderPortfolioChart() inside renderPortfolio (needs PF/totals) */
 /* scenarioChart is rendered lazily by renderScenario() when the Scenarios page opens */
 /* Stock Finder now renders a live forecast fan chart (see sfSelect) */
-renderGauge(20);renderDonut(10);onCalc();
+renderGauge(20);renderDonut(10);
 /* NOTE: live-data init (renderFc/loadIndices) runs at the very end of the script;
    it depends on `var API` which is assigned further down. */
 
