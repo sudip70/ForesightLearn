@@ -18,5 +18,5 @@ jobs:
 
       - name: Boot backend
         env:
-          FORESIGHT_BACKEND_BOOT_URL: ${{ vars.FORESIGHT_BACKEND_BOOT_URL || 'https://foresight-backend-a5qx.onrender.com' }}
+          FISCALLY_BACKEND_BOOT_URL: ${{ vars.FISCALLY_BACKEND_BOOT_URL || vars.FORESIGHT_BACKEND_BOOT_URL || 'https://foresight-backend-a5qx.onrender.com' }}
         run: scripts/boot_backend_daily.sh

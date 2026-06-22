@@ -1,0 +1,15 @@
+{
+  "name": "fiscally-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fiscally desktop web app (modular source + single-file build)",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 3333",
+    "build": "node build.mjs",
+    "build:min": "node build.mjs --minify"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}

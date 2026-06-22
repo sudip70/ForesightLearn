@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fiscally · Learn money & practice investing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<!--BUILD:STYLES-->
+<link rel="stylesheet" href="src/styles/app.css"/>
+<!--/BUILD:STYLES-->
+</head>
+<body>
+<div id="app">
+
+  <!-- ════ WELCOME ════ -->
+  <div id="welcome">
+    <div class="wel-inner">
+      <div class="wel-mark">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M24 41 C24 33 23 28 24 22" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          <path d="M24 28 C16 29 11 23.5 11 15.5 C19 15.5 24 20.5 24 28 Z" fill="#fff" opacity=".96"/>
+          <path d="M24.5 24.5 C32 25.5 37 19.5 37 12 C29 12 24.5 17.2 24.5 24.5 Z" fill="#fff" opacity=".78"/>
+        </svg>
+      </div>
+      <div class="wel-word">Fiscally</div>
+      <div class="wel-tag">Learn money and practice investing. Calm, friendly, and risk-free.</div>
+      <div class="wel-mia">
+        <div class="face">__AV__</div>
+        <div class="wel-mia-b">Hi, I'm <b>Mia</b> 👋 I'll be right here, turning the confusing parts of investing into simple, friendly steps.</div>
+      </div>
+      <div class="wel-loop">
+        <div class="wl-step"><span class="wl-e">💡</span>Learn</div>
+        <div class="wl-arrow">→</div>
+        <div class="wl-step"><span class="wl-e">🪙</span>Practice</div>
+        <div class="wl-arrow">→</div>
+        <div class="wl-step"><span class="wl-e">🌱</span>Grow</div>
+      </div>
+    </div>
+    <div class="wel-foot">
+      <button class="wel-cta" onclick="startWelcome()">Get started</button>
+      <div class="wel-note">🌱 Practice money only · your real money stays safe</div>
+    </div>
+  </div>
+
+  <!-- ════ ONBOARDING ════ -->
+  <div id="onboarding">
+    <div class="ob-top">
+      <div class="ob-dots" id="obDots"></div>
+      <button class="ob-skip" onclick="finishOB()">Skip</button>
+    </div>
+    <div class="ob-body">
+
+      <!-- OB1 experience -->
+      <div class="ob-screen active" data-ob="1">
+        <div class="ob-h">What level of investing experience do you have?</div>
+        <div class="ob-p">We'll tailor your journey so it never feels over your head.</div>
+        <div class="exp-card sel" onclick="pickExp(this,'Beginner')"><div class="exp-t">Beginner</div><div class="exp-d">I'm brand new to investing</div></div>
+        <div class="exp-card" onclick="pickExp(this,'Intermediate')"><div class="exp-t">Intermediate</div><div class="exp-d">I know how interest works</div></div>
+        <div class="exp-card" onclick="pickExp(this,'Experienced')"><div class="exp-t">Experienced</div><div class="exp-d">I already have a portfolio</div></div>
+      </div>
+
+      <!-- OB2 why / goals -->
+      <div class="ob-screen" data-ob="2">
+        <div class="ob-acorn">🌰</div>
+        <div class="ob-h">Let's set some Goals!</div>
+        <div class="ob-p">Why are you investing? Pick what fits best.</div>
+        <div class="why-grid">
+          <div class="why" onclick="pickWhy(this)">To save for a big expense</div>
+          <div class="why sel" onclick="pickWhy(this)">So my money can grow safely</div>
+          <div class="why" onclick="pickWhy(this)">To save for the future</div>
+          <div class="why" onclick="pickWhy(this)">As a way to make money</div>
+        </div>
+      </div>
+
+      <!-- OB3 saving goal -->
+      <div class="ob-screen" data-ob="3">
+        <div class="ob-h">Invest to Save</div>
+        <div class="ob-p">A good goal is Specific, Measurable & Time-based. Let's shape yours.</div>
+        <label class="f-label">What are you saving for?</label>
+        <input class="f-in" id="goalWhat" placeholder="e.g. A car" value="A car"/>
+        <label class="f-label">How much will it cost?</label>
+        <input class="f-in" id="goalAmt" placeholder="$10,000" value="$10,000"/>
+        <label class="f-label">How long are you planning to save?</label>
+        <input class="f-in" id="goalTime" placeholder="5 years" value="5 years"/>
+      </div>
+
+      <!-- OB4 how much to invest -->
+      <div class="ob-screen" data-ob="4">
+        <div class="ob-h">How much to invest?</div>
+        <div class="ob-p">We recommend putting aside 5–10% of your earnings to start.</div>
+        <div class="chart-wrap" id="obDonut"></div>
+        <div class="lim"><span id="donutLo">$300</span><span id="donutHi">$3,000</span></div>
+        <input type="range" id="pctSlider" min="3" max="20" value="10" oninput="onPct(this.value)"/>
+        <div class="muted-note">Drag to adjust how much of your earnings you invest.</div>
+      </div>
+
+      <!-- OB5 account -->
+      <div class="ob-screen" data-ob="5">
+        <div class="ob-h">What account should I use?</div>
+        <div class="ob-p">Let's start with a <b>TFSA</b>, a kind of savings account. We'll explain more as we go!</div>
+        <div class="mia" style="margin-top:10px">
+          <div class="face">__AV__</div>
+          <div>
+            <div class="bubble">Your <b>TFSA</b> is a Tax-Free Savings Account. Every dollar it earns is yours to keep, no tax on the growth!</div>
+            <button class="whats" onclick="openTip('tfsa')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>What's That?</button>
+          </div>
+        </div>
+        <div class="acct tfsa" style="margin-top:6px"><div class="a-ic">T</div><div class="a-b"><div class="a-t">TFSA</div><div class="a-d">Tax-Free Savings · Recommended</div></div><div class="a-r"><span class="pill" style="background:rgba(255,255,255,.28);color:#fff">✓ Selected</span></div></div>
+        <div class="acct rrsp" style="opacity:.7"><div class="a-ic">R</div><div class="a-b"><div class="a-t">RRSP</div><div class="a-d">Retirement plan</div></div></div>
+        <div class="acct etf" style="opacity:.7"><div class="a-ic">E</div><div class="a-b"><div class="a-t">ETFs</div><div class="a-d">Bundled funds</div></div></div>
+      </div>
+
+      <!-- OB6 milestones -->
+      <div class="ob-screen" data-ob="6">
+        <div class="ob-h">My Goal</div>
+        <div class="ob-p" style="margin-bottom:14px"><b style="color:var(--purple-strong);font-size:18px">Save $10,000</b><br/>for a car, over 5 years</div>
+        <div class="card-t" style="margin-bottom:11px">Your Milestones</div>
+        <div class="milestone"><div class="ms-n">1</div><div class="ms-t">Open a Fiscally TFSA Journey</div></div>
+        <div class="milestone"><div class="ms-n">2</div><div class="ms-t">Learn about levels of risk</div></div>
+        <div class="milestone"><div class="ms-n">3</div><div class="ms-t">Contribute 10% of your earnings monthly</div></div>
+        <div class="milestone"><div class="ms-n">4</div><div class="ms-t">Open a real TFSA & apply what you've learned!</div></div>
+      </div>
+
+    </div>
+    <div class="ob-foot">
+      <button class="btn btn-pur" id="obNextBtn" onclick="obNext()">Next</button>
+    </div>
+  </div>
+
+  <!-- ════ SIDEBAR (web nav) ════ -->
+  <aside class="sidebar hidden" id="appNav">
+    <div class="sb-brand">
+      <div class="sb-mark"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 41 C24 33 23 28 24 22" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M24 28 C16 29 11 23.5 11 15.5 C19 15.5 24 20.5 24 28 Z" fill="#fff" opacity=".96"/><path d="M24.5 24.5 C32 25.5 37 19.5 37 12 C29 12 24.5 17.2 24.5 24.5 Z" fill="#fff" opacity=".78"/></svg></div>
+      <div class="sb-word">Fiscally</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-cap">Menu</div>
+      <button class="nav-btn active" data-tab="home" onclick="goTab('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span>Home</span>
+      </button>
+      <button class="nav-btn" data-tab="learn" onclick="goTab('learn')">
+        <svg viewBox="0 0 24 24"><path d="M2 4h7a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H22z"/></svg><span>Learn</span>
+      </button>
+      <button class="nav-btn trade-btn" data-tab="journey" onclick="goTab('journey')">
+        <div class="fab"><svg viewBox="0 0 24 24" fill="none"><path d="M4 16l5-5 3 3 7-8"/><path d="M14 6h5v5"/></svg></div><span>Practice</span>
+      </button>
+      <button class="nav-btn" data-tab="tools" onclick="goTab('tools')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Tools</span>
+      </button>
+      <button class="nav-btn" data-tab="social" onclick="goTab('social')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profile</span>
+      </button>
+    </div>
+    <div class="sb-foot">
+      <div class="sb-safe"><span class="dot"></span>Practice money only · your real money stays safe</div>
+    </div>
+  </aside>
+
+  <!-- ════ MAIN ════ -->
+  <main>
+  <!-- ════ TOPBAR ════ -->
+  <header class="topbar hidden" id="appHeader">
+    <div class="h-left">
+      <button class="h-back" id="hBack" onclick="back()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="h-title" id="hTitle">Fiscally</div>
+    </div>
+    <div class="h-right">
+      <div class="tb-chip streak" title="Day streak"><span class="e">🔥</span><span id="tbStreak">5</span></div>
+      <div class="tb-chip lvl" title="Your level"><span class="e">⭐</span><span id="tbLevel">Lvl 3</span></div>
+      <div class="av" id="headerAv" onclick="goTab('social')">__AV__</div>
+    </div>
+  </header>
+
+  <!-- ════ PAGES ════ -->
+  <div id="pages">
+
+    <!-- ─── HOME ─── -->
+    <div class="page active" id="page-home">
+      <div class="page-title">Welcome back 👋</div>
+      <div class="home-greet" id="homeGreet" style="margin-top:0">Here's where things stand today.</div>
+
+      <div class="grid-2">
+        <div class="stack">
+          <div class="section-t">Practice Portfolio</div>
+          <div class="hero" style="cursor:pointer" onclick="goTab('journey')">
+            <div class="hero-spark" id="homeSpark"></div>
+            <div class="hero-l">Open Practice ›</div>
+            <div class="hero-v tnum" id="homeVal">$10,041.67</div>
+            <div class="hero-c" id="homeChg">▲ +$41.67 (+0.4%) all time</div>
+            <div class="hero-row">
+              <div class="s"><label>Invested</label><span class="tnum" id="homeInvested">$10,000</span></div>
+              <div class="s"><label>Growth</label><span class="tnum" id="homeGrowth">+$41.67</span></div>
+              <div class="s"><label>Cash</label><span class="tnum" id="homeCash">$0</span></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="stack">
+          <div class="section-t">My Goals</div>
+          <div id="homeGoal"></div>
+        </div>
+      </div>
+
+      <div class="section-t" style="margin-top:6px">Manage your money</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px">
+        <div id="tileBudget"></div>
+        <div id="tileSpending"></div>
+        <div id="tileNetworth"></div>
+      </div>
+    </div>
+
+    <!-- ─── MONEY TOOLS (sub) ─── -->
+    <div class="page" id="page-budget">
+      <div class="page-title" style="margin-top:2px">Budget</div>
+      <div class="page-sub">Plan where your money goes each month.</div>
+      <div id="budgetBody"></div>
+    </div>
+    <div class="page" id="page-goals">
+      <div class="page-title" style="margin-top:2px">Savings Goals</div>
+      <div class="page-sub">Set goals and watch your savings grow toward them.</div>
+      <div id="goalsBody"></div>
+    </div>
+    <div class="page" id="page-spending">
+      <div class="page-title" style="margin-top:2px">Spending</div>
+      <div class="page-sub">Log expenses and see where your money goes.</div>
+      <div id="spendBody"></div>
+    </div>
+    <div class="page" id="page-networth">
+      <div class="page-title" style="margin-top:2px">Net Worth</div>
+      <div class="page-sub">What you own minus what you owe.</div>
+      <div id="nwBody"></div>
+    </div>
+
+    <!-- ─── JOURNEY (sub) ─── -->
+    <div class="page" id="page-journey">
+      <div class="practice-grid">
+        <div class="practice-main">
+          <div class="dash-hero">
+            <div class="dh-top"><div class="dh-k">Practice portfolio</div><span class="pill pill-grn" id="pfAllPct">+1.0%</span></div>
+            <div class="dh-val tnum" id="pfValue">$10,101.29</div>
+            <div class="dh-chg"><span id="scStatVal" class="tnum">+$101.29</span> · all time<span id="pfToday"></span></div>
+            <div class="dh-bp"><div class="dh-bp-l">⚡ Buying power</div><div class="dh-bp-v tnum" id="pfCash">$3,346.81</div></div>
+          </div>
+
+          <div class="card">
+            <div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">Portfolio value <span id="pfRangeChg" style="font-size:12px;font-weight:700;color:var(--muted)"></span></div><span class="pill pill-gry" id="pfPxSrc">Sample prices</span></div>
+            <div id="journeyChart"></div>
+            <div style="display:flex;gap:6px;margin-top:11px">
+              <button class="rt" onclick="setRange('1D',this)">1D</button>
+              <button class="rt" onclick="setRange('1W',this)">1W</button>
+              <button class="rt on" onclick="setRange('1M',this)">1M</button>
+              <button class="rt" onclick="setRange('6M',this)">6M</button>
+              <button class="rt" onclick="setRange('YTD',this)">YTD</button>
+              <button class="rt" onclick="setRange('ALL',this)">ALL</button>
+            </div>
+            <div class="chart-hint">Hover for values · scroll to zoom · drag to pan · double-click to reset</div>
+            <div class="pf-stats" style="margin-top:13px">
+              <div class="pf-stat"><label>Invested</label><span class="tnum" id="pfInvested">$10,000</span></div>
+              <div class="pf-stat"><label>Unrealized</label><span id="pfUnreal" class="tnum up">+$0</span></div>
+              <div class="pf-stat"><label>Realized</label><span id="pfReal" class="tnum">$0.00</span></div>
+            </div>
+          </div>
+
+          <div class="mia" style="margin:2px 0 13px">
+            <div class="face">__AV__</div>
+            <div>
+              <div class="bubble">Buy and sell on the right to practice, it's all <b>virtual cash</b>, zero risk. Your <b>TFSA</b> keeps every gain tax-free.</div>
+              <button class="whats" onclick="openTip('tfsa')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>What's That?</button>
+            </div>
+          </div>
+
+          <div class="menu-card mc-scenario" onclick="push('scenario')">
+            <div class="mc-ico">🎮</div>
+            <div class="mc-b"><div class="mc-t">Scenarios</div><div class="mc-d">Fast-forward your portfolio through a what-if</div></div>
+            <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+        </div>
+
+        <div class="practice-side">
+          <div class="subtabs">
+            <div class="subtab active" onclick="jTab(this,'hold')">Holdings</div>
+            <div class="subtab" onclick="jTab(this,'trade')">Trade</div>
+            <div class="subtab" onclick="jTab(this,'watch')">Watch</div>
+            <div class="subtab" onclick="jTab(this,'act')">Activity</div>
+            <div class="subtab" onclick="jTab(this,'plan')">Plan</div>
+          </div>
+
+          <div id="jHold"></div>
+          <div id="jTrade" style="display:none"></div>
+          <div id="jWatch" style="display:none"></div>
+          <div id="jAct" style="display:none"></div>
+          <div id="jPlan" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SCENARIO (sub) ─── -->
+    <div class="page" id="page-scenario">
+      <div class="page-title" style="margin-top:2px">Scenarios</div>
+      <div class="page-sub">Fast-forward your portfolio through a what-if and watch it unfold.</div>
+
+      <div class="grid-2">
+        <div class="stack">
+      <div class="card" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe);box-shadow:var(--shadow-lg)">
+        <div class="row" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:9px"><div class="face" style="width:34px;height:34px;border-radius:50%;overflow:hidden">__AV__</div><div id="scnTitle" style="font-size:16px;font-weight:800;color:var(--purple-deep)">❄️ The Compound Effect</div></div>
+          <span class="pill" style="background:#fff;color:var(--purple-deep)">What-if</span>
+        </div>
+        <div id="scenarioChart"></div>
+        <div id="scnResult"></div>
+        <button class="btn btn-taupe" style="margin-top:12px" id="scnRunBtn" onclick="animateScenario()">Replay ▶</button>
+      </div>
+
+      <div class="mia">
+        <div class="face">__AV__</div>
+        <div>
+          <div class="bubble" id="scnMia">Pick a what-if below to fast-forward your portfolio through it.</div>
+          <button class="whats" onclick="openTip(scnTerm)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>What's That?</button>
+        </div>
+      </div>
+
+        </div>
+        <div class="stack">
+      <div class="section-t" style="margin-top:0">What-if scenarios</div>
+      <div class="ls-sub" style="margin:-4px 0 11px">Replay <b>real market history</b> on your holdings, risk-free. Nothing here changes your actual portfolio.</div>
+      <div class="scenario-card" data-scn="gfc2008" onclick="runScenario('gfc2008')">
+        <div class="sc-ico">📉</div><div class="sc-body"><div class="sc-ttl">The 2008 Financial Crisis</div><div class="sc-dsc">Live through the real −57% crash, and the recovery that followed.</div></div>
+        <div class="scn-chev"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="scenario-card" data-scn="covid2020" onclick="runScenario('covid2020')">
+        <div class="sc-ico">🦠</div><div class="sc-body"><div class="sc-ttl">The COVID Crash, 2020</div><div class="sc-dsc">A 34% drop in five weeks, then a record-breaking rebound.</div></div>
+        <div class="scn-chev"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="scenario-card" data-scn="bull2021" onclick="runScenario('bull2021')">
+        <div class="sc-ico">🚀</div><div class="sc-body"><div class="sc-ttl">The 2020–21 Bull Run</div><div class="sc-dsc">Ride your holdings from the COVID low to an all-time high.</div></div>
+        <div class="scn-chev"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="scenario-card" data-scn="compound" onclick="runScenario('compound')">
+        <div class="sc-ico">❄️</div><div class="sc-body"><div class="sc-ttl">The Compound Effect</div><div class="sc-dsc">Hold your portfolio for 5 simulated years and watch the snowball.</div></div>
+        <div class="scn-chev"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="scenario-card" data-scn="diversify" onclick="runScenario('diversify')">
+        <div class="sc-ico">🌐</div><div class="sc-body"><div class="sc-ttl">Diversify with Mia</div><div class="sc-dsc">Compare your mix against a spread-out one through the same shock.</div></div>
+        <div class="scn-chev"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── RISK (sub) ─── -->
+    <div class="page" id="page-risk">
+      <div class="style-chip">
+        <div class="sc-av">__AV__</div>
+        <div class="sc-mid"><div class="sc-label">Investment Style</div><div class="sc-name">Future Planner</div></div>
+        <div class="sc-stat"><div class="d">TFSA</div><div class="v" id="riskRate">3.0%</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-t">Risk Level</div>
+        <div class="chart-wrap" id="gaugeWrap"></div>
+        <div class="row" style="font-size:11px;font-weight:700;color:var(--muted);padding:0 6px;margin-top:-6px"><span>Low</span><span>Medium</span><span>High</span></div>
+        <input type="range" id="riskSlider" min="0" max="100" value="20" oninput="onRisk(this.value)"/>
+        <div class="row" style="margin-top:4px">
+          <div><div style="font-size:11px;color:var(--muted);font-weight:700">Projected annual interest</div><div style="font-size:22px;font-weight:800;color:var(--purple-deep)" id="riskReturn" class="tnum">+$30</div></div>
+          <div style="text-align:right"><div style="font-size:11px;color:var(--muted);font-weight:700">Rate</div><div style="font-size:22px;font-weight:800;color:var(--ink)" id="riskPct" class="tnum">3.0%</div></div>
+        </div>
+      </div>
+
+      <div class="mia">
+        <div class="face">__AV__</div>
+        <div><div class="bubble" id="riskTip">A <b>Low</b> risk plan grows slowly but steadily, your money rarely dips. Great for short-term goals.</div></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-soft" onclick="showToast('Simulating outcome…')">Simulate</button>
+        <button class="btn btn-pur" onclick="back();showToast('✓ Investment adjusted')">Invest</button>
+      </div>
+    </div>
+
+    <!-- ─── LEARN ─── -->
+    <div class="page" id="page-learn">
+      <div id="learnBody"></div>
+    </div>
+
+    <!-- ─── TOOLS ─── -->
+    <div class="page" id="page-tools">
+      <div class="page-title">Tools</div>
+      <div class="page-sub">Run the numbers, look up any asset, and learn money the fun way.</div>
+
+      <div class="section-t">Play &amp; Learn</div>
+      <div class="page-sub" style="margin-top:-8px">Quick games that teach real money skills, one round at a time.</div>
+      <div class="game-grid">
+        <div class="game-tile" style="--bg:#e7e4ee" onclick="push('game-wordle')">
+          <div class="gt-ico"><svg viewBox="0 0 64 64"><rect x="3" y="3" width="17" height="17" rx="4" fill="#4f9c7e"/><rect x="23" y="3" width="17" height="17" rx="4" fill="#c19a34"/><rect x="43" y="3" width="17" height="17" rx="4" fill="#b3acc6"/></svg></div>
+          <div class="gt-txt"><div class="gt-t">Wordle</div><div class="gt-d">Guess today's money word</div></div></div>
+        <div class="game-tile" style="--bg:#d9efe4" onclick="push('game-wnb')">
+          <div class="gt-ico" style="background:#28a565;color:#fff;font-size:22px">✓</div>
+          <div class="gt-txt"><div class="gt-t">Wants vs Needs</div><div class="gt-d">Sort spending smart</div></div></div>
+
+        <div class="game-tile wide" style="--bg:#dbe6fb" onclick="push('game-xword')">
+          <div class="gt-txt"><div class="gt-t big">The Mini Crossword</div><div class="gt-d">Fill the grid with money terms.</div><div class="gt-meta">Today's puzzle · 7×7</div></div>
+          <div class="gt-graphic"><svg viewBox="0 0 64 64" width="74" height="74"><rect x="2" y="2" width="28" height="28" rx="6" fill="#2b2b3a"/><rect x="34" y="2" width="28" height="28" rx="6" fill="#fff"/><rect x="2" y="34" width="28" height="28" rx="6" fill="#fff"/><rect x="34" y="34" width="28" height="28" rx="6" fill="#2b2b3a"/></svg></div></div>
+
+        <div class="game-tile" style="--bg:#ede7f9" onclick="push('game-swipe')">
+          <div class="gt-ico" style="font-size:24px">🃏</div>
+          <div class="gt-txt"><div class="gt-t">Budget Swipe</div><div class="gt-d">Keep needs, cut wants</div></div></div>
+        <div class="game-tile" style="--bg:#f7ddd5" onclick="push('game-scam')">
+          <div class="gt-ico" style="font-size:24px">🚨</div>
+          <div class="gt-txt"><div class="gt-t">Scammer Scanner</div><div class="gt-d">Spot the red flags</div></div></div>
+
+        <div class="game-tile wide" style="--bg:#f6eccf" onclick="push('game-quiz')">
+          <div class="gt-txt"><div class="gt-t big">Quick Count</div><div class="gt-d">Beat the clock at money math.</div><div class="gt-meta">8 questions · 15s each</div></div>
+          <div class="gt-graphic"><svg viewBox="0 0 64 64" width="64" height="64"><rect x="4" y="4" width="56" height="56" rx="13" fill="#fff"/><text x="19" y="31" font-size="20" font-weight="800" fill="#c19a34" font-family="'Plus Jakarta Sans',sans-serif">1</text><text x="40" y="31" font-size="20" font-weight="800" fill="#cf5a40" font-family="'Plus Jakarta Sans',sans-serif">2</text><text x="29" y="53" font-size="20" font-weight="800" fill="#4f9c7e" font-family="'Plus Jakarta Sans',sans-serif">3</text></svg></div></div>
+
+        <div class="game-tile wide" style="--bg:#fce8ec" onclick="push('game-hangman')">
+          <div class="gt-txt"><div class="gt-t big">Debtor's Tower</div><div class="gt-d">Guess the money word before the tower falls.</div><div class="gt-meta">Hangman · learn a term each round</div></div>
+          <div class="gt-graphic"><svg viewBox="0 0 64 64" width="64" height="64"><rect x="20" y="8" width="24" height="9" rx="2" fill="#cf5a40" transform="rotate(7 32 12)" opacity=".55"/><rect x="20" y="20" width="24" height="9" rx="2" fill="#c19a34"/><rect x="20" y="31" width="24" height="9" rx="2" fill="#4f9c7e"/><rect x="20" y="42" width="24" height="9" rx="2" fill="#4f9c7e"/><rect x="16" y="53" width="32" height="8" rx="2" fill="#565072"/></svg></div></div>
+      </div>
+
+      <div class="section-t" style="margin-top:22px">Financial Tools</div>
+      <div class="menu-card mc-tools" onclick="push('stockfinder')">
+        <div class="mc-ico">🔍</div>
+        <div class="mc-b"><div class="mc-t">Stock Finder</div><div class="mc-d">Explore any of 56 assets with live charts and a clear forecast range</div></div>
+        <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="menu-card mc-tools" onclick="push('loan-calc')">
+        <div class="mc-ico">💳</div>
+        <div class="mc-b"><div class="mc-t">Loan Calculator</div><div class="mc-d">See the true cost of a loan once interest is added in</div></div>
+        <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="menu-card mc-tools" onclick="push('mortgage-calc')">
+        <div class="mc-ico">🏠</div>
+        <div class="mc-b"><div class="mc-t">Mortgage Calculator</div><div class="mc-d">Estimate a monthly home payment and total interest</div></div>
+        <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+
+      <div class="explore-tools">
+        <div class="card">
+          <div class="row" style="margin-bottom:13px"><div class="card-t" style="margin-bottom:0">Market Today</div><span class="pill pill-gry" id="marketSrc">Sample</span></div>
+          <div id="marketRows">
+          <div class="lrow"><div><div class="l-n">S&amp;P 500</div><div class="l-s">SPY · ^GSPC</div></div><div class="l-v"><div class="l-p tnum">5,294.15</div><div class="l-c up">+0.62%</div></div></div>
+          <div class="lrow"><div><div class="l-n">Nasdaq</div><div class="l-s">QQQ · ^IXIC</div></div><div class="l-v"><div class="l-p tnum">18,431.70</div><div class="l-c up">+0.91%</div></div></div>
+          <div class="lrow"><div><div class="l-n">Dow Jones</div><div class="l-s">DIA · ^DJI</div></div><div class="l-v"><div class="l-p tnum">38,877.43</div><div class="l-c down">-0.14%</div></div></div>
+          <div class="lrow"><div><div class="l-n">S&amp;P/TSX</div><div class="l-s">EWC · ^GSPTSE</div></div><div class="l-v"><div class="l-p tnum">22,183.90</div><div class="l-c up">+0.29%</div></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-t">Scenario Forecast</div>
+          <div class="tkr-pick">
+            <div class="tchip sel" data-t="AAPL" onclick="pickFc(this)">AAPL</div>
+            <div class="tchip" data-t="NVDA" onclick="pickFc(this)">NVDA</div>
+            <div class="tchip" data-t="SPY" onclick="pickFc(this)">SPY</div>
+            <div class="tchip" data-t="BTC" onclick="pickFc(this)">BTC</div>
+          </div>
+          <div id="fcScen"></div>
+          <div class="mia" style="margin:13px 0 0">
+            <div class="face">__AV__</div>
+            <div><div class="bubble" id="fcTip">Three futures for <b>AAPL</b>: a rough <b>bear</b>, a likely <b>base</b>, and an optimistic <b>bull</b>. Plan around the base.</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-t">Compound Calculator</div>
+          <div class="row" style="margin-bottom:2px"><span style="font-size:13px;font-weight:700">Monthly contribution</span><span style="font-size:15px;font-weight:800;color:var(--purple-deep)" id="ccAmt">$200</span></div>
+          <input type="range" id="ccSlider" min="50" max="1000" value="200" step="50" oninput="onCalc()"/>
+          <div class="grid2" style="margin:6px 0 0">
+            <div style="background:var(--purple-soft);border-radius:12px;padding:13px"><div style="font-size:10px;font-weight:700;color:var(--purple-strong);text-transform:uppercase;letter-spacing:.5px">In 10 yrs</div><div style="font-size:19px;font-weight:800;color:var(--purple-deep)" id="cc10" class="tnum">$33.3K</div></div>
+            <div style="background:var(--green-soft);border-radius:12px;padding:13px"><div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px">In 30 yrs</div><div style="font-size:19px;font-weight:800;color:var(--green)" id="cc30" class="tnum">$200K</div></div>
+          </div>
+          <div class="muted-note" style="padding-top:10px">Assumes ~7% annual growth, compounded monthly.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STOCK FINDER (sub) ─── -->
+    <div class="page" id="page-stockfinder">
+      <div class="page-title" style="margin-top:2px">Stock Finder</div>
+      <div class="page-sub">Search 56 assets · live forecast with a clear range</div>
+
+      <div class="sf-search">
+        <svg class="sf-search-ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+        <input id="sfSearch" placeholder="Search AAPL, Bitcoin, Gold…" oninput="sfFilter()" onfocus="sfFilter()" autocomplete="off"/>
+      </div>
+      <div id="sfResults" class="sf-results" style="display:none"></div>
+
+      <div id="sfDetail"></div>
+    </div>
+
+    <!-- ─── CALCULATORS (sub) ─── -->
+    <div class="page" id="page-loan-calc"><div id="loanBody"></div></div>
+    <div class="page" id="page-mortgage-calc"><div id="mortBody"></div></div>
+
+    <!-- ─── GAMES (sub) ─── -->
+    <div class="page" id="page-game-swipe"><div id="bsBody"></div></div>
+    <div class="page" id="page-game-wnb"><div id="wnbBody"></div></div>
+    <div class="page" id="page-game-scam"><div id="scamBody"></div></div>
+    <div class="page" id="page-game-wordle"><div id="wordleBody"></div></div>
+    <div class="page" id="page-game-xword"><div id="xwordBody"></div></div>
+    <div class="page" id="page-game-quiz"><div id="qcBody"></div></div>
+    <div class="page" id="page-game-hangman"><div id="hmBody"></div></div>
+
+    <!-- ─── SOCIAL ─── -->
+    <div class="page" id="page-social">
+      <div class="page-title">Profile</div>
+      <div class="page-sub">Your level, goals and badges, and the community.</div>
+
+      <div class="grid-2">
+        <div class="stack">
+          <div class="hero" style="background:linear-gradient(140deg,#4f9c7e,#6bbf9c)">
+            <div class="hero-l">Your Level</div>
+            <div class="hero-v" id="pfLevel">Level 3 · Sprout 🌱</div>
+            <div class="hero-c" id="pfLevelXP">340 XP</div>
+            <div class="bar" style="background:rgba(255,255,255,.25);margin-top:12px"><div class="bar-fill" id="pfLevelBar" style="width:68%;background:#fff"></div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-t">Community · weekly leaderboard</div>
+            <div class="ls-sub" style="margin:-2px 0 8px">Ranked by what you've learned, not by who took the biggest risk.</div>
+            <div id="lbRows"></div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="section-t">Your Badges</div>
+          <div class="badge-grid" id="badgeGrid"></div>
+
+          <button class="btn btn-soft" style="margin-top:14px" onclick="showToast('Shared your journey 🎉')">Share My Journey</button>
+          <button class="btn btn-ghost" style="margin-top:10px" onclick="restartOnboarding()">↺ Replay Onboarding</button>
+          <button class="btn btn-ghost" style="margin-top:10px;color:var(--red)" onclick="resetProgress()">↺ Reset all progress</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  </main>
+</div>
+
+<!-- Bottom sheet (Mia explainer) -->
+<div class="sheet-ov" id="sheetOv" onclick="closeTip(event)">
+  <div class="sheet">
+    <div class="sheet-grip"></div>
+    <div class="sheet-mia"><div class="face">__AV__</div><div class="sheet-term" id="sheetTerm"></div></div>
+    <div class="sheet-def" id="sheetDef"></div>
+    <button class="btn btn-pur sheet-close" onclick="closeTipBtn()">Got it 👍</button>
+  </div>
+</div>
+
+<!-- Learning bottom sheet (lessons / goal setup) -->
+<div class="sheet-ov" id="lsheetOv" onclick="if(event.target===this)closeL()">
+  <div class="sheet"><div class="sheet-grip"></div><div id="lsheetInner"></div></div>
+</div>
+
+<div id="toast"></div>
+<!--BUILD:SCRIPTS-->
+<script src="src/js/01-charts-data.js"></script>
+<script src="src/js/02-nav-onboarding.js"></script>
+<script src="src/js/03-trading-engine.js"></script>
+<script src="src/js/04-persistence.js"></script>
+<script src="src/js/05-portfolio-scenarios.js"></script>
+<script src="src/js/06-stock-finder.js"></script>
+<script src="src/js/07-tools-api.js"></script>
+<script src="src/js/07b-money.js"></script>
+<script src="src/js/08-learn-init.js"></script>
+<script src="src/js/09-tools-games.js"></script>
+<!--/BUILD:SCRIPTS-->
+</body>
+</html>
