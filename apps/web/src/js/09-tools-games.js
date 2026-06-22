@@ -751,24 +751,36 @@ function monthlyPayment(principal,annualPct,months){
   if(r===0)return principal/months;
   return principal*r/(1-Math.pow(1+r,-months));
 }
-function renderLoanCalc(){
-  var el=document.getElementById('loanBody');if(!el)return;var s=loanState;
+/* Output card markup, kept separate so slider drags can refresh just the
+ * numbers without re-creating the <input> being dragged (which caused jank). */
+function loanOutHTML(s){
   var pay=monthlyPayment(s.p,s.rate,s.term);
   var totalCost=pay*s.term;var interest=totalCost-s.p;
   var iPct=totalCost>0?Math.round(interest/totalCost*100):0;
-  var terms=[{m:12,l:'1 yr'},{m:24,l:'2 yr'},{m:36,l:'3 yr'},{m:60,l:'5 yr'},{m:84,l:'7 yr'}];
-  var h=gameHead('💳','Loan Calculator','See what a loan really costs once interest is added.');
-  h+='<div class="card calc-out"><div class="co-label">Monthly payment</div><div class="co-big tnum">'+money(pay)+'</div>'
+  return '<div class="co-label">Monthly payment</div><div class="co-big tnum">'+money(pay)+'</div>'
     +'<div class="co-split"><div class="cs"><label>Principal</label><b class="tnum">'+money0(s.p)+'</b></div>'
       +'<div class="cs"><label>Total interest</label><b class="tnum" style="color:var(--red)">'+money0(interest)+'</b></div>'
       +'<div class="cs"><label>Total cost</label><b class="tnum">'+money0(totalCost)+'</b></div></div>'
     +'<div class="split-bar"><div class="sb-p" style="width:'+(100-iPct)+'%"></div><div class="sb-i" style="width:'+iPct+'%"></div></div>'
-    +'<div class="split-key"><span><i class="dot-p"></i>Principal</span><span><i class="dot-i"></i>Interest '+iPct+'%</span></div></div>';
+    +'<div class="split-key"><span><i class="dot-p"></i>Principal</span><span><i class="dot-i"></i>Interest '+iPct+'%</span></div>';
+}
+/* Live slider handler: refresh only the output + value labels, leave inputs be. */
+function loanInput(){
+  var s=loanState;
+  var out=document.getElementById('loanOut');if(out)out.innerHTML=loanOutHTML(s);
+  var pv=document.getElementById('loanPVal');if(pv)pv.textContent=money0(s.p);
+  var rv=document.getElementById('loanRVal');if(rv)rv.textContent=s.rate.toFixed(1)+'%';
+}
+function renderLoanCalc(){
+  var el=document.getElementById('loanBody');if(!el)return;var s=loanState;
+  var terms=[{m:12,l:'1 yr'},{m:24,l:'2 yr'},{m:36,l:'3 yr'},{m:60,l:'5 yr'},{m:84,l:'7 yr'}];
+  var h=gameHead('💳','Loan Calculator','See what a loan really costs once interest is added.');
+  h+='<div class="card calc-out" id="loanOut">'+loanOutHTML(s)+'</div>';
   h+='<div class="card calc-form">'
-    +'<div class="cf-row"><label>Loan amount</label><span class="tnum cf-val">'+money0(s.p)+'</span></div>'
-    +'<input type="range" min="1000" max="100000" step="500" value="'+s.p+'" oninput="loanState.p=+this.value;renderLoanCalc()"/>'
-    +'<div class="cf-row"><label>Interest rate</label><span class="tnum cf-val">'+s.rate.toFixed(1)+'%</span></div>'
-    +'<input type="range" min="0" max="25" step="0.5" value="'+s.rate+'" oninput="loanState.rate=+this.value;renderLoanCalc()"/>'
+    +'<div class="cf-row"><label>Loan amount</label><span class="tnum cf-val" id="loanPVal">'+money0(s.p)+'</span></div>'
+    +'<input type="range" min="1000" max="100000" step="500" value="'+s.p+'" oninput="loanState.p=+this.value;loanInput()"/>'
+    +'<div class="cf-row"><label>Interest rate</label><span class="tnum cf-val" id="loanRVal">'+s.rate.toFixed(1)+'%</span></div>'
+    +'<input type="range" min="0" max="25" step="0.5" value="'+s.rate+'" oninput="loanState.rate=+this.value;loanInput()"/>'
     +'<div class="cf-row" style="margin-bottom:8px"><label>Term</label></div>'
     +'<div class="chip-row">';
   terms.forEach(function(t){h+='<div class="calc-chip'+(s.term===t.m?' on':'')+'" onclick="loanState.term='+t.m+';renderLoanCalc()">'+t.l+'</div>';});
@@ -781,31 +793,43 @@ function renderLoanCalc(){
  *  MORTGAGE CALCULATOR
  * ════════════════════════════════════════════════════════════════════════ */
 var mortState={price:450000,down:10,rate:5,years:25};
-function renderMortgageCalc(){
-  var el=document.getElementById('mortBody');if(!el)return;var s=mortState;
+/* Output card markup split out so price/rate slider drags refresh only the
+ * numbers + donut, never the <input> being dragged (which caused jank). */
+function mortOutHTML(s){
   var downAmt=s.price*s.down/100;var loan=s.price-downAmt;var months=s.years*12;
   var pay=monthlyPayment(loan,s.rate,months);var totalPaid=pay*months;var interest=totalPaid-loan;
   var iPct=totalPaid>0?Math.round(interest/totalPaid*100):0;
   var donut=miniDonut([{v:(100-iPct)/100,c:'#6f659a'},{v:iPct/100,c:'#cf5a40'}],108,iPct+'%','interest');
-  var downs=[5,10,20];
-  var amorts=[{y:15,l:'15 yr'},{y:20,l:'20 yr'},{y:25,l:'25 yr'},{y:30,l:'30 yr'}];
-  var h=gameHead('🏠','Mortgage Calculator','Estimate the monthly payment on a home.');
-  h+='<div class="card calc-out"><div class="co-label">Monthly payment</div><div class="co-big tnum">'+money(pay)+'</div>'
+  return '<div class="co-label">Monthly payment</div><div class="co-big tnum">'+money(pay)+'</div>'
     +'<div class="mort-donut">'+donut+'<div class="md-rows">'
       +'<div class="cs"><label>Mortgage</label><b class="tnum">'+money0(loan)+'</b></div>'
       +'<div class="cs"><label>Down payment</label><b class="tnum">'+money0(downAmt)+'</b></div>'
       +'<div class="cs"><label>Total interest</label><b class="tnum" style="color:var(--red)">'+money0(interest)+'</b></div>'
       +'<div class="cs"><label>Total paid</label><b class="tnum">'+money0(totalPaid+downAmt)+'</b></div>'
-    +'</div></div></div>';
+    +'</div></div>';
+}
+/* Live slider handler: refresh only the output + value labels, leave inputs be. */
+function mortInput(){
+  var s=mortState;
+  var out=document.getElementById('mortOut');if(out)out.innerHTML=mortOutHTML(s);
+  var pv=document.getElementById('mortPVal');if(pv)pv.textContent=money0(s.price);
+  var rv=document.getElementById('mortRVal');if(rv)rv.textContent=s.rate.toFixed(1)+'%';
+}
+function renderMortgageCalc(){
+  var el=document.getElementById('mortBody');if(!el)return;var s=mortState;
+  var downs=[5,10,20];
+  var amorts=[{y:15,l:'15 yr'},{y:20,l:'20 yr'},{y:25,l:'25 yr'},{y:30,l:'30 yr'}];
+  var h=gameHead('🏠','Mortgage Calculator','Estimate the monthly payment on a home.');
+  h+='<div class="card calc-out" id="mortOut">'+mortOutHTML(s)+'</div>';
   h+='<div class="card calc-form">'
-    +'<div class="cf-row"><label>Home price</label><span class="tnum cf-val">'+money0(s.price)+'</span></div>'
-    +'<input type="range" min="100000" max="1500000" step="10000" value="'+s.price+'" oninput="mortState.price=+this.value;renderMortgageCalc()"/>'
+    +'<div class="cf-row"><label>Home price</label><span class="tnum cf-val" id="mortPVal">'+money0(s.price)+'</span></div>'
+    +'<input type="range" min="100000" max="1500000" step="10000" value="'+s.price+'" oninput="mortState.price=+this.value;mortInput()"/>'
     +'<div class="cf-row" style="margin-bottom:8px"><label>Down payment</label><span class="cf-val">'+s.down+'%</span></div>'
     +'<div class="chip-row">';
   downs.forEach(function(d){h+='<div class="calc-chip'+(s.down===d?' on':'')+'" onclick="mortState.down='+d+';renderMortgageCalc()">'+d+'%</div>';});
   h+='</div>'
-    +'<div class="cf-row"><label>Interest rate</label><span class="tnum cf-val">'+s.rate.toFixed(1)+'%</span></div>'
-    +'<input type="range" min="1" max="12" step="0.25" value="'+s.rate+'" oninput="mortState.rate=+this.value;renderMortgageCalc()"/>'
+    +'<div class="cf-row"><label>Interest rate</label><span class="tnum cf-val" id="mortRVal">'+s.rate.toFixed(1)+'%</span></div>'
+    +'<input type="range" min="1" max="12" step="0.25" value="'+s.rate+'" oninput="mortState.rate=+this.value;mortInput()"/>'
     +'<div class="cf-row" style="margin-bottom:8px"><label>Amortization</label></div>'
     +'<div class="chip-row">';
   amorts.forEach(function(a){h+='<div class="calc-chip'+(s.years===a.y?' on':'')+'" onclick="mortState.years='+a.y+';renderMortgageCalc()">'+a.l+'</div>';});
