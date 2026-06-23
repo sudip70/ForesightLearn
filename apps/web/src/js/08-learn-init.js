@@ -58,135 +58,175 @@ function lrow(n,v,p){return '<div class="lz-row"><div class="row"><span class="l
 var LESSONS_L={
   /* ── Unit 1 · Money foundations ── */
   f_budget:{xp:40,celeb:'You\'ve got a plan for every paycheque now.',steps:[
-    {say:'Before investing, know where your money goes. One simple split keeps it easy: <b>50 / 30 / 20</b>. 🧾'},
-    {say:'Of each paycheque: <b>50%</b> to needs, <b>30%</b> to wants, <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#7a5cae">50% needs</div><div style="width:30%;background:#5b8def">30% wants</div><div style="width:20%;background:#4f9c7e">20% save</div></div>';}},
-    {q:'You take home $2,000 a month. Using 50/30/20, how much goes to saving &amp; debt?',opts:['$100','$400','$1,000'],correct:1,yes:'Exactly!',why:'20% of $2,000 = $400. Automate it and you barely notice it leave.'},
-    {say:'Tip: <b>pay yourself first</b>, move that 20% the day you\'re paid, before it can disappear. 💪'}
+    {say:'Before investing, know where your money goes. One simple split keeps it automatic: <b>50 / 30 / 20</b>. 🧾'},
+    {say:'<b>50%</b> to needs (rent, groceries), <b>30%</b> to wants (fun, takeout), <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#7a5cae">50% needs</div><div style="width:30%;background:#5b8def">30% wants</div><div style="width:20%;background:#4f9c7e">20% save</div></div>';}},
+    {q:'You take home $2,000 a month. Using 50/30/20, how much goes to saving &amp; debt?',opts:['$100','$400','$1,000'],correct:1,yes:'Exactly!',why:'20% × $2,000 = $400. Even automating a piece of this changes everything.'},
+    {say:'The <b>pay-yourself-first</b> trick: move that 20% on payday — before it can disappear on wants. Future-you always wins this one. 💪'},
+    {q:'Which best describes "pay yourself first"?',opts:['Spend freely, save whatever\'s left','Transfer savings the moment you\'re paid','Invest only when you have extra'],correct:1,yes:'Yes!',why:'Moving money before you can spend it is what actually makes saving happen. Willpower alone rarely works.'},
+    {say:'Start today — even $50 a month adds up to <b>$600 a year</b>, and it builds the habit that matters most. 🌱'}
   ]},
   f_emergency:{xp:40,celeb:'You built the foundation everything else stands on.',steps:[
-    {say:'Life happens, a car repair, a lost job. An <b>emergency fund</b> stops a surprise becoming a crisis. 🛟'},
-    {say:'Aim for <b>3–6 months</b> of essential expenses, kept in a plain savings account you can reach instantly.'},
-    {q:'Where should your emergency fund live?',opts:['Invested in stocks','A savings account you can access anytime','Locked away for 5 years'],correct:1,yes:'Right.',why:'It must be safe and instant, not invested, where it could drop right when you need it most.'},
-    {say:'Build this <b>before</b> investing seriously, it\'s what lets you stay calm when markets dip. 🧘'}
+    {say:'Life happens — a car repair, a sudden job loss, a medical bill. An <b>emergency fund</b> stops a surprise from becoming a crisis. 🛟'},
+    {say:'Aim for <b>3–6 months</b> of essential expenses (rent, groceries, transport) kept in a savings account you can reach <i>the same day</i>.'},
+    {q:'Where should your emergency fund live?',opts:['In stocks for better returns','A high-interest savings account you can reach today','Locked in a GIC for 5 years'],correct:1,yes:'Right.',why:'It must be safe and instant. Stocks could drop 30% right when you need the money.'},
+    {say:'<b>How much is enough?</b> Take your monthly essentials and multiply by 3. That\'s your starter target — track it in the Goals card on Home. 🎯'},
+    {q:'Your monthly essentials total $1,500. What\'s your 3-month emergency fund target?',opts:['$500','$1,500','$4,500'],correct:2,yes:'Nailed it!',why:'$1,500 × 3 months = $4,500. Build this before investing seriously — it\'s what lets you ride out market dips without panic-selling.'},
+    {say:'Build the fund first, <i>then</i> invest. Without it, a small surprise can force you to sell investments at the worst moment. 🧘'}
   ]},
   f_debt:{xp:40,celeb:'You know which dollars to attack first.',steps:[
-    {say:'Not all debt is equal. A mortgage at 4% is very different from a credit card at <b>20%</b>. 💳'},
-    {say:'Paying off a 20% card is like earning a <b>guaranteed 20% return</b>, better than almost any investment.'},
-    {q:'Spare cash: a card charges 20%, investing might earn ~8%. What wins?',opts:['Invest the cash','Pay off the card'],correct:1,yes:'Yes.',why:'Clearing 20% interest beats earning 8%. Crush high-interest debt before investing.'},
-    {say:'Rule of thumb: high-interest debt first, then invest. Low-interest debt (like a mortgage) can ride alongside. 👍'}
+    {say:'Not all debt is equal. A mortgage at 4% is manageable. A credit card at <b>20%</b> is draining you every single month. 💳'},
+    {say:'Paying off a 20% card is like earning a <b>guaranteed 20% return</b> — better than almost any investment, with zero risk.'},
+    {q:'Spare cash: a card charges 20%, investing might earn ~8%. What wins?',opts:['Invest the cash','Pay off the card first'],correct:1,yes:'Yes.',why:'Clearing 20% interest beats earning 8% every time. No investment consistently returns more than your highest rate.'},
+    {say:'A simple rule: <b>highest interest first</b> (cards, payday loans), then invest. Low-interest debt (mortgage) can ride alongside once the expensive stuff is gone.'},
+    {q:'Which debt should you attack first?',opts:['Student loan at 5%','Credit card at 22%','Mortgage at 3%'],correct:1,yes:'Exactly!',why:'Always hit the highest interest rate first — that\'s where your money works hardest for you (or against you).'},
+    {say:'Crush the expensive debt, then redirect those payments into investing. It\'s like giving yourself a raise. 💪'}
   ]},
   f_inflation:{xp:40,celeb:'Now you know the real reason to invest.',steps:[
-    {say:'Cash feels safe, but <b>inflation</b> quietly shrinks what it can buy. 🎈'},
-    {say:'At ~3% inflation, $100 today buys only about <b>$74</b> of stuff in 10 years if it just sits there.',viz:function(){return '<div class="viz-bar"><div class="viz-fill" style="width:74%">$100 → ~$74 of buying power in 10 yrs</div></div>';}},
-    {q:'Why is "safe" cash actually risky long-term?',opts:['It can be stolen','Inflation erodes its buying power','Banks always lose it'],correct:1,yes:'Exactly!',why:'Money that doesn\'t grow faster than inflation loses value every year. Investing aims to outpace it.'},
-    {say:'So investing isn\'t about getting rich quick, it\'s about <b>beating inflation</b> over time. 🌱'}
+    {say:'Cash feels safe. But there\'s a silent force quietly shrinking what it can buy, year after year. It\'s called <b>inflation</b>. 🎈'},
+    {say:'At a steady 3% inflation, $100 today has the buying power of only about <b>$74</b> in 10 years if it just sits there.',viz:function(){return '<div class="viz-bar"><div class="viz-fill" style="width:74%">$100 → ~$74 of buying power in 10 yrs</div></div>';}},
+    {q:'Why is "keeping cash safe" actually risky long-term?',opts:['It can be stolen','Inflation slowly erodes its buying power','Banks always lose cash'],correct:1,yes:'Exactly!',why:'Money that doesn\'t grow faster than inflation loses value every year. Silent, but real.'},
+    {say:'Investing aims to <b>outpace inflation</b> — ideally growing 4–5% per year above it. That\'s not getting rich quick; that\'s protecting what you earn. 🛡️'},
+    {q:'Inflation is 3%/yr. A savings account pays 1%/yr. Are you winning or losing buying power?',opts:['Winning — you have more dollars','Losing — your money buys less each year','Breaking even'],correct:1,yes:'Right.',why:'1% growth minus 3% inflation = −2% real return. You have more dollars but each one buys less. Stocks historically return ~7% nominal.'},
+    {say:'Investing isn\'t gambling — it\'s the responsible move to keep your money\'s value intact over time. 🌱'}
   ]},
   /* ── Unit 2 · Why invest ── */
   v_save:{xp:40,celeb:'You\'ll always match the tool to the timeline now.',steps:[
-    {say:'Saving and investing are both good, but they do <b>different jobs</b>. 🐷'},
-    {say:'<b>Save</b> (safe, instant) for short-term goals &amp; emergencies. <b>Invest</b> (grows, bounces) for goals 5+ years away.'},
-    {q:'Saving for a vacation in 8 months, save or invest?',opts:['Invest it','Save it'],correct:1,yes:'Right.',why:'Short timeline = save. Investing could dip just before you need it. Long timeline = invest.'},
-    {say:'Match the tool to the timeline and you\'ll never be caught short. ⏱️'}
+    {say:'Saving and investing are both good — but they\'re completely different tools for different jobs. Mixing them up is an expensive mistake. 🐷'},
+    {say:'<b>Save</b> = safe, stable, instant. Great for emergencies and anything under 3 years. <b>Invest</b> = grows over time, but bounces. Best for goals 5+ years away.'},
+    {q:'You\'re saving for a vacation in 8 months. Save or invest?',opts:['Invest it — more growth','Save it — too soon to risk a dip'],correct:1,yes:'Right.',why:'8 months is too short. Markets can drop 20% right before your trip. Keep near-term money safe.'},
+    {say:'The golden rule: <b>time horizon determines the tool</b>. Match them and you\'ll never be caught short — and never miss out on growth you deserved.'},
+    {q:'Retirement is 30 years away. Where should those savings be?',opts:['Safe in a HISA','Invested — long enough to ride the ups and downs'],correct:1,yes:'Yes!',why:'30 years gives you time to recover from every dip the market has ever thrown. That\'s exactly when investing shines.'},
+    {say:'Match the tool to the timeline and your money is always working the right way. ⏱️'}
   ]},
   v_compound:{xp:50,celeb:'You just met the most powerful force in money.',steps:[
-    {say:'The closest thing to magic in money: <b>compounding</b>, earning returns on your past returns. ❄️'},
-    {say:'$100 at 8%/yr becomes about <b>$466</b> in 20 years, most of that is growth <i>on the growth</i>.',viz:function(){return '<div class="viz-bar"><div class="viz-fill" style="width:100%">$100 → ~$466 in 20 yrs at 8%/yr</div></div>';}},
-    {q:'What matters most for compounding?',opts:['Picking the perfect stock','Time, starting early','One huge deposit'],correct:1,yes:'Exactly!',why:'Time is the secret ingredient. Starting 10 years earlier often beats investing twice as much later.'},
-    {say:'The takeaway: <b>start now</b>, even small. Your future self will thank you. 🙏'}
+    {say:'The closest thing to magic in money: <b>compounding</b> — when your returns start earning their own returns. The longer you wait to start, the less magic you get. ❄️'},
+    {say:'$200/month invested at 7%/yr grows to about <b>$243,000</b> in 30 years. You only contributed $72,000 — the rest is compounding doing the heavy lifting.',viz:function(){return '<div class="viz-split"><div style="width:30%;background:#7a5cae">$72K you put in</div><div style="width:70%;background:#4f9c7e">$171K growth</div></div>';}},
+    {q:'What matters most for compounding to work?',opts:['Picking the perfect stock','Starting early and staying in','Making one huge deposit'],correct:1,yes:'Exactly!',why:'Time is the secret ingredient. Starting 10 years earlier often beats investing twice as much later.'},
+    {say:'You invest $1,000 today vs waiting 10 years to invest the same $1,000. At 7%/yr and 30-year horizon, the early start gives you <b>roughly twice the outcome</b>. 😬'},
+    {q:'Friend A invests $1,000 today. Friend B waits 10 years, then invests $1,000. At 7%/yr over 30 years, who has more?',opts:['Friend A — started today','Friend B — saved longer before investing','They end up equal'],correct:0,yes:'Right!',why:'Friend A: ~$7,600. Friend B: ~$3,870. One decade of delay costs almost half the final amount.'},
+    {say:'Start now, even small. Your future self will thank you far more for an early start than a bigger amount later. 🙏'}
   ]},
   v_assets:{xp:40,celeb:'You know the three building blocks of investing.',steps:[
-    {say:'Three building blocks you\'ll use forever: <b>stocks, ETFs and bonds</b>. 🧩'},
-    {say:'A <b>stock</b> = a slice of one company. A <b>bond</b> = a loan that pays interest. An <b>ETF</b> = a basket of many, in one buy.'},
-    {q:'You want instant diversification in one purchase. Which?',opts:['A single stock','An ETF','One company\'s bond'],correct:1,yes:'Yes!',why:'An ETF bundles hundreds of holdings, instant spread, low effort. Great for beginners.'},
-    {say:'Most beginners start with a broad, low-cost <b>ETF</b>, simple and spread out. 👌'}
+    {say:'Three building blocks you\'ll use forever: <b>stocks</b>, <b>ETFs</b>, and <b>bonds</b>. Know what each one does and you\'ve got the basics down. 🧩'},
+    {say:'<b>Stock</b> = a tiny slice of ownership in one company. <b>Bond</b> = a loan you make that pays interest. <b>ETF</b> = a basket of many stocks or bonds in one purchase.'},
+    {q:'You want instant diversification in one purchase. Which?',opts:['A single stock','An ETF','One company\'s bond'],correct:1,yes:'Yes!',why:'An ETF bundles hundreds of holdings — instant spread, low cost, low effort. Perfect for beginners.'},
+    {say:'Risk spectrum: <b>crypto</b> (most volatile) → <b>single stocks</b> (bouncy) → <b>broad ETFs</b> (smoother) → <b>government bonds</b> (calmest). Match to your timeline.'},
+    {q:'Which best describes a bond?',opts:['A slice of ownership in a company','A loan you make that pays you interest','A fund holding many assets'],correct:1,yes:'Right.',why:'Bonds are loans. You lend money to a company or government; they pay you interest, then return the principal. Calmer than stocks.'},
+    {say:'Most beginners start with a broad, low-cost <b>ETF</b> — simple, diversified, and hard to get wrong. 👌'}
   ]},
   v_timing:{xp:40,celeb:'You\'ll stop trying to outguess the market.',steps:[
-    {say:'Tempted to wait for the "perfect" moment to invest? Almost nobody gets it right. 🎯'},
-    {say:'Markets rise over the long run, and the best days often come right after the worst, miss a few and returns crater.'},
-    {q:'What beats trying to time the market?',opts:['Time IN the market','Checking prices hourly','Buying only at the bottom'],correct:0,yes:'Right!',why:'Staying invested through ups and downs, "time in the market beats timing the market."'},
-    {say:'So invest regularly and <b>stay in</b>. Boring beats clever here. 🧘'}
+    {say:'Tempted to wait for the "perfect" moment to invest? Almost nobody — including professional fund managers — gets it right consistently. 🎯'},
+    {say:'Miss just the <b>10 best days</b> of the S&P 500 over 20 years and your return drops by more than half. Those best days usually arrive right after the worst ones.'},
+    {q:'What beats trying to time the market?',opts:['Time <i>in</i> the market','Checking prices hourly','Buying only at the bottom'],correct:0,yes:'Right!',why:'"Time in the market beats timing the market" — one of the most reliable rules in investing.'},
+    {say:'<b>Dollar-cost averaging</b>: invest the same amount every month, no matter what. When prices fall, your money buys more shares. When prices rise, you\'re already in. 📅'},
+    {q:'What is dollar-cost averaging?',opts:['Only buying when prices drop','Investing a fixed amount on a regular schedule, no matter what','Averaging costs across multiple brokers'],correct:1,yes:'Exactly!',why:'Fixed, regular investments remove the need to "time" anything. It\'s boring, automatic, and it works.'},
+    {say:'Invest regularly, stay in, and let time do the heavy lifting. Boring beats clever here. 🧘'}
   ]},
   /* ── Unit 3 · Build a smart portfolio ── */
   p_risk:{xp:45,celeb:'You can now match risk to your timeline.',steps:[
-    {say:'Risk isn\'t bad, it\'s the engine of returns. The trick is matching it to your <b>time horizon</b>. 🛡️'},
-    {say:'Money you need <b>soon</b> → keep it calm (less risk). Money for <b>years away</b> → it can ride the bumps for more growth.'},
-    {q:'Retirement is 30 years away. How much short-term bounciness can you handle?',opts:['Very little','Quite a lot'],correct:1,yes:'Exactly.',why:'A long horizon lets you ride out dips, so you can take more risk for more growth.'},
-    {say:'Right risk for the right timeline, that\'s the heart of smart investing. ⏳'}
+    {say:'Risk isn\'t your enemy — it\'s the engine that produces returns. The trick is matching the right level to your <b>time horizon</b>. 🛡️'},
+    {say:'Money you need <b>soon</b> → keep it calm (lower risk, lower growth). Money for <b>years away</b> → it can ride the bumps for more growth. Time absorbs risk.'},
+    {q:'Your retirement is 30 years away. How much short-term bounciness can you absorb?',opts:['Very little — even small dips feel scary','Quite a lot — 30 years to recover'],correct:1,yes:'Exactly.',why:'A long horizon lets you wait out every dip the market has thrown — historically, every one has recovered.'},
+    {say:'Two things shape your risk choice: <b>risk capacity</b> (how long you can hold) and <b>risk tolerance</b> (how much volatility you can sleep through). Both matter.'},
+    {q:'You need $20,000 for a house down payment in 18 months. Where should it be?',opts:['In stocks for higher returns','In a high-interest savings account','In crypto — highest potential'],correct:1,yes:'Right.',why:'18 months is not enough recovery time if stocks drop. Short timeline + money you need = low risk. Non-negotiable.'},
+    {say:'Right risk for the right timeline — that\'s the heart of smart investing. Get this right and everything else follows. ⏳'}
   ]},
   risk_div:{xp:50,celeb:'You just learned the #1 way to protect your money.',steps:[
-    {say:'Quick one, friend, let\'s see what happens when most of your money sits in <b>one</b> place. 👀'},
+    {say:'Quick one — let\'s see what happens when most of your money sits in <b>one</b> place. 👀'},
     {say:function(s){return 'Right now your biggest holding, <b>'+s.big.t+'</b>, is <b>'+Math.round(s.big.pct*100)+'%</b> of your invested money.';},viz:function(s){var p=Math.round(s.big.pct*100);return '<div class="viz-bar"><div class="viz-fill" style="width:'+Math.max(14,p)+'%">'+s.big.t+' · '+p+'%</div></div>';}},
     {q:function(s){return 'If <b>'+s.big.t+'</b> dropped <b>20%</b>, about how much would your <i>whole</i> portfolio fall?';},opts:function(s){return ['About 2%','About '+Math.round(s.big.pct*20)+'%','About 50%'];},correct:1,yes:'That\'s it!',why:function(s){return Math.round(s.big.pct*100)+'% × 20% ≈ '+Math.round(s.big.pct*20)+'%. One holding\'s dip becomes most of your loss.';}},
-    {say:'Exactly, concentration turns one bad day into a big one. Spreading across more holdings <b>softens the swings</b>. 🛡️'},
-    {say:'Try it for real next: add a different asset type in <b>Trade</b> and watch your risk drop. Penny\'s cheering you on! 🦊'}
+    {say:'Diversification doesn\'t mean owning 50 things — even <b>3 different asset types</b> (a stock, an ETF, and a bond) dramatically smooths your ride.'},
+    {q:'What\'s the main benefit of holding multiple asset types?',opts:['Guaranteed profits','One bad day can\'t sink your whole portfolio','More exciting to track'],correct:1,yes:'Yes!',why:'When one asset drops, others often hold steady or rise. Less risk for the same expected return — that\'s the free lunch of diversification.'},
+    {say:'Try it for real: add a different asset type in <b>Trade</b> and watch your concentration drop. Penny\'s cheering you on! 🦊'}
   ]},
   p_mix:{xp:45,celeb:'You can design a mix you\'ll actually stick with.',steps:[
-    {say:'Your <b>asset mix</b>, how much in stocks vs bonds, drives most of your long-run results. 🥗'},
-    {say:'A classic start: more <b>stocks</b> when young (growth), shifting to more <b>bonds</b> as your goal nears (stability).',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#7a5cae">80% stocks</div><div style="width:20%;background:#5b8def">20% bonds</div></div>';}},
-    {q:'You\'re 25, investing for retirement. A reasonable tilt?',opts:['Mostly bonds','Mostly stocks','All cash'],correct:1,yes:'Yes.',why:'Young + long horizon = lean to stocks for growth; add bonds as the goal gets closer.'},
-    {say:'Pick a mix you can <b>hold through a downturn</b>, that matters more than the perfect ratio. 🤝'}
+    {say:'Your <b>asset mix</b> — how much in stocks vs bonds vs other — shapes most of your long-run results. Get this right and you can sleep through any dip. 🥗'},
+    {say:'A classic start for a 25-year-old: <b>80% stocks / 20% bonds</b> — lean to growth when young, shift toward stability as your goal nears.',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#7a5cae">80% stocks</div><div style="width:20%;background:#5b8def">20% bonds</div></div>';}},
+    {q:'You\'re 25, investing for retirement in 40 years. A reasonable tilt?',opts:['Mostly bonds — safe','Mostly stocks — long horizon','All cash — wait and see'],correct:1,yes:'Yes.',why:'40 years gives you time to ride out every dip stocks throw. Lean into growth when your horizon is long.'},
+    {say:'<b>Rebalancing</b>: if stocks boom and grow to 90% of your portfolio, sell a little and buy bonds to drift back to your 80/20 target. Once a year is usually enough.'},
+    {q:'Your target is 80% stocks. After a great year it\'s grown to 90% stocks. What do you do?',opts:['Do nothing — let it run','Sell some stocks, buy bonds to get back to 80/20','Sell everything and restart'],correct:1,yes:'Right!',why:'Rebalancing keeps your risk at the level you chose. Let stocks run unchecked and one bad year hits far harder.'},
+    {say:'Pick a mix you can hold calmly through a dip — that matters more than finding the "perfect" ratio. Consistency wins. 🤝'}
   ]},
   p_fees:{xp:45,celeb:'You\'ll keep more of every dollar you earn.',steps:[
-    {say:'Fees feel tiny but quietly eat returns. <b>1%</b> vs <b>0.1%</b> a year can cost tens of thousands over decades. 🪙'},
-    {say:'<b>Index funds / ETFs</b> just track the market at very low cost, and beat most pricey "active" funds over time.'},
-    {q:'Two funds hold similar things; one charges 1%, one 0.1%. Smarter pick?',opts:['The 1% one','The 0.1% one'],correct:1,yes:'Right!',why:'Lower fees = more of the return stays yours. With index funds you rarely give up performance for the savings.'},
-    {say:'Always check the <b>MER</b> (the fee) before you buy. Low and boring wins. 👍'}
+    {say:'Fees feel tiny but they compound <i>negatively</i> — every dollar you pay in fees is a dollar that never gets to compound for you. 🪙'},
+    {say:'The math: $10,000 at 7%/yr over 30 years with a <b>0.1% fee</b> → ~$73,000. With a <b>1% fee</b> → ~$57,000. That\'s a <b>$16,000 difference</b> from one percentage point.'},
+    {q:'Two funds hold similar things; one charges 1%/yr, one 0.1%/yr. Smarter pick?',opts:['The 1% one — more expensive must mean better','The 0.1% one — keep more of your return'],correct:1,yes:'Right!',why:'Lower fees = more of the return stays yours. Index funds charge less and historically beat most active funds over 10+ years.'},
+    {say:'<b>MER</b> (Management Expense Ratio) is the annual fee built into the fund — you never write a cheque, it just quietly reduces your gains. Look for under 0.25%.'},
+    {q:'What does MER stand for?',opts:['Market Earnings Rate','Management Expense Ratio','Minimum Equity Requirement'],correct:1,yes:'Exactly.',why:'The MER is automatically deducted from the fund\'s return. For broad Canadian index ETFs (like XEQT, VEQT), it\'s around 0.20%.'},
+    {say:'Always check the MER before you buy. Under 0.25% is excellent. Boring, cheap index funds win in the long run. 👍'}
   ]},
-  uncertainty:{xp:50,celeb:'You now read forecasts like a pro, ranges, not promises.',onDone:function(){LEARN.flags.uncertainty=true;},steps:[
-    {say:'Ever seen an app promise an <b>exact</b> future price? 🤨 Truth is, nobody can know it.'},
-    {say:'So instead we show a <b>range</b>: a rough case, a likely middle, and a strong case. 🔭'},
-    {q:'A <b>wider</b> range means…',opts:['More certainty','Less certainty','Guaranteed profit'],correct:1,yes:'Yes!',why:'Wider = more spread of possible outcomes = less certain. Narrow ranges are the confident ones.'},
-    {say:'We never show a single "prediction", that\'d be a lie. We show the range <b>and</b> what moves it. 🌱'}
+  uncertainty:{xp:50,celeb:'You now read forecasts like a pro — ranges, not promises.',onDone:function(){LEARN.flags.uncertainty=true;},steps:[
+    {say:'Ever seen an app promise an <b>exact</b> future price? 🤨 Nobody — not a computer, not a hedge fund, not Mia — can know it for certain.'},
+    {say:'That\'s why we show a <b>range</b>: a rough (bear) case, a most-likely middle (base), and a strong (bull) case. No single number is "the prediction."'},
+    {q:'A <b>wider</b> range between bear and bull means…',opts:['More certainty — the model is confident','Less certainty — more possible outcomes','Guaranteed profit near the middle'],correct:1,yes:'Yes!',why:'Wider = more spread of possible outcomes = higher uncertainty. The model is saying "it could go quite differently either way."'},
+    {say:'What <b>moves</b> a price? Earnings surprises, interest rate changes, investor sentiment, news cycles. The range captures those uncertainties — a map of possibilities, not a promise.'},
+    {say:'We never show one "prediction" because that would be dishonest. We show the range <b>and</b> what moves it — so you invest with eyes open. 🌱'}
   ]},
   /* ── Unit 4 · Canadian accounts ── */
   c_tfsa:{xp:45,celeb:'You\'ve unlocked Canada\'s friendliest account.',steps:[
-    {say:'In Canada, the <b>TFSA</b> is a beginner\'s best friend. 🍁'},
-    {say:'Everything it earns, growth, dividends, interest, is <b>completely tax-free</b>, even when you withdraw. Take money out anytime.'},
-    {q:'You make $500 of gains inside a TFSA. Tax owed on it?',opts:['$0','About $100','Depends on income'],correct:0,yes:'Exactly!',why:'Zero. That\'s the magic of a TFSA, gains are never taxed.'},
-    {say:'Flexible + tax-free makes the TFSA a great <b>first account</b> for most people. 🎉'}
+    {say:'In Canada, the <b>TFSA</b> (Tax-Free Savings Account) is arguably the most powerful savings tool available to any Canadian. 🍁'},
+    {say:'Everything inside it — growth, dividends, interest — is completely <b>tax-free</b>, even when you withdraw. No tax. Ever. On any of the gains.'},
+    {q:'You make $500 of gains inside a TFSA. Tax owed when you withdraw?',opts:['$0 — completely tax-free','About $100','Depends on your income'],correct:0,yes:'Exactly!',why:'Zero. That\'s the magic. Unlike regular accounts or RRSPs, TFSA withdrawals are never taxed.'},
+    {say:'You get <b>new contribution room every January</b> ($7,000 in 2024). Withdraw anytime — that room comes back the following year. No tax slip. No penalty.'},
+    {q:'You withdraw $5,000 from your TFSA this year. What happens to that contribution room?',opts:['It\'s gone forever','It comes back on January 1st next year','You must re-contribute within 90 days'],correct:1,yes:'Right.',why:'TFSA room is re-credited January 1. Unlike an RRSP, you can re-contribute what you withdrew next year — flexible for life.'},
+    {say:'Flexible + tax-free makes the TFSA a great <b>first account</b> for most people, especially if you\'re under 40. 🎉'}
   ]},
   c_rrsp:{xp:45,celeb:'You understand the RRSP\'s tax twist.',steps:[
-    {say:'The <b>RRSP</b> is built for retirement, with a tax twist. 🏦'},
-    {say:'Contributions <b>lower your taxable income now</b> (a refund today); you pay tax later when you withdraw, usually at a lower rate.'},
-    {q:'When does an RRSP help most?',opts:['When your income is low','When your income is high (bigger refund now)'],correct:1,yes:'Right.',why:'Higher income → bigger deduction now, and you likely withdraw at a lower rate in retirement.'},
-    {say:'Best for steady retirement saving, especially in your higher-earning years. 📈'}
+    {say:'The <b>RRSP</b> (Registered Retirement Savings Plan) is built for retirement, with a tax trick that works best when you\'re earning well. 🏦'},
+    {say:'Contributions <b>reduce your taxable income right now</b> — potentially a real refund this spring. You pay tax later, when you withdraw in retirement, usually at a lower rate.'},
+    {q:'When does an RRSP help most?',opts:['When your income is low — smaller tax bill','When your income is high — bigger refund now','When you want to access money anytime'],correct:1,yes:'Right.',why:'Higher income = bigger deduction today. Then you withdraw in retirement at a lower rate. That spread is what makes it powerful.'},
+    {say:'You must convert your RRSP to a <b>RRIF</b> by age 71 and withdraw a minimum each year. The money was always meant for retirement — the rules ensure that.'},
+    {q:'You contribute $10,000 to your RRSP at a 30% marginal tax rate. Your approximate refund?',opts:['$0','$3,000','$10,000'],correct:1,yes:'Yes!',why:'RRSP refund = contribution × marginal rate. $10,000 × 30% = $3,000 back. At 45% it\'s $4,500. Worth more the more you earn.'},
+    {say:'RRSP + TFSA together is a powerful combination. RRSP for the tax break in high-earning years, TFSA for flexibility. 📈'}
   ]},
   c_which:{xp:45,celeb:'You can pick the right account with confidence.',steps:[
-    {say:'So, TFSA or RRSP? A simple rule of thumb based on your income. ⚖️'},
-    {say:'Lower income now → lean <b>TFSA</b> (bank the RRSP room for later). Higher income → the <b>RRSP</b> deduction is worth more.'},
-    {q:'You\'re a student earning little this year. Which usually first?',opts:['RRSP','TFSA'],correct:1,yes:'Yes!',why:'At low income the RRSP deduction is small, TFSA flexibility wins, and you save RRSP room for higher-earning years.'},
-    {say:'Plenty of people use <b>both</b> over time. Start where the rule points today. 🤝'}
+    {say:'TFSA or RRSP first? Most people wonder this at some point. Here\'s a simple rule of thumb. ⚖️'},
+    {say:'Lower income now → lean <b>TFSA</b> (the RRSP deduction isn\'t worth much; bank that room for later). Higher income → the <b>RRSP</b> deduction is worth more right now.'},
+    {q:'You\'re a student earning $18,000 this year. Which usually wins?',opts:['RRSP — always prioritize retirement','TFSA — low income means a small RRSP deduction; save that room'],correct:1,yes:'Yes!',why:'At $18k, you\'re in a low tax bracket — the RRSP deduction barely saves anything. TFSA is flexible and gains are still tax-free.'},
+    {say:'Rough split: under ~$50k → favour TFSA. Over ~$70k → RRSP is usually worth the deduction. Between $50–70k? Both are reasonable.'},
+    {q:'You\'re earning $95,000 and want to reduce your tax bill now. Which wins?',opts:['TFSA — tax-free growth is always best','RRSP — the deduction at your income rate is significant'],correct:1,yes:'Exactly.',why:'At $95k you\'re likely in a 43%+ marginal rate. Each $1,000 RRSP contribution saves ~$430 in tax this year — an immediate, guaranteed return.'},
+    {say:'Plenty of people use <b>both</b> over time — TFSA for flexibility, RRSP for the tax break in high-earning years. Start where the rule points today. 🤝'}
   ]},
   c_order:{xp:45,celeb:'You know exactly where each new dollar should go.',steps:[
-    {say:'A handy priority order for where new money should go. 📊'},
-    {say:'1) Emergency fund → 2) crush high-interest debt → 3) any employer match → 4) TFSA / RRSP → 5) taxable account.'},
-    {q:'Your employer matches retirement contributions. Where does that rank?',opts:['Last','Near the top, it\'s free money','Skip it'],correct:1,yes:'Exactly!',why:'A match is an instant 100% return, grab it before most other investing.'},
-    {say:'Work down the list and your money always lands in the highest-value spot. ✅'}
+    {say:'Money is finite. When you have spare cash, a simple priority ladder helps you always put it in the highest-value spot. 📊'},
+    {say:'<b>1)</b> Emergency fund → <b>2)</b> High-interest debt → <b>3)</b> Any employer match → <b>4)</b> TFSA / RRSP → <b>5)</b> Everything else (taxable account, RESP, etc.)'},
+    {q:'Your employer matches 4% of salary in retirement contributions. Where does that rank?',opts:['Last — focus on debt first','Right after emergency fund and expensive debt','Third — always behind TFSA'],correct:1,yes:'Exactly!',why:'An employer match is an instant 100% return. Don\'t leave free money behind — it comes right after your emergency fund and high-rate debt.'},
+    {say:'The only things above an employer match: not carrying expensive debt (anything over ~8%) and having your emergency fund set. Those two protect you from crisis.'},
+    {q:'After building your emergency fund, the most important step before investing is:',opts:['Open a brokerage account right away','Pay off high-interest debt (over ~8%)','Read every investing book you can find'],correct:1,yes:'Right.',why:'Eliminating 20% credit card debt gives a guaranteed 20% "return" — better than almost any investment. Then you\'re free to invest with a clear head.'},
+    {say:'Work down the ladder and your money always lands in the highest-value spot. Not exciting, but reliably wealth-building. ✅'}
   ]},
   /* ── Unit 5 · Plan & reach your goals ── */
   g_smart:{xp:45,celeb:'Your goals just got real and reachable.',steps:[
-    {say:'A vague "I should save more" rarely works. A <b>SMART</b> goal does. 🎯'},
-    {say:'Specific, Measurable, Achievable, Relevant, Time-based, e.g. "Save <b>$10,000</b> for a car in <b>5 years</b>."'},
-    {q:'Which is a SMART goal?',opts:['"Get rich"','"Save $6,000 for a trip in 2 years"','"Invest someday"'],correct:1,yes:'Right!',why:'It names the amount and the deadline, so you can plan backwards and track it.'},
-    {say:'Set yours in the <b>goal card</b> on Home and we\'ll help you reach it. 🗺️'}
+    {say:'A vague "I should save more" rarely works. Your brain needs a clear target to aim at. That\'s where <b>SMART goals</b> come in. 🎯'},
+    {say:'<b>S</b>pecific · <b>M</b>easurable · <b>A</b>chievable · <b>R</b>elevant · <b>T</b>ime-based. Example: "Save <b>$6,000</b> for a Japan trip in <b>2 years</b>."'},
+    {q:'Which is a SMART goal?',opts:['"Get rich someday"','"Save $6,000 for a trip in 2 years"','"Invest when I have spare cash"'],correct:1,yes:'Right!',why:'It has a specific amount, a purpose, and a deadline. That\'s enough to plan backwards from and automate.'},
+    {say:'<b>Work backwards</b>: $6,000 ÷ 24 months = $250/month. Now you know exactly what to automate. No guessing, no guilt, no willpower required.'},
+    {q:'You want to save $4,800 in 2 years. How much per month?',opts:['$150/month','$200/month','$400/month'],correct:1,yes:'Nailed it!',why:'$4,800 ÷ 24 months = $200. Work backwards from the goal and the monthly number reveals itself. Automate it the day you\'re paid.'},
+    {say:'Set yours in the <b>goal card</b> on Home — Fiscally will track it for you. Clear target → automatic deposit → it happens. 🗺️'}
   ]},
   g_buckets:{xp:45,celeb:'Every goal now has the right home.',steps:[
-    {say:'Different goals need different homes for the money. 🪣'},
-    {say:'<b>Short-term</b> (under ~3 yrs): keep it safe in savings. <b>Long-term</b> (5+ yrs): invest it so it grows.'},
-    {q:'A down payment you need in 2 years, where?',opts:['Invested in stocks','Safe in savings'],correct:1,yes:'Yes.',why:'Too soon to risk a dip, keep near-term money safe. Long-term money can ride the market.'},
-    {say:'Sort each goal into a bucket and the "save or invest" question answers itself. 👌'}
+    {say:'Not all savings goals belong in the same place. Mixing them up is one of the most common — and painful — mistakes in personal finance. 🪣'},
+    {say:'<b>Short-term goals</b> (under ~3 years): keep in a HISA or GIC — safe and liquid. <b>Long-term goals</b> (5+ years): invest so it can actually grow.'},
+    {q:'Down payment you need in 2 years. Where does the money live?',opts:['Invested in stocks — better returns','In a high-interest savings account or short GIC'],correct:1,yes:'Yes.',why:'Too soon to risk a market dip. If stocks fall 30% in month 22, you can\'t buy the house. Near-term money stays safe.'},
+    {say:'Safety net for short-term: a <b>HISA</b> paying 3–5% is real growth with zero market risk. A 1-year GIC can lock in even better rates — explore them at your bank.'},
+    {q:'Your retirement is 35 years away. Where should those savings be?',opts:['HISA — safety first','Invested in a diversified portfolio — time absorbs the risk'],correct:1,yes:'Right.',why:'35 years of compounding in a diversified portfolio will vastly outpace any savings account. Time is what makes investing appropriate for long-horizon goals.'},
+    {say:'Sort each goal into a bucket — near-term safe, long-term invested — and the "save or invest?" question answers itself every time. 👌'}
   ]},
   g_howmuch:{xp:45,celeb:'You have a contribution plan that sticks.',steps:[
-    {say:'How much should you invest? Enough to matter, not so much it hurts. 💧'},
-    {say:'A common start: <b>5–10%</b> of your income, automated. Nudge it up a little whenever your income rises.'},
-    {q:'What makes investing actually stick?',opts:['Big one-time deposits','Automating a regular amount','Waiting for spare cash'],correct:1,yes:'Exactly!',why:'Automatic, regular contributions beat willpower, you invest before you can spend it.'},
-    {say:'Set it, automate it, forget it. Consistency is the whole game. 🔁'}
+    {say:'One of the biggest questions: <b>how much should I invest?</b> The short answer: enough to matter, not so much it hurts. 💧'},
+    {say:'A common starting point: <b>5–10% of take-home income</b>, automated on payday. Even $50/month matters — the habit matters more than the amount at first.'},
+    {q:'What makes investing actually stick long-term?',opts:['Large one-time windfalls','Automating a regular amount every paycheque','Waiting until you have "spare" cash'],correct:1,yes:'Exactly!',why:'Automatic and regular beats willpower. You invest before you see the money, so it never feels like a sacrifice.'},
+    {say:'As your income grows, nudge it up — even 1% more per raise. Going from 5% to 6% to 8% over a few years is how steady wealth gets built without feeling deprived.'},
+    {q:'You get a $200/month raise. The smartest move?',opts:['Spend it all — you earned it','Invest half, spend half — grow without feeling deprived','Put it all in savings'],correct:1,yes:'Yes!',why:'Balanced is sustainable. Going from nothing to investing half of a raise is far more impactful than an all-or-nothing approach.'},
+    {say:'Set it, automate it, forget it — and nudge it up every time you earn more. Consistency is literally the whole game. 🔁'}
   ]},
   g_ready:{xp:60,celeb:'You\'re ready to invest for real. 🎉',steps:[
-    {say:'You\'ve learned the foundations and practised with no risk. How do you know you\'re <b>ready for real money</b>? 🎓'},
-    {say:'A quick checklist: emergency fund ✓, high-interest debt handled ✓, a clear goal ✓, and a mix you can hold calmly through a dip ✓.'},
-    {q:'The best sign you\'re ready to invest for real?',opts:['You found a hot stock tip','You have a plan and stayed calm through practice dips','The market just went up'],correct:1,yes:'That\'s it. 🎉',why:'Readiness is about your plan and temperament, not a tip or market timing.'},
-    {say:'When you can check those boxes, open a real <b>TFSA</b> and start small. You\'ve got this. 🌟'}
+    {say:'You\'ve learned the foundations, practised on real data, and built some confidence. How do you know you\'re actually ready for real money? 🎓'},
+    {say:'A quick four-box checklist: ✓ Emergency fund built → ✓ High-interest debt cleared → ✓ A goal with a timeline → ✓ A calm mix you can hold through a dip.'},
+    {q:'The best sign you\'re ready to invest real money?',opts:['Someone gave you a hot stock tip','You have a plan and stayed calm through practice dips','The market just went up a lot'],correct:1,yes:'That\'s it. 🎉',why:'Readiness is about your plan and mindset, not a tip or market timing. If you held calmly through dips in practice, you\'ve got the muscle.'},
+    {say:'Starting small is fine — even $500 in a diversified ETF inside a TFSA is a real investment. The goal is to <b>begin</b>, not to be perfect.'},
+    {q:'Where should most beginners open their first real account?',opts:['A taxable brokerage account','A TFSA — tax-free gains, flexible withdrawals','An RRSP — always prioritize retirement'],correct:1,yes:'Right.',why:'TFSA first for most beginners. Tax-free gains, withdraw whenever you need to, no tax slip. Simple, flexible, powerful.'},
+    {say:'When you can check those four boxes — open a real TFSA and start small. You\'ve practised with us; now the stage is yours. 🌟'}
   ]}
 };
 /* ── lesson/path progression ── */
@@ -461,6 +501,40 @@ function saveGoal(){
 }
 function openL(html){document.getElementById('lsheetInner').innerHTML=html;document.getElementById('lsheetOv').classList.add('open');var sh=document.querySelector('#lsheetOv .sheet');if(sh)sh.scrollTop=0;}
 function closeL(){document.getElementById('lsheetOv').classList.remove('open');}
+var UNIT_GUIDES={
+  'Unit 1':{t:'Unit 1 · Money foundations',body:
+    '<div class="lp-say"><b>50 / 30 / 20 rule</b><br>50% needs · 30% wants · 20% save &amp; debt. Move that 20% on payday before it can disappear.</div>'
+   +'<div class="lp-say"><b>Emergency fund target</b><br>Monthly essentials × 3 (min). Keep in a savings account you can reach same-day — not invested.</div>'
+   +'<div class="lp-say"><b>Debt priority</b><br>Highest interest rate first (cards, payday loans). Low-interest debt (mortgage) can ride alongside investing once expensive debt is gone.</div>'
+   +'<div class="lp-say"><b>Why invest at all?</b><br>Inflation runs ~3%/yr. Cash that sits still loses buying power. Investing aims to outpace it by 4–5%/yr above inflation.</div>'
+   +'<div class="lp-say" style="background:var(--card)"><b>Quick numbers</b> · 20% card = 20% guaranteed return to pay it off · $100 cash → ~$74 buying power in 10 yrs at 3% inflation</div>'},
+  'Unit 2':{t:'Unit 2 · Why invest',body:
+    '<div class="lp-say"><b>Save vs invest — the rule</b><br>Under 3 yrs → save (safe, instant). Over 5 yrs → invest (grows, bounces). Match the tool to the timeline.</div>'
+   +'<div class="lp-say"><b>Compounding</b><br>Returns earn returns. $200/mo at 7%/yr for 30 yrs → ~$243K. You put in only $72K — the rest is compounding. Starting 10 yrs early can double the outcome.</div>'
+   +'<div class="lp-say"><b>Three asset types</b><br>Stock = ownership slice · Bond = loan you make that pays interest · ETF = basket of many (great starting point).</div>'
+   +'<div class="lp-say"><b>Time in, not timing</b><br>Miss the 10 best S&P days over 20 yrs → returns drop by more than half. Stay invested. Use dollar-cost averaging: same amount, every month, no matter what.</div>'
+   +'<div class="lp-say" style="background:var(--card)"><b>Quick numbers</b> · S&P 500 historical average: ~10%/yr nominal, ~7% after inflation</div>'},
+  'Unit 3':{t:'Unit 3 · Build a smart portfolio',body:
+    '<div class="lp-say"><b>Risk ↔ timeline</b><br>Short horizon → low risk. Long horizon → can take more volatility for more growth. Risk capacity (how long you can hold) + risk tolerance (how you sleep) both matter.</div>'
+   +'<div class="lp-say"><b>Diversification</b><br>Spread across stocks, ETFs, bonds, or crypto. Even 3 different asset types dramatically smooths your ride — one bad day can\'t sink everything.</div>'
+   +'<div class="lp-say"><b>Asset mix example</b><br>Age 25 starting point: 80% stocks / 20% bonds. Shift toward bonds as your goal nears. Rebalance back to target once a year.</div>'
+   +'<div class="lp-say"><b>Fees compound negatively</b><br>0.1% vs 1% MER on $10K over 30 yrs → $16K difference. Look for MER under 0.25% on broad index ETFs (XEQT, VEQT ≈ 0.20%).</div>'
+   +'<div class="lp-say" style="background:var(--card)"><b>Forecasts</b> · We show bear/base/bull ranges — never a single "prediction." Wider range = more uncertainty about the outcome.</div>'},
+  'Unit 4':{t:'Unit 4 · Canadian accounts',body:
+    '<div class="lp-say"><b>TFSA</b><br>Tax-free growth &amp; withdrawals. $7,000/yr room (2024). Room you withdraw comes back Jan 1 next year. Best first account for most Canadians.</div>'
+   +'<div class="lp-say"><b>RRSP</b><br>Contributions lower taxable income now (refund today). Pay tax when you withdraw in retirement at (usually) a lower rate. Convert to RRIF by 71.</div>'
+   +'<div class="lp-say"><b>TFSA vs RRSP rule of thumb</b><br>Income under ~$50K → TFSA first. Over ~$70K → RRSP deduction is worth more now. Between $50–70K → both are reasonable. Use both over time.</div>'
+   +'<div class="lp-say" style="background:var(--card)"><b>Priority ladder</b><br>1) Emergency fund · 2) High-interest debt · 3) Employer match · 4) TFSA / RRSP · 5) Taxable account</div>'},
+  'Unit 5':{t:'Unit 5 · Plan &amp; reach your goals',body:
+    '<div class="lp-say"><b>SMART goals</b><br>Specific · Measurable · Achievable · Relevant · Time-based. "Save $6,000 for Japan in 2 years" → $250/month automated.</div>'
+   +'<div class="lp-say"><b>Two buckets</b><br>Short-term (under 3 yrs) → HISA or GIC, safe &amp; liquid. Long-term (5+ yrs) → invest in a diversified portfolio, time absorbs the risk.</div>'
+   +'<div class="lp-say"><b>How much to invest</b><br>Start at 5–10% of take-home, automated on payday. Nudge it up 1% per raise. The habit &amp; consistency beat the amount.</div>'
+   +'<div class="lp-say" style="background:var(--card)"><b>Readiness checklist</b><br>✓ Emergency fund · ✓ High-interest debt gone · ✓ Clear goal with timeline · ✓ A mix you can hold through a dip → open a real TFSA &amp; start.</div>'}
+};
+function openUnitGuide(k){
+  var g=UNIT_GUIDES[k];if(!g)return;
+  openL('<div class="ls-tag">Quick reference 📖</div><h3 style="margin:4px 0 14px;font-size:16px;color:var(--text)">'+g.t+'</h3>'+g.body+'<button class="btn-sec" onclick="closeL()" style="width:100%;margin-top:18px">Got it ✓</button>');
+}
 function renderLearn(){
   var g=GOAL,gpct=Math.min(100,Math.round(g.saved/g.amt*100)),daily=Math.min(LEARN.dailyXP,50);
   var h='<div class="page-title">Learn</div>';
@@ -474,7 +548,7 @@ function renderLearn(){
   var L_states=lessonStates();
   learnUnits().forEach(function(u){
     var ud=unitDone(u),ua=unitActive(u,L_states);
-    h+='<div class="unit-head'+((!ud&&!ua)?' locked':'')+'" style="--acc:'+u.acc+'"><div class="unit-ic">'+(ud?lic('check'):(ua?lic('play'):lic('lock')))+'</div><div><div class="unit-k">'+u.k+'</div><div class="unit-t">'+u.t+'</div></div><button class="unit-gb" onclick="showToast(\'📖 Unit guidebook, coming soon\')">'+lic('book')+'</button></div>';
+    h+='<div class="unit-head'+((!ud&&!ua)?' locked':'')+'" style="--acc:'+u.acc+'"><div class="unit-ic">'+(ud?lic('check'):(ua?lic('play'):lic('lock')))+'</div><div><div class="unit-k">'+u.k+'</div><div class="unit-t">'+u.t+'</div></div><button class="unit-gb" onclick="openUnitGuide(\''+u.k+'\')">'+lic('book')+'</button></div>';
     h+=renderUnitPath(u,L_states);
   });
   h+='</div>';
@@ -521,10 +595,26 @@ function renderProfile(){
 
 /* ── Home: Question of the Day (daily bite-sized learning) ── */
 var QOTD=[
-  {q:'You invest <b>$100</b> and it grows about <b>8%</b> in a year. Roughly what\'s it worth?',opts:['$108','$180','$800'],correct:0,why:'8% of $100 is $8, so about $108. Small percentages snowball over many years; that\'s compounding.'},
-  {q:'Which of these usually <b>bounces around</b> the most in price?',opts:['A bond ETF','A big-company stock','A crypto coin'],correct:2,why:'Crypto is the bounciest, bigger ups and bigger downs. Bonds are the calmest of the three.'},
-  {q:'What does a <b>TFSA</b> let you do?',opts:['Grow money tax-free','Borrow at 0%','Guarantee profits'],correct:0,why:'A TFSA lets your investments grow, and come out, completely tax-free. Nothing guarantees profits.'},
-  {q:'Spreading money across different investments is called…',opts:['Chasing','Diversifying','Day-trading'],correct:1,why:'Diversifying, it softens the blow if any one thing drops. The closest thing to a free lunch in investing.'}
+  {q:'You invest <b>$100</b> and it grows about <b>8%</b> in a year. Roughly what\'s it worth?',opts:['$108','$180','$800'],correct:0,why:'8% of $100 is $8, so about $108. Small percentages snowball over many years — that\'s compounding.'},
+  {q:'Which of these usually <b>bounces around</b> the most in price?',opts:['A bond ETF','A big-company stock','A crypto coin'],correct:2,why:'Crypto is the bounciest — bigger ups and bigger downs. Bonds are the calmest of the three.'},
+  {q:'What does a <b>TFSA</b> let you do?',opts:['Grow money tax-free','Borrow at 0%','Guarantee profits'],correct:0,why:'A TFSA lets your investments grow and come out completely tax-free. Nothing guarantees profits.'},
+  {q:'Spreading money across different investments is called…',opts:['Chasing','Diversifying','Day-trading'],correct:1,why:'Diversifying — it softens the blow if any one thing drops. The closest thing to a free lunch in investing.'},
+  {q:'Your emergency fund should cover how many months of essential expenses?',opts:['1–2 weeks','3–6 months','10+ years'],correct:1,why:'3–6 months of essentials gives a real cushion — enough to handle job loss or a major repair without panic-selling investments.'},
+  {q:'$100 today at 3% inflation has roughly how much buying power in 10 years?',opts:['$134','About $74','Exactly $100'],correct:1,why:'At 3%/yr inflation, $100 loses about 26% of buying power in 10 years. Investing is how you fight the silent shrinkage.'},
+  {q:'Paying off a credit card charging <b>20%</b> is like earning a guaranteed __% return.',opts:['5%','20%','7%'],correct:1,why:'Exactly 20%. No mainstream investment reliably beats eliminating your highest interest rate.'},
+  {q:'An ETF is best described as:',opts:['A loan to a company','A basket of many stocks or bonds in one purchase','A single company\'s shares'],correct:1,why:'ETFs bundle hundreds of holdings, giving you instant diversification in one click — ideal for beginners.'},
+  {q:'<b>Dollar-cost averaging</b> means:',opts:['Buying only when prices drop','Investing a fixed amount on a regular schedule','Averaging costs across multiple brokers'],correct:1,why:'Regular fixed contributions remove the need to "time" the market. When prices fall, your money automatically buys more shares.'},
+  {q:'The S&P 500 has returned about how much per year on average, historically?',opts:['About 2%','About 10%','About 25%'],correct:1,why:'Roughly 10% nominal (or ~7% after inflation). Boring, broad, and reliable over decades.'},
+  {q:'You should build your emergency fund <i>before</i> investing mainly because:',opts:['Savings accounts pay more','A job loss could force you to sell investments at the worst time','Investing is only for the wealthy'],correct:1,why:'Without a safety net, any financial shock could force you to cash out investments at exactly the wrong moment.'},
+  {q:'What does <b>MER</b> stand for (on a fund)?',opts:['Minimum Entry Requirement','Management Expense Ratio','Market Earnings Rate'],correct:1,why:'MER (Management Expense Ratio) is the annual fee quietly deducted from the fund. Under 0.25% is excellent for index ETFs.'},
+  {q:'<b>Rebalancing</b> a portfolio means:',opts:['Selling everything and starting over','Adjusting holdings back to your target asset mix','Buying more of your best performers'],correct:1,why:'If stocks grow to 95% when you wanted 80%, you sell some and buy bonds to return to your target — keeping your risk level steady.'},
+  {q:'A <b>bond</b> in investing is:',opts:['A legal contract never to sell','A loan you make to a company or government that pays interest','A type of high-risk stock'],correct:1,why:'Bonds are loans. You lend money; they pay regular interest and return your principal at maturity. Calmer than stocks.'},
+  {q:'Short-term goal (under 2 years) — should the money be in stocks?',opts:['Yes — even short-term needs growth','No — markets can drop right when you need it','Yes, but only Canadian stocks'],correct:1,why:'Near-term money stays safe. Markets can fall 30%+ in a year. A savings account or short GIC is the right tool.'},
+  {q:'TFSA withdrawal room you use this year comes back:',opts:['Never — once used, it\'s gone','On January 1st of the following year','6 months after withdrawal'],correct:1,why:'One of the most misunderstood TFSA rules: the room you withdraw comes back the next calendar year, letting you re-contribute freely.'},
+  {q:'An <b>RRSP</b> is best used for:',opts:['Tax-free short-term savings','Long-term retirement savings with a tax deduction today','An emergency fund'],correct:1,why:'RRSP contributions reduce your taxable income now, and the money grows tax-sheltered until you withdraw in retirement at (usually) a lower rate.'},
+  {q:'Which strategy has historically beaten most active fund managers over 10+ years?',opts:['Picking individual stocks','Low-cost index fund investing','Switching funds frequently'],correct:1,why:'Index funds just track the market cheaply. After fees, most actively managed funds underperform the index over a decade.'},
+  {q:'$200/month invested for 30 years at 7%/yr grows to roughly:',opts:['$72,000','$243,000','$2,000,000'],correct:1,why:'About $243,000 — but you only contributed $72,000. The rest ($171K) is compounding at work. Time is the multiplier.'},
+  {q:'For most Canadian beginners, which account should be opened first?',opts:['A taxable brokerage account','A TFSA','An RRSP'],correct:1,why:'TFSA first for most: tax-free gains, withdraw anytime, no tax slip. Flexible, powerful, and perfect for learning to invest with real money.'}
 ];
 var qPick=0,qOpen=true,qDone=false,qChoice=-1;/* web: show the question's options inline — there's room */
 function renderQOTD(){

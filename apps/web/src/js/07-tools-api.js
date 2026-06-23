@@ -95,3 +95,5 @@ function closeTipBtn(){document.getElementById('sheetOv').classList.remove('open
 var tt;
 function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},2600);}
 
+onCalc();
+
