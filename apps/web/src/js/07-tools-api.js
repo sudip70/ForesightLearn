@@ -54,7 +54,7 @@ function loadForecast(t){
 }
 
 /* ── Compound calculator ─────────────────────── */
-function fv(m,yrs){var r=0.07/12,n=yrs*12;return m*((Math.pow(1+r,n)-1)/r);}
+function fv(m,yrs,annual){var r=(annual==null?0.07:annual)/12,n=yrs*12;return r===0?m*n:m*((Math.pow(1+r,n)-1)/r);}
 function onCalc(){
   var m=+document.getElementById('ccSlider').value;
   document.getElementById('ccAmt').textContent='$'+m;
