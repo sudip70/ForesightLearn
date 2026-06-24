@@ -21,6 +21,8 @@ var LOANS=[{id:'l_seed',name:'Student loan',balance:6000,monthly:75}];
 var SAVINGS={balance:0};
 
 function moneyUid(){return 'm'+Math.random().toString(36).slice(2,9);}
+/* Escape user-entered text before interpolating it into HTML (category, loan, note names). */
+function escHtml(s){return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function todayISO(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
 function thisMonth(){return todayISO().slice(0,7);}
 function numVal(v){var n=parseFloat((''+v).replace(/[^0-9.\-]/g,''));return isFinite(n)?n:0;}
@@ -228,14 +230,15 @@ function lpaRow(learn,practice,activate){
 /* ── inline graphics ── */
 function bankCardSVG(kind){
   var c=kind==='debit'?{a:'#4f9c7e',chip:'#dbeee6',t:'DEBIT'}:{a:'#565072',chip:'#e7e1f4',t:'CREDIT'};
+  var gid='cardSheen_'+kind;
   return '<svg viewBox="0 0 80 52" width="62" height="40" style="display:block;border-radius:8px;box-shadow:var(--shadow);flex-shrink:0">'
     +'<rect width="80" height="52" rx="8" fill="'+c.a+'"/>'
-    +'<rect width="80" height="52" rx="8" fill="url(#cardSheen)" opacity=".18"/>'
+    +'<rect width="80" height="52" rx="8" fill="url(#'+gid+')" opacity=".18"/>'
     +'<rect x="9" y="20" width="15" height="12" rx="2.5" fill="'+c.chip+'"/>'
     +'<path d="M9 26h15M16.5 20v12" stroke="'+c.a+'" stroke-width="1" opacity=".55"/>'
     +'<circle cx="62" cy="40" r="8" fill="rgba(255,255,255,.32)"/><circle cx="53" cy="40" r="8" fill="rgba(255,255,255,.2)"/>'
     +'<text x="9" y="46" font-size="6.5" font-weight="800" fill="rgba(255,255,255,.92)" font-family="\'Plus Jakarta Sans\',sans-serif" letter-spacing=".5">'+c.t+'</text>'
-    +'<defs><linearGradient id="cardSheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs></svg>';
+    +'<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs></svg>';
 }
 function loanSVG(){
   return '<svg viewBox="0 0 48 48" width="48" height="48" style="flex-shrink:0"><rect x="3" y="3" width="42" height="42" rx="12" fill="#f7d9ce"/>'
@@ -289,7 +292,7 @@ function acctDonut(){
   data.forEach(function(d,i){
     var a0=ang,a1=ang+(d.val/total)*2*Math.PI;ang=a1;
     var common='id="dnArc'+i+'" fill="none" stroke="'+d.color+'" stroke-width="'+sw+'" stroke-linecap="round" style="cursor:pointer;transition:opacity .15s" '
-      +'onmouseover="donutHover('+i+')" onmouseout="donutHover(-1)" onclick="donutPick(\''+d.name.replace(/'/g,"\\'")+'\')"';
+      +'onmouseover="donutHover('+i+')" onmouseout="donutHover(-1)" onclick="donutPick('+i+')"';
     if(data.length===1)svg+='<circle cx="65" cy="65" r="48" '+common+'/>';
     else svg+='<path d="'+arcPath(cx,cy,r,a0+gap/2,a1-gap/2)+'" '+common+'/>';
   });
@@ -297,8 +300,8 @@ function acctDonut(){
     +'<text id="dnSub" x="65" y="80" text-anchor="middle" font-size="9.5" font-weight="700" fill="#847f9c" font-family="\'Plus Jakarta Sans\',sans-serif">spent this month</text></svg>';
   var leg='<div class="donut-legend">';
   data.forEach(function(d,i){
-    leg+='<div class="dleg" id="dnLeg'+i+'" onmouseover="donutHover('+i+')" onmouseout="donutHover(-1)" onclick="donutPick(\''+d.name.replace(/'/g,"\\'")+'\')">'
-      +'<span class="dl-dot" style="background:'+d.color+'"></span><span class="dl-n">'+d.name+'</span>'
+    leg+='<div class="dleg" id="dnLeg'+i+'" onmouseover="donutHover('+i+')" onmouseout="donutHover(-1)" onclick="donutPick('+i+')">'
+      +'<span class="dl-dot" style="background:'+d.color+'"></span><span class="dl-n">'+escHtml(d.name)+'</span>'
       +'<span class="dl-v tnum">'+money0(d.val)+'</span></div>';
   });
   return '<div class="donut-wrap">'+svg+leg+'</div></div>';
@@ -313,7 +316,8 @@ function donutHover(i){
     var l=document.getElementById('dnLeg'+k);if(l)l.style.background=(k===i)?'var(--surface-soft)':'';
   });
 }
-function donutPick(name){
+function donutPick(i){
+  var d=DONUT[i];if(!d)return;var name=d.name;
   acctCat=name;var sel=document.getElementById('axCat');if(sel)sel.value=name;
   var amt=document.getElementById('axAmt');if(amt)amt.focus();
   showToast('Logging to '+name+' — enter an amount');
@@ -343,7 +347,7 @@ function renderAcctSpend(){
     +'<div class="row" style="margin-bottom:12px"><div class="ac-name" style="margin:0">🧾 Log spending</div><span class="pill pill-pur">'+money0(monthTotal())+' this month</span></div>'
     +'<div class="logrow">'
     +'<input class="f-in" id="axAmt" inputmode="decimal" placeholder="Amount" style="margin:0" onkeydown="if(event.key===\'Enter\')addAcctExpense()"/>'
-    +'<select class="f-in" id="axCat" style="margin:0" onchange="acctCat=this.value">'+cats.map(function(c){return '<option'+(c===acctCat?' selected':'')+'>'+c+'</option>';}).join('')+'</select>'
+    +'<select class="f-in" id="axCat" style="margin:0" onchange="acctCat=this.value">'+cats.map(function(c){return '<option'+(c===acctCat?' selected':'')+'>'+escHtml(c)+'</option>';}).join('')+'</select>'
     +'<select class="f-in" id="axPay" style="margin:0" onchange="acctPay=this.value">'+['Debit card','Credit card','Cash'].map(function(p){return '<option'+(p===acctPay?' selected':'')+'>'+p+'</option>';}).join('')+'</select>'
     +'<button class="btn btn-pur" style="width:auto;flex:0 0 auto;padding:10px 18px" onclick="addAcctExpense()">Add</button></div>';
   /* live breakdown: interactive donut of this month's spending */
@@ -352,8 +356,8 @@ function renderAcctSpend(){
   if(recent.length){
     h+='<div style="margin-top:15px"><div class="card-t" style="margin-bottom:9px">Recent</div>';
     recent.forEach(function(s){
-      h+='<div class="lrow"><div style="min-width:0"><div class="l-n">'+(s.note||s.category)+'</div>'
-        +'<div class="l-s">'+s.category+(s.acct?' · '+s.acct:'')+' · '+(s.date||'')+'</div></div>'
+      h+='<div class="lrow"><div style="min-width:0"><div class="l-n">'+escHtml(s.note||s.category)+'</div>'
+        +'<div class="l-s">'+escHtml(s.category)+(s.acct?' · '+escHtml(s.acct):'')+' · '+(s.date||'')+'</div></div>'
         +'<div style="display:flex;align-items:center;gap:10px"><div class="l-p tnum down">-'+money0(s.amount)+'</div>'
         +'<button class="acct-q" style="width:28px;height:28px;font-size:14px;border-color:var(--line)" title="Delete" onclick="delAcctExpense(\''+s.id+'\')">✕</button></div></div>';
     });
@@ -387,7 +391,7 @@ function renderAcctLoans(){
     +'<div><div class="ac-name" style="margin:0">Loan Accounts</div>'+(mo>0?'<div class="ac-note" style="margin-top:2px">'+money0(mo)+'/mo in payments</div>':'')+'</div></div>'
     +'<div style="display:flex;align-items:center;gap:9px"><span class="pill pill-red">owe '+money0(owe)+'</span>'+helpDot('loan_acct')+'</div></div>';
   LOANS.forEach(function(l,i){
-    h+='<div class="cat-row"><div class="cat-top"><span class="cat-n">'+l.name+'</span>'
+    h+='<div class="cat-row"><div class="cat-top"><span class="cat-n">'+escHtml(l.name)+'</span>'
       +'<span class="cat-v over">'+money0(l.balance)+(numVal(l.monthly)>0?' · '+money0(l.monthly)+'/mo':'')+'</span></div>'
       +'<div class="cat-add">'+moneyInput('lpay'+i,null,'Payment')
       +'<button class="btn btn-soft" onclick="payLoan('+i+')">Pay</button>'
