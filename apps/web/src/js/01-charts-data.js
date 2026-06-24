@@ -31,7 +31,13 @@ var GLOSS={
   concentration:{t:'Concentration',d:'How much of your money sits in one place, one holding or one sector. High concentration means one bad move hits you hard.'},
   position_sizing:{t:'Position sizing',d:'Deciding how much to put into one holding. A common guardrail: keep any single position under about 25% of your money.'},
   uncertainty:{t:'Why a range, not a number',d:'Nobody can predict a price. A range shows the outcomes that are realistically plausible, and honestly reminds you the future isn\'t knowable.'},
-  bouncy:{t:'Bounciness (volatility)',d:'How much a price swings around. Bouncier investments can grow faster, but they can also drop harder.'}
+  bouncy:{t:'Bounciness (volatility)',d:'How much a price swings around. Bouncier investments can grow faster, but they can also drop harder.'},
+  bank_account:{t:'Bank account',d:'A safe place a bank holds your money. A chequing account is for day-to-day spending (debit, bills, e-transfers); a savings account is for money you want to set aside and grow. Most banks let you open one for free, often online in minutes.'},
+  debit_card:{t:'Debit card',d:'A card tied to your chequing account. When you tap or swipe it, the money comes straight out of your own balance, no borrowing, no interest. It can only spend what you actually have.'},
+  credit_card:{t:'Credit card',d:'A card that lets you borrow from the bank to pay now and settle later. Pay the full balance each month and it costs nothing, and builds your credit score. Carry a balance and you pay high interest. A powerful tool used carefully.'},
+  loan_acct:{t:'Loan',d:'Money you borrow and pay back over time, usually with interest. Student loans, car loans and lines of credit are common kinds. The key questions: how much interest, and how long to repay?'},
+  savings_acct:{t:'Savings account',d:'A bank account built for setting money aside. It pays a little interest and keeps your savings separate from spending, so it is easier to grow an emergency fund or save toward a goal.'},
+  investing_acct:{t:'Investing account',d:'An account (like a TFSA or RRSP) you use to buy investments such as stocks, ETFs and bonds. Over years your money can grow far faster than in a savings account, in exchange for some ups and downs along the way.'}
 };
 var FC={
   AAPL:{bear:['$162','-11%'],base:['$196','+8%'],bull:['$218','+20%']},
