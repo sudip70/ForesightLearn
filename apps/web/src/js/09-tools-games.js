@@ -1009,8 +1009,24 @@ function igWheelLegend(){
     .map(function(x){return '<div class="dleg"><span class="dl-dot" style="background:'+x[2]+'"></span><span class="dl-n">'+x[0]+'</span><span class="dl-v tnum">'+money0(e*x[1])+'</span></div>';}).join('');
 }
 function igSegs(){var b=igBuckets();return [{v:b.spend,c:IG_PAL.spend},{v:b.save,c:IG_PAL.save},{v:b.share,c:IG_PAL.share},{v:b.invest,c:IG_PAL.invest}];}
+/* Softer donut than miniDonut: thicker ring, rounded segment caps with small
+ * gaps, two-line centre. Reuses the global arcPath() helper. */
+function igDonut(segs,size,top,sub){
+  size=size||150;var cx=65,cy=65,r=49,sw=17,gap=0.07,ang=-Math.PI/2;
+  var tot=0;segs.forEach(function(g){tot+=Math.max(0,g.v);});if(tot<=0)tot=1;
+  var vis=segs.filter(function(g){return g.v>0;});
+  var s='<circle cx="65" cy="65" r="'+r+'" fill="none" stroke="#f0edfa" stroke-width="'+sw+'"/>';
+  vis.forEach(function(g){
+    var a0=ang,a1=ang+(g.v/tot)*2*Math.PI;ang=a1;var pad=vis.length>1?gap/2:0;
+    if(vis.length===1)s+='<circle cx="65" cy="65" r="'+r+'" fill="none" stroke="'+g.c+'" stroke-width="'+sw+'"/>';
+    else s+='<path d="'+arcPath(cx,cy,r,a0+pad,a1-pad)+'" fill="none" stroke="'+g.c+'" stroke-width="'+sw+'" stroke-linecap="round"/>';
+  });
+  s+='<text x="65" y="62" text-anchor="middle" font-size="21" font-weight="800" fill="#322e44" font-family="\'Plus Jakarta Sans\',sans-serif">'+top+'</text>'
+    +'<text x="65" y="80" text-anchor="middle" font-size="9.5" font-weight="700" fill="#9a93b3" font-family="\'Plus Jakarta Sans\',sans-serif">'+(sub||'')+'</text>';
+  return '<svg viewBox="0 0 130 130" width="'+size+'" height="'+size+'" style="display:block;flex:0 0 auto">'+s+'</svg>';
+}
 function igBudgetWheel(){
-  return '<div class="donut-wrap" style="margin-top:4px">'+miniDonut(igSegs(),150,money0(IG.earn),'per month')+'<div class="donut-legend">'+igWheelLegend()+'</div></div>';
+  return '<div class="donut-wrap" style="margin-top:4px">'+igDonut(igSegs(),150,money0(IG.earn),'per month')+'<div class="donut-legend">'+igWheelLegend()+'</div></div>';
 }
 function igSetEarn(v){IG.earn=numVal(v);var w=document.getElementById('igWheel');if(w)w.innerHTML=igBudgetWheel();}
 
@@ -1024,7 +1040,7 @@ function igInvest(){
     +'<div class="muted-note" style="text-align:left">Investing is just a slice of what you earn — the rest still covers spending, saving and giving.</div></div>'+igNav(true);
 }
 function igInvestWheel(){
-  return '<div class="donut-wrap" style="margin-top:4px">'+miniDonut(igSegs(),150,IG.investPct+'%','invested')
+  return '<div class="donut-wrap" style="margin-top:4px">'+igDonut(igSegs(),150,IG.investPct+'%','invested')
     +'<div class="donut-legend"><div class="dleg"><span class="dl-dot" style="background:'+IG_PAL.invest+'"></span><span class="dl-n">Invest / month</span><span class="dl-v tnum">'+money0(IG.earn*IG.investPct/100)+'</span></div>'
     +'<div class="dleg"><span class="dl-n" style="color:var(--muted)">of '+money0(IG.earn)+' earned</span></div></div></div>';
 }
