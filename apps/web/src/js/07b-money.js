@@ -18,7 +18,9 @@ var NETWORTH={assets:[{name:'Savings account',value:4200},{name:'Chequing',value
               debts:[{name:'Student loan',value:6000},{name:'Credit card',value:450}]};
 /* My Accounts ledgers (recorded from the My Accounts screen) */
 var LOANS=[{id:'l_seed',name:'Student loan',balance:6000,monthly:75}];
-var SAVINGS={balance:0};
+/* Mirrors the "Savings account" asset in NETWORTH so the My Accounts hub and
+   Net Worth screens show the same savings balance on load. */
+var SAVINGS={balance:4200};
 
 function moneyUid(){return 'm'+Math.random().toString(36).slice(2,9);}
 /* Escape user-entered text before interpolating it into HTML (category, loan, note names). */

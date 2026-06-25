@@ -205,7 +205,7 @@ function renderPortfolioChart(){
   });
   var lab=document.getElementById('pfRangeChg');if(!lab)return;
   if(win.length>=2&&win[0].date){var a=win[0].total,b=win[win.length-1].total,d=b-a,pct=a?d/a*100:0;
-    lab.innerHTML='· <span class="'+(d>=0?'up':'down')+'">'+(d>=0?'+':'-')+'$'+Math.abs(d).toFixed(2)+' ('+(d>=0?'+':'')+pct.toFixed(2)+'%)</span> '+rangeName(pfRange);
-  }else lab.textContent='· '+rangeName(pfRange);
+    lab.innerHTML='<span class="'+(d>=0?'up':'down')+'">'+(d>=0?'+':'-')+'$'+Math.abs(d).toFixed(2)+' ('+(d>=0?'+':'')+pct.toFixed(2)+'%)</span> '+rangeName(pfRange);
+  }else lab.textContent=rangeName(pfRange);
 }
 

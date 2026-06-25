@@ -762,7 +762,7 @@ function loanOutHTML(s){
       +'<div class="cs"><label>Total interest</label><b class="tnum" style="color:var(--red)">'+money0(interest)+'</b></div>'
       +'<div class="cs"><label>Total cost</label><b class="tnum">'+money0(totalCost)+'</b></div></div>'
     +'<div class="split-bar"><div class="sb-p" style="width:'+(100-iPct)+'%"></div><div class="sb-i" style="width:'+iPct+'%"></div></div>'
-    +'<div class="split-key"><span><i class="dot-p"></i>Principal</span><span><i class="dot-i"></i>Interest '+iPct+'%</span></div>';
+    +'<div class="split-key"><span><i class="dot-p"></i>Principal</span><span><i class="dot-i"></i>Interest '+iPct+'% of cost</span></div>';
 }
 /* Live slider handler: refresh only the output + value labels, leave inputs be. */
 function loanInput(){
@@ -952,7 +952,7 @@ var IG={},igTimer=null;
 
 function initInvestGame(){
   if(igTimer){clearInterval(igTimer);igTimer=null;}
-  IG={step:0,charKey:'adult',custom:false,earn:4170,investPct:15,investAmt:0,typeIdx:1,risk:45,years:20,series:[],result:null};
+  IG={step:0,charKey:'adult',custom:false,earn:4170,investPct:15,investAmt:0,typeIdx:1,risk:45,years:20,result:null};
   igRender();
 }
 function igRender(){
@@ -1041,7 +1041,7 @@ function igInvest(){
 }
 function igInvestWheel(){
   return '<div class="donut-wrap" style="margin-top:4px">'+igDonut(igSegs(),150,IG.investPct+'%','invested')
-    +'<div class="donut-legend"><div class="dleg"><span class="dl-dot" style="background:'+IG_PAL.invest+'"></span><span class="dl-n">Invest / month</span><span class="dl-v tnum">'+money0(IG.earn*IG.investPct/100)+'</span></div>'
+    +'<div class="donut-legend"><div class="dleg"><span class="dl-dot" style="background:'+IG_PAL.invest+'"></span><span class="dl-n">Invest / month</span><span class="dl-v tnum">'+money0(igInvestMonthly())+'</span></div>'
     +'<div class="dleg"><span class="dl-n" style="color:var(--muted)">of '+money0(IG.earn)+' earned</span></div></div></div>';
 }
 function igSetInvest(v){IG.investPct=numVal(v);var w=document.getElementById('igWheel2');if(w)w.innerHTML=igInvestWheel();}
@@ -1063,8 +1063,12 @@ function igType(){
     +'<input type="range" min="0" max="100" value="'+IG.risk+'" oninput="igSetRisk(this.value)"/>'
     +'<div class="row" style="margin-top:8px"><div><div class="muted-note" style="margin:0;text-align:left">Typical return</div><div class="tnum" id="igRet" style="font-size:21px;font-weight:800;color:var(--purple-deep)">'+Math.round(igExpReturn()*100)+'%/yr</div></div>'
     +'<div style="text-align:right"><div class="muted-note" style="margin:0">Yearly swing</div><div class="tnum" id="igVol" style="font-size:21px;font-weight:800;color:var(--ink)">±'+Math.round(igVolPct()*100)+'%</div></div></div></div>'
+    +'<div class="card"><div class="card-t">How long do you invest?</div>'
+    +'<div class="chip-row">'+[5,10,20,30,40].map(function(y){return '<div class="calc-chip'+(IG.years===y?' on':'')+'" onclick="igSetYears('+y+')">'+y+' yr</div>';}).join('')+'</div>'
+    +'<div class="muted-note" style="text-align:left;margin-top:8px">The longer you stay invested, the more compounding works for you — time in the market beats timing it.</div></div>'
     +igNav(true,'Simulate ▶');
 }
+function igSetYears(y){IG.years=y;igRender();}
 function igTypeStep(d){IG.typeIdx=(IG.typeIdx+d+IG_TYPES.length)%IG_TYPES.length;igRender();}
 function igDrawRisk(){var g=document.getElementById('igGauge');if(g)g.innerHTML=gaugeChart(IG.risk/100);}
 function igSetRisk(v){
@@ -1090,8 +1094,9 @@ function igYearReturn(){
   var r=Math.exp(mu+s*gauss())-1;return r<-0.85?-0.85:r;
 }
 function igShareMonthly(){return IG.earn*igBuckets().share;}
+function igInvestMonthly(){return IG.earn*IG.investPct/100;}
 function igBuildDraws(){
-  IG.investAmt=IG.earn*IG.investPct/100;
+  IG.investAmt=igInvestMonthly();
   IG.draws=[];for(var y=0;y<IG.years;y++)IG.draws.push(igYearReturn());
   IG.events={};
   if(IG.charKey==='grad'||IG.charKey==='adult')IG.events.raise=4+Math.floor(Math.random()*7);   /* a raise mid-career */
@@ -1161,18 +1166,18 @@ function igSkip(){
 }
 /* counterfactual: same draws/events but fully invested the whole way (what holding would've yielded) */
 function igHoldPath(){
-  var bal=0,inv=IG.earn*IG.investPct/100,ev=IG.events;
+  var bal=0,inv=igInvestMonthly(),ev=IG.events;
   for(var y=1;y<=IG.years;y++){if(ev.raise===y)inv=Math.round(inv*1.25);var c=(ev.skip===y)?0:inv;bal=Math.max(0,bal*(1+IG.draws[y-1])+c*12);}
   return bal;
 }
 function igSavingsPath(){
-  var bal=0,inv=IG.earn*IG.investPct/100,ev=IG.events;
+  var bal=0,inv=igInvestMonthly(),ev=IG.events;
   for(var y=1;y<=IG.years;y++){if(ev.raise===y)inv=Math.round(inv*1.25);var c=(ev.skip===y)?0:inv;bal=bal*1.02+c*12;}
   return bal;
 }
 /* run N independent paths of the SAME plan to get the range of outcomes (cone + percentiles) */
 function igRunPaths(n){
-  var years=IG.years,ev=IG.events,base=IG.earn*IG.investPct/100,byYear=[],finals=[],y;
+  var years=IG.years,ev=IG.events,base=igInvestMonthly(),byYear=[],finals=[],y;
   for(y=0;y<=years;y++)byYear.push([]);
   for(var k=0;k<n;k++){
     var bal=0,inv=base;byYear[0].push(0);
@@ -1226,7 +1231,7 @@ function igResult(){
   var r=IG.result;
   var debrief = r.panic ? 'Selling to cash cost you about <b>'+money0(Math.max(0,r.hold-r.end))+'</b> vs holding.'
     : (r.boughtDip ? 'Buying the dip helped you finish above the typical outcome.'
-    : 'Your run landed at the <b>'+r.pct+'th percentile</b> of where this plan could end up.');
+    : 'Replay the same plan and it can land very differently — the shaded band shows how wide that range is.');
   return igHeader()
     +'<div class="hero" style="background:linear-gradient(140deg,#6f659a,#9084b4)"><div class="ig-grade">'+r.grade+'</div>'
     +'<div class="hero-l">After '+IG.years+' years</div><div class="hero-v tnum">'+money0(r.end)+'</div>'
@@ -1237,7 +1242,7 @@ function igResult(){
     +'<div class="row"><span class="dleg" style="padding:0"><span class="dl-n" style="color:var(--muted)">Likely range (10–90%)</span></span><span class="tnum" style="font-weight:700;color:var(--muted)">'+money0(r.p10)+' – '+money0(r.p90)+'</span></div>'
     +'<div class="row"><span class="dleg" style="padding:0"><span class="dl-dot" style="background:#a59c92"></span><span class="dl-n">All savings (2%)</span></span><span class="tnum" style="font-weight:700;color:var(--muted)">'+money0(r.savings)+'</span></div>'
     +'<div class="muted-note" style="text-align:left;margin-top:8px">'+debrief+'</div></div>'
-    +(r.donated>0?'<div class="card" style="display:flex;align-items:center;gap:11px"><div style="font-size:24px">💛</div><div><div class="ac-name" style="margin:0;font-size:14px">You gave '+money0(r.donated)+'</div><div class="ac-note">to causes you care about, from your Share bucket — investing and giving aren\'t either/or.</div></div></div>':'')
+    +(r.donated>0?'<div class="card" style="display:flex;align-items:center;gap:11px"><div style="font-size:24px">💛</div><div><div class="ac-name" style="margin:0;font-size:14px">You gave '+money0(igShareMonthly())+' a month</div><div class="ac-note">to causes you care about, from your Share bucket — investing and giving aren\'t either/or.</div></div></div>':'')
     +miaSays(igLesson())
     +'<div class="row" style="gap:10px"><button class="btn btn-ghost" style="flex:1" onclick="initInvestGame()">New game</button><button class="btn btn-pur" style="flex:1.4" onclick="igAgain()">Play again ↻</button></div>';
 }

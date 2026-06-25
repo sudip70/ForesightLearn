@@ -543,7 +543,7 @@ function renderLearn(){
   h+='<div class="learn-trail">';
   h+='<div class="dstrip"><div class="dstat"><span>🔥</span><div><div class="ds-v">'+LEARN.streak+'</div><div class="ds-k">day streak</div></div></div>'
     +'<div class="dstat">'+lring(daily,50)+'<div><div class="ds-v">'+daily+'/50</div><div class="ds-k">daily goal</div></div></div>'
-    +'<div class="dstat"><span>⭐</span><div><div class="ds-v">'+LEARN.xp+'</div><div class="ds-k">XP</div></div></div></div>';
+    +'<div class="dstat"><span>⭐</span><div><div class="ds-v">'+totalXP().toLocaleString()+'</div><div class="ds-k">XP</div></div></div></div>';
   h+=miaGuide();
   var L_states=lessonStates();
   learnUnits().forEach(function(u){
@@ -579,7 +579,7 @@ var BADGES=[
 ];
 function renderProfile(){
   var lv=document.getElementById('pfLevel');if(lv)lv.textContent='Level '+LEARN.level+' · '+tierName(LEARN.level);
-  var xe=document.getElementById('pfLevelXP');if(xe)xe.textContent=LEARN.xp+' XP · '+Math.max(0,LEARN.xpToNext-LEARN.xp)+' to Level '+(LEARN.level+1);
+  var xe=document.getElementById('pfLevelXP');if(xe)xe.textContent=totalXP().toLocaleString()+' XP · '+Math.max(0,LEARN.xpToNext-LEARN.xp)+' to Level '+(LEARN.level+1);
   var bar=document.getElementById('pfLevelBar');if(bar)bar.style.width=Math.min(100,Math.round(LEARN.xp/LEARN.xpToNext*100))+'%';
   var rows=PEERS.map(function(p){return {n:p.n,av:p.av,xp:p.xp,me:false};});
   rows.push({n:'You',av:'__ME__',xp:totalXP(),me:true});
