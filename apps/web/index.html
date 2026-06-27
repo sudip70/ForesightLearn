@@ -149,6 +149,9 @@
       <button class="nav-btn" data-tab="tools" onclick="goTab('tools')">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Tools</span>
       </button>
+      <button class="nav-btn" data-tab="accounts" onclick="goTab('accounts')">
+        <svg viewBox="0 0 24 24"><path d="M3 7V6a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M16 12.5h4v3h-4a1.5 1.5 0 0 1 0-3z"/></svg><span>Accounts</span>
+      </button>
       <button class="nav-btn" data-tab="social" onclick="goTab('social')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profile</span>
       </button>
@@ -526,12 +529,6 @@
             <div class="bar" style="background:rgba(255,255,255,.25);margin-top:12px"><div class="bar-fill" id="pfLevelBar" style="width:68%;background:#fff"></div></div>
           </div>
 
-          <div class="menu-card mc-tools" onclick="push('accounts')">
-            <div class="mc-ico">💼</div>
-            <div class="mc-b"><div class="mc-t">My Accounts</div><div class="mc-d">Spending, saving & investing accounts, learn what each one does</div></div>
-            <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-          </div>
-
           <div class="card">
             <div class="card-t">Community · weekly leaderboard</div>
             <div class="ls-sub" style="margin:-2px 0 8px">Ranked by what you've learned, not by who took the biggest risk.</div>
@@ -570,6 +567,32 @@
   <div class="sheet"><div class="sheet-grip"></div><div id="lsheetInner"></div></div>
 </div>
 
+<!-- Mia coach — floating launcher + chat panel (all in-app pages) -->
+<button class="coach-fab hidden" id="coachFab" onclick="openCoach()" aria-label="Ask Mia, your money coach">
+  <div class="face">__AV__</div>
+  <span class="coach-fab-dot"></span>
+</button>
+<div class="coach-ov" id="coachOv" onclick="closeCoach(event)">
+  <div class="coach-panel">
+    <div class="coach-head">
+      <div class="face">__AV__</div>
+      <div class="coach-head-t"><div class="coach-name">Mia</div><div class="coach-role">your money coach</div></div>
+      <button class="coach-reset" onclick="coachReset(this)" aria-label="Reset chat" title="Reset chat">
+        <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-.9 4.5"/><polyline points="20 4 20 11 13 11"/></svg>
+      </button>
+      <button class="coach-x" onclick="closeCoachBtn()" aria-label="Close">&times;</button>
+    </div>
+    <div class="coach-log" id="coachLog"></div>
+    <div class="coach-chips" id="coachChips"></div>
+    <div class="coach-input">
+      <input id="coachInput" type="text" placeholder="Ask Mia about money…" autocomplete="off" onkeydown="coachKey(event)">
+      <button class="coach-send" onclick="coachSend()" aria-label="Send">
+        <svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-7-7-1z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 <!--BUILD:SCRIPTS-->
 <script src="src/js/01-charts-data.js"></script>
@@ -582,6 +605,7 @@
 <script src="src/js/07b-money.js"></script>
 <script src="src/js/08-learn-init.js"></script>
 <script src="src/js/09-tools-games.js"></script>
+<script src="src/js/10-coach-chat.js"></script>
 <!--/BUILD:SCRIPTS-->
 </body>
 </html>
