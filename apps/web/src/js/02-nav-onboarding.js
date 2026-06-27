@@ -1,8 +1,8 @@
 /* ── Navigation ──────────────────────────────── */
-var TAB_OF={home:'home',learn:'learn',tools:'tools',social:'social',journey:'journey',scenario:'journey',risk:'tools',stockfinder:'tools',budget:'home',goals:'home',spending:'home',networth:'home',accounts:'social',
-  'loan-calc':'tools','mortgage-calc':'tools','game-swipe':'tools','game-wnb':'tools','game-scam':'tools','game-wordle':'tools','game-xword':'tools','game-quiz':'tools','game-hangman':'tools'};
+var TAB_OF={home:'home',learn:'learn',tools:'tools',social:'social',journey:'journey',scenario:'journey',risk:'tools',stockfinder:'tools',budget:'home',goals:'home',spending:'home',networth:'home',accounts:'accounts',
+  'loan-calc':'tools','mortgage-calc':'tools','game-swipe':'tools','game-wnb':'tools','game-scam':'tools','game-wordle':'tools','game-xword':'tools','game-quiz':'tools','game-hangman':'tools','game-invest':'tools'};
 var TITLES={home:"Fiscally",learn:'Learn',tools:'Tools',social:'Profile',journey:'Practice',scenario:'Scenarios',risk:'Risk Level',stockfinder:'Stock Finder',budget:'Budget',goals:'Savings Goals',spending:'Spending',networth:'Net Worth',accounts:'My Accounts',
-  'loan-calc':'Loan Calculator','mortgage-calc':'Mortgage Calculator','game-swipe':'Budget Swipe','game-wnb':'Wants vs Needs','game-scam':'Scammer Scanner','game-wordle':'Finance Wordle','game-xword':'Finance Crossword','game-quiz':'Quick Count','game-hangman':"Debtor's Tower"};
+  'loan-calc':'Loan Calculator','mortgage-calc':'Mortgage Calculator','game-swipe':'Budget Swipe','game-wnb':'Wants vs Needs','game-scam':'Scammer Scanner','game-wordle':'Finance Wordle','game-xword':'Finance Crossword','game-quiz':'Quick Count','game-hangman':"Debtor's Tower",'game-invest':'Invest Game'};
 var stack=['home'];
 function show(id){
   closeL();closeTipBtn();/* never leave a lesson/term sheet floating over a new tab */
@@ -27,9 +27,10 @@ function show(id){
   if(id==='game-xword')initCrossword();
   if(id==='game-quiz')initQuickCount();
   if(id==='game-hangman')initHangman();
+  if(id==='game-invest')initInvestGame();
   var tab=TAB_OF[id];
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});
-  var isSub=['scenario','risk','stockfinder','budget','goals','spending','networth','accounts','loan-calc','mortgage-calc','game-swipe','game-wnb','game-scam','game-wordle','game-xword','game-quiz','game-hangman'].indexOf(id)>=0;
+  var isSub=['scenario','risk','stockfinder','budget','goals','spending','networth','loan-calc','mortgage-calc','game-swipe','game-wnb','game-scam','game-wordle','game-xword','game-quiz','game-hangman','game-invest'].indexOf(id)>=0;
   document.getElementById('hBack').classList.toggle('show',isSub);
   document.getElementById('hTitle').innerHTML=isSub?TITLES[id]:"Let's <b>Invest</b>".replace('Invest',TITLES[id]==="Let's Invest"?'Invest':TITLES[id]);
   document.getElementById('hTitle').innerHTML = isSub ? TITLES[id] : (id==='home'?"Home":TITLES[id]);
@@ -62,7 +63,7 @@ function startWelcome(){
   w.style.transition='opacity .4s ease';w.style.opacity='0';
   setTimeout(function(){w.classList.add('hidden');w.style.opacity='';w.style.transition='';},400);
 }
-function restartOnboarding(){obStep=1;renderOB();document.getElementById('welcome').classList.remove('hidden');document.getElementById('onboarding').classList.remove('hidden');document.getElementById('appHeader').classList.add('hidden');document.getElementById('appNav').classList.add('hidden');}
+function restartOnboarding(){obStep=1;renderOB();document.getElementById('welcome').classList.remove('hidden');document.getElementById('onboarding').classList.remove('hidden');document.getElementById('appHeader').classList.add('hidden');document.getElementById('appNav').classList.add('hidden');document.getElementById('coachFab').classList.add('hidden');closeCoachBtn();}
 function pickExp(el,v){document.querySelectorAll('.exp-card').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');}
 function pickWhy(el){document.querySelectorAll('.why').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');}
 function onPct(v){

@@ -149,6 +149,9 @@
       <button class="nav-btn" data-tab="tools" onclick="goTab('tools')">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Tools</span>
       </button>
+      <button class="nav-btn" data-tab="accounts" onclick="goTab('accounts')">
+        <svg viewBox="0 0 24 24"><path d="M3 7V6a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M16 12.5h4v3h-4a1.5 1.5 0 0 1 0-3z"/></svg><span>Accounts</span>
+      </button>
       <button class="nav-btn" data-tab="social" onclick="goTab('social')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profile</span>
       </button>
@@ -251,7 +254,7 @@
           </div>
 
           <div class="card">
-            <div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">Portfolio value <span id="pfRangeChg" style="font-size:12px;font-weight:700;color:var(--muted)"></span></div><span class="pill pill-gry" id="pfPxSrc">Sample prices</span></div>
+            <div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">Portfolio value <span id="pfRangeChg" style="display:block;margin-top:3px;font-size:12px;font-weight:700;color:var(--muted);text-transform:none;letter-spacing:.2px"></span></div><span class="pill pill-gry" id="pfPxSrc">Sample prices</span></div>
             <div id="journeyChart"></div>
             <div style="display:flex;gap:6px;margin-top:11px">
               <button class="rt" onclick="setRange('1D',this)">1D</button>
@@ -420,9 +423,12 @@
           <div class="gt-txt"><div class="gt-t big">Quick Count</div><div class="gt-d">Beat the clock at money math.</div><div class="gt-meta">8 questions · 15s each</div></div>
           <div class="gt-graphic"><svg viewBox="0 0 64 64" width="64" height="64"><rect x="4" y="4" width="56" height="56" rx="13" fill="#fff"/><text x="19" y="31" font-size="20" font-weight="800" fill="#c19a34" font-family="'Plus Jakarta Sans',sans-serif">1</text><text x="40" y="31" font-size="20" font-weight="800" fill="#cf5a40" font-family="'Plus Jakarta Sans',sans-serif">2</text><text x="29" y="53" font-size="20" font-weight="800" fill="#4f9c7e" font-family="'Plus Jakarta Sans',sans-serif">3</text></svg></div></div>
 
-        <div class="game-tile wide" style="--bg:#fce8ec" onclick="push('game-hangman')">
-          <div class="gt-txt"><div class="gt-t big">Debtor's Tower</div><div class="gt-d">Guess the money word before the tower falls.</div><div class="gt-meta">Hangman · learn a term each round</div></div>
-          <div class="gt-graphic"><svg viewBox="0 0 64 64" width="64" height="64"><rect x="20" y="8" width="24" height="9" rx="2" fill="#cf5a40" transform="rotate(7 32 12)" opacity=".55"/><rect x="20" y="20" width="24" height="9" rx="2" fill="#c19a34"/><rect x="20" y="31" width="24" height="9" rx="2" fill="#4f9c7e"/><rect x="20" y="42" width="24" height="9" rx="2" fill="#4f9c7e"/><rect x="16" y="53" width="32" height="8" rx="2" fill="#565072"/></svg></div></div>
+        <div class="game-tile" style="--bg:#fce8ec" onclick="push('game-hangman')">
+          <div class="gt-ico"><svg viewBox="0 0 64 64"><rect x="20" y="8" width="24" height="9" rx="2" fill="#cf5a40" transform="rotate(7 32 12)" opacity=".55"/><rect x="20" y="20" width="24" height="9" rx="2" fill="#c19a34"/><rect x="20" y="31" width="24" height="9" rx="2" fill="#4f9c7e"/><rect x="20" y="42" width="24" height="9" rx="2" fill="#4f9c7e"/><rect x="16" y="53" width="32" height="8" rx="2" fill="#565072"/></svg></div>
+          <div class="gt-txt"><div class="gt-t">Debtor's Tower</div><div class="gt-d">Guess before the tower falls</div></div></div>
+        <div class="game-tile" style="--bg:#e7e1f4" onclick="push('game-invest')">
+          <div class="gt-ico"><svg viewBox="0 0 64 64"><rect x="13" y="40" width="8" height="14" rx="2" fill="#9084b4"/><rect x="28" y="31" width="8" height="23" rx="2" fill="#7a6ea8"/><rect x="43" y="20" width="8" height="34" rx="2" fill="#6f659a"/><path d="M14 34l12-9 8 6 14-14" stroke="#4f9c7e" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M44 17h6v6" stroke="#4f9c7e" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="gt-txt"><div class="gt-t">Invest Game</div><div class="gt-d">Simulate your financial future</div></div></div>
       </div>
 
       <div class="section-t" style="margin-top:22px">Financial Tools</div>
@@ -507,6 +513,7 @@
     <div class="page" id="page-game-xword"><div id="xwordBody"></div></div>
     <div class="page" id="page-game-quiz"><div id="qcBody"></div></div>
     <div class="page" id="page-game-hangman"><div id="hmBody"></div></div>
+    <div class="page" id="page-game-invest"><div id="igBody"></div></div>
 
     <!-- ─── SOCIAL ─── -->
     <div class="page" id="page-social">
@@ -520,12 +527,6 @@
             <div class="hero-v" id="pfLevel">Level 3 · Sprout 🌱</div>
             <div class="hero-c" id="pfLevelXP">340 XP</div>
             <div class="bar" style="background:rgba(255,255,255,.25);margin-top:12px"><div class="bar-fill" id="pfLevelBar" style="width:68%;background:#fff"></div></div>
-          </div>
-
-          <div class="menu-card mc-tools" onclick="push('accounts')">
-            <div class="mc-ico">💼</div>
-            <div class="mc-b"><div class="mc-t">My Accounts</div><div class="mc-d">Spending, saving & investing accounts, learn what each one does</div></div>
-            <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
           </div>
 
           <div class="card">
@@ -566,6 +567,32 @@
   <div class="sheet"><div class="sheet-grip"></div><div id="lsheetInner"></div></div>
 </div>
 
+<!-- Mia coach — floating launcher + chat panel (all in-app pages) -->
+<button class="coach-fab hidden" id="coachFab" onclick="openCoach()" aria-label="Ask Mia, your money coach">
+  <div class="face">__AV__</div>
+  <span class="coach-fab-dot"></span>
+</button>
+<div class="coach-ov" id="coachOv" onclick="closeCoach(event)">
+  <div class="coach-panel">
+    <div class="coach-head">
+      <div class="face">__AV__</div>
+      <div class="coach-head-t"><div class="coach-name">Mia</div><div class="coach-role">your money coach</div></div>
+      <button class="coach-reset" onclick="coachReset(this)" aria-label="Reset chat" title="Reset chat">
+        <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-.9 4.5"/><polyline points="20 4 20 11 13 11"/></svg>
+      </button>
+      <button class="coach-x" onclick="closeCoachBtn()" aria-label="Close">&times;</button>
+    </div>
+    <div class="coach-log" id="coachLog"></div>
+    <div class="coach-chips" id="coachChips"></div>
+    <div class="coach-input">
+      <input id="coachInput" type="text" placeholder="Ask Mia about money…" autocomplete="off" onkeydown="coachKey(event)">
+      <button class="coach-send" onclick="coachSend()" aria-label="Send">
+        <svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-7-7-1z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 <!--BUILD:SCRIPTS-->
 <script src="src/js/01-charts-data.js"></script>
@@ -578,6 +605,7 @@
 <script src="src/js/07b-money.js"></script>
 <script src="src/js/08-learn-init.js"></script>
 <script src="src/js/09-tools-games.js"></script>
+<script src="src/js/10-coach-chat.js"></script>
 <!--/BUILD:SCRIPTS-->
 </body>
 </html>

@@ -28,6 +28,7 @@ function enterApp(){
   document.getElementById('onboarding').classList.add('hidden');
   document.getElementById('appHeader').classList.remove('hidden');
   document.getElementById('appNav').classList.remove('hidden');
+  document.getElementById('coachFab').classList.remove('hidden');
   goTab('home');
 }
 
