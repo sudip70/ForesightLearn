@@ -247,28 +247,28 @@
       <div class="practice-grid">
         <div class="practice-main">
           <div class="dash-hero">
-            <div class="dh-top"><div class="dh-k">Practice portfolio</div><span class="pill pill-grn" id="pfAllPct">+1.0%</span></div>
+            <div class="dh-top"><div class="dh-k">Practice portfolio</div><span class="pill pill-grn min-int" id="pfAllPct">+1.0%</span></div>
             <div class="dh-val tnum" id="pfValue">$10,101.29</div>
-            <div class="dh-chg"><span id="scStatVal" class="tnum">+$101.29</span> · all time<span id="pfToday"></span></div>
-            <div class="dh-bp"><div class="dh-bp-l">⚡ Buying power</div><div class="dh-bp-v tnum" id="pfCash">$3,346.81</div></div>
+            <div class="dh-chg"><span id="scStatVal" class="tnum">+$101.29</span><span class="min-int"> · all time</span><button type="button" class="qd on-dark min-int" onclick="openTip('all_time_return')" aria-label="What is all-time return?">?</button><span id="pfToday" class="min-int"></span></div>
+            <div class="dh-bp"><div class="dh-bp-l">⚡ Buying power<button type="button" class="qd" onclick="openTip('buying_power')" aria-label="What is buying power?">?</button></div><div class="dh-bp-v tnum" id="pfCash">$3,346.81</div></div>
           </div>
 
           <div class="card">
-            <div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">Portfolio value <span id="pfRangeChg" style="display:block;margin-top:3px;font-size:12px;font-weight:700;color:var(--muted);text-transform:none;letter-spacing:.2px"></span></div><span class="pill pill-gry" id="pfPxSrc">Sample prices</span></div>
+            <div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">Portfolio value <span id="pfRangeChg" class="min-int" style="display:block;margin-top:3px;font-size:12px;font-weight:700;color:var(--muted);text-transform:none;letter-spacing:.2px"></span></div><span class="pill pill-gry min-pro" id="pfPxSrc">Sample prices</span></div>
             <div id="journeyChart"></div>
             <div style="display:flex;gap:6px;margin-top:11px">
-              <button class="rt" onclick="setRange('1D',this)">1D</button>
-              <button class="rt" onclick="setRange('1W',this)">1W</button>
+              <button class="rt min-int" onclick="setRange('1D',this)">1D</button>
+              <button class="rt min-int" onclick="setRange('1W',this)">1W</button>
               <button class="rt on" onclick="setRange('1M',this)">1M</button>
-              <button class="rt" onclick="setRange('6M',this)">6M</button>
-              <button class="rt" onclick="setRange('YTD',this)">YTD</button>
+              <button class="rt min-int" onclick="setRange('6M',this)">6M</button>
+              <button class="rt min-int" onclick="setRange('YTD',this)">YTD</button>
               <button class="rt" onclick="setRange('ALL',this)">ALL</button>
             </div>
-            <div class="chart-hint">Hover for values · scroll to zoom · drag to pan · double-click to reset</div>
-            <div class="pf-stats" style="margin-top:13px">
-              <div class="pf-stat"><label>Invested</label><span class="tnum" id="pfInvested">$10,000</span></div>
-              <div class="pf-stat"><label>Unrealized</label><span id="pfUnreal" class="tnum up">+$0</span></div>
-              <div class="pf-stat"><label>Realized</label><span id="pfReal" class="tnum">$0.00</span></div>
+            <div class="chart-hint min-int">Hover for values · scroll to zoom · drag to pan · double-click to reset</div>
+            <div class="pf-stats min-int" style="margin-top:13px">
+              <div class="pf-stat"><label>Invested<button type="button" class="qd" onclick="openTip('invested')" aria-label="What is invested?">?</button></label><span class="tnum" id="pfInvested">$10,000</span></div>
+              <div class="pf-stat"><label>Unrealized<button type="button" class="qd" onclick="openTip('unrealized')" aria-label="What is unrealized?">?</button></label><span id="pfUnreal" class="tnum up">+$0</span></div>
+              <div class="pf-stat"><label>Realized<button type="button" class="qd" onclick="openTip('realized')" aria-label="What is realized?">?</button></label><span id="pfReal" class="tnum">$0.00</span></div>
             </div>
           </div>
 
@@ -280,7 +280,7 @@
             </div>
           </div>
 
-          <div class="menu-card mc-scenario" onclick="push('scenario')">
+          <div class="menu-card mc-scenario min-int" onclick="push('scenario')">
             <div class="mc-ico">🎮</div>
             <div class="mc-b"><div class="mc-t">Scenarios</div><div class="mc-d">Fast-forward your portfolio through a what-if</div></div>
             <div class="mc-arr"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
@@ -288,12 +288,19 @@
         </div>
 
         <div class="practice-side">
+          <div class="lvl-card">
+            <div class="lvl-row"><span class="lvl-k">Detail level<button type="button" class="qd" onclick="openTip('detail_level')" aria-label="What is the detail level?">?</button></span><span class="lvl-now" id="pfLevelName">Starter</span></div>
+            <input type="range" class="lvl-slider" id="pfLevelSlider" min="1" max="3" step="1" value="1" oninput="setPfLevel(+this.value)" aria-label="Detail level: Starter, Intermediate or Pro">
+            <div class="lvl-stops"><span class="on" data-lvl="1" onclick="setPfLevel(1)">Starter</span><span data-lvl="2" onclick="setPfLevel(2)">Intermediate</span><span data-lvl="3" onclick="setPfLevel(3)">Pro</span></div>
+            <div class="lvl-help" id="pfLevelHelp">Few numbers · welcoming. Slide right for more detail.</div>
+          </div>
+
           <div class="subtabs">
             <div class="subtab active" onclick="jTab(this,'hold')">Holdings</div>
             <div class="subtab" onclick="jTab(this,'trade')">Trade</div>
-            <div class="subtab" onclick="jTab(this,'watch')">Watch</div>
-            <div class="subtab" onclick="jTab(this,'act')">Activity</div>
-            <div class="subtab" onclick="jTab(this,'plan')">Plan</div>
+            <div class="subtab min-int" onclick="jTab(this,'watch')">Watch</div>
+            <div class="subtab min-int" onclick="jTab(this,'act')">Activity</div>
+            <div class="subtab min-pro" onclick="jTab(this,'plan')">Plan</div>
           </div>
 
           <div id="jHold"></div>

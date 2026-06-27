@@ -177,6 +177,10 @@ header.hidden{display:none}
 .ac-toggle:hover{transform:translateY(-1px);filter:brightness(.98)}
 .acct-q{width:32px;height:32px;border-radius:50%;border:2px solid var(--purple-line);background:var(--surface);color:var(--purple-deep);font-size:16px;font-weight:800;cursor:pointer;flex-shrink:0;font-family:var(--font);transition:transform .12s,background .12s;line-height:1}
 .acct-q:hover{transform:scale(1.08);background:var(--purple-soft)}
+/* compact inline help dot — sits next to a label, opens the What's-That sheet */
+.qd{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:none;background:var(--purple-soft);color:var(--purple-deep);font-size:10px;font-weight:800;cursor:pointer;font-family:var(--font);line-height:1;vertical-align:middle;margin-left:5px;padding:0;transition:transform .12s}
+.qd:hover{transform:scale(1.15)}
+.qd.on-dark{background:rgba(255,255,255,.28);color:#fff}
 .lpa{display:flex;gap:8px;margin:2px 0 10px}
 .lpa-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--surface);border:1.5px solid var(--purple-line);border-radius:13px;padding:10px 6px;font-size:11px;font-weight:800;color:var(--purple-deep);cursor:pointer;font-family:var(--font);transition:transform .12s,box-shadow .12s}
 .lpa-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
@@ -356,6 +360,23 @@ header.hidden{display:none}
 /* slider */
 input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:5px;background:var(--purple-soft);outline:none;margin:14px 0}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 8px rgba(124,109,206,.5);cursor:pointer;border:3px solid var(--purple-strong)}
+
+/* ── Practice detail-level slider (Starter / Intermediate / Pro) ───────── */
+.lvl-card{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:13px 16px 11px;margin-bottom:18px}
+.lvl-row{display:flex;align-items:center;justify-content:space-between}
+.lvl-k{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.lvl-now{font-size:13px;font-weight:800;color:var(--purple-deep)}
+.lvl-slider{margin:9px 0 4px!important;background:linear-gradient(90deg,var(--purple-strong) 0%,var(--purple-strong) var(--fill,14%),var(--purple-soft) var(--fill,14%),var(--purple-soft) 100%)}
+.lvl-stops{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--faint)}
+.lvl-stops span{cursor:pointer;flex:1;text-align:center;transition:color .15s}
+.lvl-stops span:first-child{text-align:left}
+.lvl-stops span:last-child{text-align:right}
+.lvl-stops span.on{color:var(--purple-deep)}
+.lvl-help{margin-top:7px;font-size:11.5px;color:var(--muted);line-height:1.45}
+
+/* ── Practice detail-level visibility gates ───────────────────────────── */
+#page-journey.lvl-1 .min-int,#page-journey.lvl-1 .min-pro{display:none!important}
+#page-journey.lvl-2 .min-pro{display:none!important}
 
 /* ── Onboarding ─────────────────────────────── */
 #onboarding{position:absolute;inset:0;background:var(--bg);z-index:30;display:flex;flex-direction:column}

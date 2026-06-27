@@ -9,7 +9,7 @@ function show(id){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page-'+id).classList.add('active');
   if(id==='learn')renderLearn();
-  if(id==='journey')refreshHeldPrices();
+  if(id==='journey'){applyPracticeLevel();refreshHeldPrices();}
   if(id==='scenario')renderScenario();
   if(id==='social')renderProfile();
   if(id==='home'){renderMoneyHome();renderGoalCard();}
