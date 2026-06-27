@@ -37,7 +37,15 @@ var GLOSS={
   credit_card:{t:'Credit card',d:'A card that lets you borrow from the bank to pay now and settle later. Pay the full balance each month and it costs nothing, and builds your credit score. Carry a balance and you pay high interest. A powerful tool used carefully.'},
   loan_acct:{t:'Loan',d:'Money you borrow and pay back over time, usually with interest. Student loans, car loans and lines of credit are common kinds. The key questions: how much interest, and how long to repay?'},
   savings_acct:{t:'Savings account',d:'A bank account built for setting money aside. It pays a little interest and keeps your savings separate from spending, so it is easier to grow an emergency fund or save toward a goal.'},
-  investing_acct:{t:'Investing account',d:'An account (like a TFSA or RRSP) you use to buy investments such as stocks, ETFs and bonds. Over years your money can grow far faster than in a savings account, in exchange for some ups and downs along the way.'}
+  investing_acct:{t:'Investing account',d:'An account (like a TFSA or RRSP) you use to buy investments such as stocks, ETFs and bonds. Over years your money can grow far faster than in a savings account, in exchange for some ups and downs along the way.'},
+  detail_level:{t:'Detail level',d:'Controls how much the Practice screen shows. Starter keeps it simple, just your value, buying power and easy buying. Slide to Intermediate for charts, metrics and your watchlist, or Pro to see everything, accounts, plans and price sources. Move it up as you grow more confident.'},
+  buying_power:{t:'Buying power',d:'The practice cash you have available to buy with right now. Every buy uses some of it; every sell adds back to it. It is all virtual money, so there is zero real-world risk.'},
+  invested:{t:'Invested',d:'The total practice money you have put in, your $10,000 starting balance plus anything you added. It is the baseline your gains and losses are measured against.'},
+  unrealized:{t:'Unrealized gain/loss',d:'Paper profit or loss on holdings you still own. It moves up and down with prices every day and only becomes "real" once you sell. Nothing is locked in yet.'},
+  realized:{t:'Realized gain/loss',d:'Profit or loss you have locked in by actually selling. Once realized, it no longer changes with the market, it is final.'},
+  all_time_return:{t:'All-time return',d:'How much your whole portfolio is up or down since you started, shown in dollars and as a percentage of what you invested. It counts both sold (realized) and still-held (unrealized) results.'},
+  avg_cost:{t:'Average cost',d:'The average price you paid per share across all your buys of one holding. Compare it to the current price to see if that position is up or down.'},
+  pnl:{t:'Profit & loss (P&L)',d:'How much a holding has made or lost, the current value minus what you paid. Green means up, red means down. Shown in dollars and as a percentage.'}
 };
 var FC={
   AAPL:{bear:['$162','-11%'],base:['$196','+8%'],bull:['$218','+20%']},

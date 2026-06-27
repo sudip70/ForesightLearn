@@ -1,7 +1,7 @@
 /* ── Persistence (localStorage, single-file, no backend) ─────────────── */
 var STORE_KEY='fiscally.web.v1',onboarded=false;
 function saveState(){
-  try{localStorage.setItem(STORE_KEY,JSON.stringify({v:1,onboarded:onboarded,PF:PF,ACTIVITY:ACTIVITY,GOAL:GOAL,LEARN:LEARN,contrib:contrib,seen:seen,initDone:initDone,SIM:SIM,BUDGET:BUDGET,GOALS:GOALS,SPENDING:SPENDING,NETWORTH:NETWORTH,LOANS:LOANS,SAVINGS:SAVINGS}));}catch(e){}
+  try{localStorage.setItem(STORE_KEY,JSON.stringify({v:1,onboarded:onboarded,PF:PF,ACTIVITY:ACTIVITY,GOAL:GOAL,LEARN:LEARN,contrib:contrib,seen:seen,initDone:initDone,SIM:SIM,BUDGET:BUDGET,GOALS:GOALS,SPENDING:SPENDING,NETWORTH:NETWORTH,LOANS:LOANS,SAVINGS:SAVINGS,pfLevel:pfLevel}));}catch(e){}
 }
 function loadState(){
   try{
@@ -15,6 +15,7 @@ function loadState(){
     if(d.BUDGET)BUDGET=d.BUDGET;if(Array.isArray(d.GOALS))GOALS=d.GOALS;
     if(Array.isArray(d.SPENDING))SPENDING=d.SPENDING;if(d.NETWORTH)NETWORTH=d.NETWORTH;
     if(Array.isArray(d.LOANS))LOANS=d.LOANS;if(d.SAVINGS)SAVINGS=d.SAVINGS;
+    if(d.pfLevel)pfLevel=Math.max(1,Math.min(3,d.pfLevel|0))||1;
     onboarded=!!d.onboarded;return true;
   }catch(e){return false;}
 }

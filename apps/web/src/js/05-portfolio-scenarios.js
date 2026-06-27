@@ -123,12 +123,48 @@ function setRange(r,el){
   if(el)[].forEach.call(el.parentNode.children,function(b){b.classList.toggle('on',b===el);});
   renderPortfolioChart();
 }
+/* ── Detail level: 1 Starter · 2 Intermediate · 3 Pro ─────────────────── */
+var pfLevel=1;
+var LVL_NAME={1:'Starter',2:'Intermediate',3:'Pro'};
+var LVL_HELP={1:'Few numbers · welcoming. Slide right for more detail.',2:'More metrics, watchlist, activity and scenarios.',3:'Everything: accounts, plan and price sources.'};
+var LVL_VIS={hold:1,trade:1,watch:2,act:2,plan:3}; /* min level each sub-tab needs */
+function applyPracticeLevel(){
+  var pg=document.getElementById('page-journey');
+  if(pg){pg.classList.remove('lvl-1','lvl-2','lvl-3');pg.classList.add('lvl-'+pfLevel);}
+  var sl=document.getElementById('pfLevelSlider');
+  /* fill grows with level; level 1 keeps a small visible nub so it never looks unset */
+  if(sl){sl.value=pfLevel;sl.style.setProperty('--fill',({1:14,2:50,3:100}[pfLevel])+'%');}
+  var nm=document.getElementById('pfLevelName');if(nm)nm.textContent=LVL_NAME[pfLevel];
+  var hp=document.getElementById('pfLevelHelp');if(hp)hp.textContent=LVL_HELP[pfLevel];
+  document.querySelectorAll('.lvl-stops span').forEach(function(s){s.classList.toggle('on',+s.dataset.lvl===pfLevel);});
+  /* if Starter forces 1M range but a higher-only range was active, fall back */
+  if(pfLevel===1&&pfRange!=='1M'&&pfRange!=='ALL'){
+    var rts=document.querySelectorAll('#page-journey .rt');
+    setRange('1M',rts[2]||null);
+  }
+}
+function setPfLevel(v){
+  pfLevel=Math.max(1,Math.min(3,v|0))||1;
+  applyPracticeLevel();
+  /* a now-hidden sub-tab falls back to Holdings */
+  if(LVL_VIS[jCur]>pfLevel){
+    var st=document.querySelectorAll('#page-journey .subtab');
+    st.forEach(function(x,i){x.classList.toggle('active',i===0);});
+    jTab(null,'hold');
+  }
+  renderPortfolio();
+  if(jCur==='hold')renderHoldings();else if(jCur==='trade')renderTradePanel();
+  saveState();
+}
 function pfMix(){var by={},inv=0;PF.pos.forEach(function(p){var v=p.sh*curPx(p.t);inv+=v;var c=lclsOf(p.t);by[c]=(by[c]||0)+v;});return {by:by,inv:inv,classes:Object.keys(by).length};}
 function renderPortfolio(){
   var T=totals();
   document.getElementById('pfValue').textContent=money(T.total);
   document.getElementById('pfCash').textContent=money(PF.cash);
-  document.getElementById('scStatVal').textContent=signed(T.unreal+PF.realized);
+  var sgain=T.unreal+PF.realized;
+  document.getElementById('scStatVal').textContent=pfLevel===1
+    ?(sgain>=0?'You\'re up '+money(sgain)+' so far':'Down '+money(Math.abs(sgain))+' so far')+' · all practice money'
+    :signed(sgain);
   var u=document.getElementById('pfUnreal');u.textContent=signed(T.unreal);u.className='tnum '+(T.unreal>=0?'up':'down');
   var r=document.getElementById('pfReal');r.textContent=PF.realized?signed(PF.realized):'$0.00';r.className='tnum '+(PF.realized>0?'up':(PF.realized<0?'down':''));
   // true investment gain excludes deposited cash; % is over capital actually put in
@@ -165,7 +201,7 @@ function sparkline(vals,w,h,color){
 function renderHoldings(){
   var html='';
   var mix=pfMix();
-  if(mix.inv){
+  if(mix.inv&&pfLevel>=2){
     var COLW={stock:'#9084b4',etf:'#5b8def',crypto:'#e0a92f'};
     var seg=Object.keys(mix.by).map(function(c){return '<div style="width:'+(mix.by[c]/mix.inv*100)+'%;background:'+(COLW[c]||'#9084b4')+'"></div>';}).join('');
     var labels=Object.keys(mix.by).map(function(c){return Math.round(mix.by[c]/mix.inv*100)+'% '+c;}).join(' · ');
@@ -174,18 +210,22 @@ function renderHoldings(){
   }
   if(!PF.pos.length){html='<div class="card"><div class="muted-note" style="text-align:left">No holdings yet. Tap <b>Trade</b> to make your first paper investment, virtual cash, zero risk.</div></div>';}
   else{
-    html+='<div class="card"><div class="row" style="margin-bottom:13px"><div class="card-t" style="margin-bottom:0">Positions</div><span class="pill pill-pur">'+PF.pos.length+' holdings</span></div>';
+    var posHelp=pfLevel>=2?'<button type="button" class="qd" onclick="event.stopPropagation();openTip(\'pnl\')" aria-label="What is profit and loss?">?</button>':'';
+    html+='<div class="card"><div class="row" style="margin-bottom:13px"><div class="card-t" style="margin-bottom:0">Positions'+posHelp+'</div><span class="pill pill-pur">'+PF.pos.length+' holdings</span></div>';
     PF.pos.forEach(function(p){
       var cur=curPx(p.t),val=p.sh*cur,pl=(cur-p.avg)*p.sh,plp=(cur/p.avg-1)*100,cls=pl>=0?'up':'down',sg=pl>=0?'+':'-';
-      var dm=posDayMove(p),today=dm?' · <span class="'+(dm.pct>=0?'up':'down')+'" style="font-weight:700">'+(dm.pct>=0?'+':'')+dm.pct.toFixed(2)+'% today</span>':'';
+      var dm=posDayMove(p),today=(pfLevel>=2&&dm)?' · <span class="'+(dm.pct>=0?'up':'down')+'" style="font-weight:700">'+(dm.pct>=0?'+':'')+dm.pct.toFixed(2)+'% today</span>':'';
+      var plHtml=pfLevel>=2
+        ?'<div class="l-c '+cls+'">'+sg+'$'+Math.abs(pl).toFixed(2)+' ('+sg+Math.abs(plp).toFixed(1)+'%)</div>'
+        :'<div class="l-c '+cls+'" style="font-size:13px">'+(pl>=0?'▲':'▼')+'</div>';
       html+='<div class="lrow" style="cursor:pointer" onclick="openTradeFor(\''+p.t+'\')">'
         +'<div style="display:flex;align-items:center;gap:11px"><div class="tkr-ic">'+p.t+'</div><div><div class="l-n">'+p.t+' <span style="font-size:10px;color:var(--faint);font-weight:700">'+p.acct+'</span></div><div class="l-s">'+fmtSh(p.sh)+' sh · avg '+money(p.avg)+today+'</div></div></div>'
-        +'<div class="l-v"><div class="l-p tnum">'+money(val)+'</div><div class="l-c '+cls+'">'+sg+'$'+Math.abs(pl).toFixed(2)+' ('+sg+Math.abs(plp).toFixed(1)+'%)</div></div></div>';
+        +'<div class="l-v"><div class="l-p tnum">'+money(val)+'</div>'+plHtml+'</div></div>';
     });
     html+='</div>';
   }
   var byAcct={};PF.pos.forEach(function(p){(byAcct[p.acct]=byAcct[p.acct]||[]).push(p);});
-  if(Object.keys(byAcct).length){
+  if(pfLevel>=3&&Object.keys(byAcct).length){
     html+='<div class="card-t" style="margin:4px 2px 10px">Accounts · risk plans</div>';
     Object.keys(byAcct).forEach(function(ac){
       var v=0;byAcct[ac].forEach(function(p){v+=p.sh*curPx(p.t);});
@@ -224,9 +264,11 @@ function renderTradePanel(){
   var sh=parseFloat((document.getElementById('tradeSh')||{}).value)||pendingSh||0;
   var h='<div class="trade-asset"><div><div class="ta-t">'+bn+' <span class="sf-cls '+a.c+'">'+a.c+'</span></div><div class="ta-n">'+a.n+(have?' · you hold '+fmtSh(have.sh):'')+'</div></div><div class="ta-px"><div class="tnum">'+money(px)+'</div><span class="pill '+(live?'pill-grn':'pill-gry')+'" style="font-size:10px">'+(live?'● Live':'~ est.')+'</span></div></div>';
   h+='<div class="toggle" style="margin-top:13px"><button class="tg buy'+(tradeAction==='buy'?' on':'')+'" onclick="setTrade(\'buy\')">Buy</button><button class="tg sell'+(tradeAction==='sell'?' on':'')+'" onclick="setTrade(\'sell\')">Sell</button></div>';
-  h+='<label class="f-label">Shares</label><input class="f-in" type="number" id="tradeSh" min="0" step="0.0001" placeholder="0" value="'+(sh||'')+'" oninput="updateCost()"/>';
+  h+='<label class="f-label">Shares<button type="button" class="qd" onclick="openTip(\'avg_cost\')" aria-label="What does shares and average cost mean?">?</button></label><input class="f-in" type="number" id="tradeSh" min="0" step="0.0001" placeholder="0" value="'+(sh||'')+'" oninput="updateCost()"/>';
   h+='<div class="row" style="margin:10px 0 13px"><span style="font-size:13px;color:var(--muted);font-weight:600" id="costLbl">'+(tradeAction==='buy'?'Estimated cost':'Estimated proceeds')+'</span><span style="font-size:17px;font-weight:800;color:var(--purple-deep)" class="tnum" id="tradeCost">'+money(sh*px)+'</span></div>';
-  if(tradeAction==='buy'){
+  if(tradeAction==='buy'&&pfLevel===1){
+    h+='<div class="muted-note" style="text-align:left">Buying is practice with virtual cash, so there\'s zero risk. Pick how many shares and review your order.</div>';
+  }else if(tradeAction==='buy'){
     var fc=TRADE_FC[t];
     if(fc){var lo=px*(1+fc.bear),hi=px*(1+fc.bull),mid=px*(1+fc.base);
       h+='<div class="pretrade-card"><div class="pretrade-title" style="color:var(--purple-deep)">🔭 A range, not a prediction</div><div style="font-size:12.5px;color:var(--purple-strong);line-height:1.5">Over the next 3 months, '+bn+' could realistically sit between <b>'+money(lo)+'</b> and <b>'+money(hi)+'</b>, most likely near '+money(mid)+'. Nobody can call which; that\'s exactly why we practice first.</div></div>';
