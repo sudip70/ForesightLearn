@@ -359,7 +359,10 @@ header.hidden{display:none}
 
 /* slider */
 input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:5px;background:var(--purple-soft);outline:none;margin:14px 0}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 8px rgba(124,109,206,.5);cursor:pointer;border:3px solid var(--purple-strong)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 8px rgba(124,109,206,.5);cursor:grab;border:3px solid var(--purple-strong);transition:box-shadow .15s,transform .12s}
+input[type=range]:active::-webkit-slider-thumb{cursor:grabbing;transform:scale(1.08);box-shadow:0 3px 12px rgba(124,109,206,.6)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(124,109,206,.5);cursor:grab;border:3px solid var(--purple-strong);transition:box-shadow .15s,transform .12s}
+input[type=range]:active::-moz-range-thumb{cursor:grabbing;transform:scale(1.08)}
 
 /* ── Practice detail-level slider (Starter / Intermediate / Pro) ───────── */
 .lvl-card{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:13px 16px 11px;margin-bottom:18px}

@@ -290,7 +290,7 @@
         <div class="practice-side">
           <div class="lvl-card">
             <div class="lvl-row"><span class="lvl-k">Detail level<button type="button" class="qd" onclick="openTip('detail_level')" aria-label="What is the detail level?">?</button></span><span class="lvl-now" id="pfLevelName">Starter</span></div>
-            <input type="range" class="lvl-slider" id="pfLevelSlider" min="1" max="3" step="1" value="1" oninput="setPfLevel(+this.value)" aria-label="Detail level: Starter, Intermediate or Pro">
+            <input type="range" class="lvl-slider" id="pfLevelSlider" min="1" max="3" step="0.001" value="1" oninput="pfLevelInput(+this.value)" onchange="pfLevelSnap()" onkeydown="pfLevelKey(event)" aria-label="Detail level: Starter, Intermediate or Pro" aria-valuetext="Starter">
             <div class="lvl-stops"><span class="on" data-lvl="1" onclick="setPfLevel(1)">Starter</span><span data-lvl="2" onclick="setPfLevel(2)">Intermediate</span><span data-lvl="3" onclick="setPfLevel(3)">Pro</span></div>
             <div class="lvl-help" id="pfLevelHelp">Few numbers · welcoming. Slide right for more detail.</div>
           </div>
