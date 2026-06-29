@@ -28,7 +28,7 @@ function escHtml(s){return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 function todayISO(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
 function thisMonth(){return todayISO().slice(0,7);}
 function numVal(v){var n=parseFloat((''+v).replace(/[^0-9.\-]/g,''));return isFinite(n)?n:0;}
-function moneyInput(id,val,ph){return '<input class="f-in" id="'+id+'" inputmode="decimal" placeholder="'+(ph||'0')+'"'+(val!=null?' value="'+val+'"':'')+'/>';}
+function moneyInput(id,val,ph,style){return '<input class="f-in" id="'+id+'" inputmode="decimal" placeholder="'+(ph||'0')+'"'+(val!=null?' value="'+val+'"':'')+(style?' style="'+style+'"':'')+'/>';}
 
 /* seed a couple of sample expenses in the current month on first run */
 (function seedSpending(){
@@ -402,8 +402,8 @@ function renderAcctLoans(){
   h+='<div style="margin-top:13px"><label class="f-label">Add a loan</label>'
     +'<div class="row" style="gap:7px;align-items:flex-end">'
     +'<div style="flex:2"><input class="f-in" id="loName" placeholder="e.g. Car loan" style="margin:0"/></div>'
-    +'<div style="flex:1.1">'+moneyInput('loBal',null,'Owed')+'</div>'
-    +'<div style="flex:1">'+moneyInput('loMo',null,'$/mo')+'</div>'
+    +'<div style="flex:1.1">'+moneyInput('loBal',null,'Owed','margin:0')+'</div>'
+    +'<div style="flex:1">'+moneyInput('loMo',null,'$/mo','margin:0')+'</div>'
     +'<button class="btn btn-soft" style="width:auto;flex:0 0 auto;padding:9px 14px" onclick="addLoan()">Add</button></div></div>';
   box.innerHTML=h+'</div>';
 }
