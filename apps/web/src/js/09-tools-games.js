@@ -462,6 +462,7 @@ function wordleHint(){if(wordleState){wordleState.hintShown=true;wordleRender();
 function wordleActive(){var p=document.getElementById('page-game-wordle');return p&&p.classList.contains('active');}
 function wordleKey(e){
   if(!wordleActive()||!wordleState||wordleState.done)return;
+  var t=e.target;if(t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))return;/* typing in a field (e.g. the Mia coach chat) shouldn't feed the grid */
   if(e.key==='Enter')return wordleEnter();
   if(e.key==='Backspace')return wordleType('DEL');
   if(/^[a-zA-Z]$/.test(e.key))wordleType(e.key.toUpperCase());
@@ -745,11 +746,54 @@ function qcEnd(){
 /* ════════════════════════════════════════════════════════════════════════
  *  LOAN CALCULATOR
  * ════════════════════════════════════════════════════════════════════════ */
-var loanState={p:15000,rate:7,term:36};
+var loanState={p:15000,rate:7,term:36,extra:0,extraOpen:false};
 function monthlyPayment(principal,annualPct,months){
   var r=annualPct/100/12;
   if(r===0)return principal/months;
   return principal*r/(1-Math.pow(1+r,-months));
+}
+/* Month-by-month amortization with an extra payment on top of the scheduled one.
+ * Returns how much sooner the loan dies and how much interest that skips. */
+function calcExtraPayoff(principal,annualPct,originalMonths,extraPerMonth){
+  if(extraPerMonth<=0)return null;
+  var r=annualPct/100/12,basePay=monthlyPayment(principal,annualPct,originalMonths);
+  var remaining=principal,months=0,totalInterest=0;
+  while(remaining>0.005&&months<originalMonths){
+    var intCharge=r>0?remaining*r:0;
+    var pay=Math.min(basePay+extraPerMonth,remaining+intCharge);
+    totalInterest+=intCharge;
+    remaining=remaining+intCharge-pay;
+    months++;
+  }
+  var origInterest=basePay*originalMonths-principal;
+  return {months:months,monthsSaved:originalMonths-months,
+    totalInterest:Math.max(0,totalInterest),interestSaved:Math.max(0,origInterest-totalInterest)};
+}
+function fmtPeriod(months){
+  var y=Math.floor(months/12),m=months%12;
+  if(y===0)return m+' mo';
+  if(m===0)return y+' yr';
+  return y+' yr '+m+' mo';
+}
+function extraSavingsHTML(basePayment,extra,result){
+  if(!result||result.monthsSaved<=0)return '<div class="ep-savings ep-savings-none">Drag the slider — even a little extra each month chips away at the interest.</div>';
+  return '<div class="ep-savings">'
+    +'<div class="ep-stat"><span class="ep-label">Paid off</span><span class="ep-val ep-green tnum">'+fmtPeriod(result.monthsSaved)+' sooner</span></div>'
+    +'<div class="ep-stat"><span class="ep-label">Interest saved</span><span class="ep-val ep-green tnum">'+money0(result.interestSaved)+'</span></div>'
+    +'<div class="ep-stat"><span class="ep-label">New monthly</span><span class="ep-val tnum">'+money(basePayment+extra)+'</span></div>'
+    +'</div>';
+}
+/* Collapsible "pay extra" card shared by both calculators; prefix is 'loan'|'mort'. */
+function extraSectionHTML(prefix,state,basePayment,principal,annualPct,originalMonths){
+  var rerender='render'+(prefix==='loan'?'Loan':'Mortgage')+'Calc()';
+  if(!state.extraOpen)return '<button class="ep-toggle" onclick="'+prefix+'State.extraOpen=true;'+rerender+'">+ What if I pay extra each month?</button>';
+  var res=calcExtraPayoff(principal,annualPct,originalMonths,state.extra);
+  return '<div class="card calc-form">'
+    +'<div class="cf-row"><label>Extra monthly payment</label><span class="tnum cf-val" id="'+prefix+'ExtraVal">'+money0(state.extra)+'</span></div>'
+    +'<input type="range" min="0" max="2000" step="25" value="'+state.extra+'" oninput="'+prefix+'State.extra=+this.value;'+prefix+'ExtraInput()"/>'
+    +'<div id="'+prefix+'ExtraSav">'+extraSavingsHTML(basePayment,state.extra,res)+'</div>'
+    +'<button class="ep-toggle ep-close" onclick="'+prefix+'State.extraOpen=false;'+prefix+'State.extra=0;'+rerender+'">✕ Remove extra payment</button>'
+    +'</div>';
 }
 /* Output card markup, kept separate so slider drags can refresh just the
  * numbers without re-creating the <input> being dragged (which caused jank). */
@@ -759,7 +803,7 @@ function loanOutHTML(s){
   var iPct=totalCost>0?Math.round(interest/totalCost*100):0;
   return '<div class="co-label">Monthly payment</div><div class="co-big tnum">'+money(pay)+'</div>'
     +'<div class="co-split"><div class="cs"><label>Principal</label><b class="tnum">'+money0(s.p)+'</b></div>'
-      +'<div class="cs"><label>Total interest</label><b class="tnum" style="color:var(--red)">'+money0(interest)+'</b></div>'
+      +'<div class="cs"><label>Total interest</label><b class="tnum" style="color:var(--loan-int)">'+money0(interest)+'</b></div>'
       +'<div class="cs"><label>Total cost</label><b class="tnum">'+money0(totalCost)+'</b></div></div>'
     +'<div class="split-bar"><div class="sb-p" style="width:'+(100-iPct)+'%"></div><div class="sb-i" style="width:'+iPct+'%"></div></div>'
     +'<div class="split-key"><span><i class="dot-p"></i>Principal</span><span><i class="dot-i"></i>Interest '+iPct+'% of cost</span></div>';
@@ -770,12 +814,20 @@ function loanInput(){
   var out=document.getElementById('loanOut');if(out)out.innerHTML=loanOutHTML(s);
   var pv=document.getElementById('loanPVal');if(pv)pv.textContent=money0(s.p);
   var rv=document.getElementById('loanRVal');if(rv)rv.textContent=s.rate.toFixed(1)+'%';
+  if(s.extraOpen)loanExtraInput();
+}
+function loanExtraInput(){
+  var s=loanState;
+  var ev=document.getElementById('loanExtraVal');if(ev)ev.textContent=money0(s.extra);
+  var sc=document.getElementById('loanExtraSav');
+  if(sc)sc.innerHTML=extraSavingsHTML(monthlyPayment(s.p,s.rate,s.term),s.extra,calcExtraPayoff(s.p,s.rate,s.term,s.extra));
 }
 function renderLoanCalc(){
   var el=document.getElementById('loanBody');if(!el)return;var s=loanState;
   var terms=[{m:12,l:'1 yr'},{m:24,l:'2 yr'},{m:36,l:'3 yr'},{m:60,l:'5 yr'},{m:84,l:'7 yr'}];
   var h=gameHead('💳','Loan Calculator','See what a loan really costs once interest is added.');
   h+='<div class="card calc-out" id="loanOut">'+loanOutHTML(s)+'</div>';
+  h+=extraSectionHTML('loan',s,monthlyPayment(s.p,s.rate,s.term),s.p,s.rate,s.term);
   h+='<div class="card calc-form">'
     +'<div class="cf-row"><label>Loan amount</label><span class="tnum cf-val" id="loanPVal">'+money0(s.p)+'</span></div>'
     +'<input type="range" min="1000" max="100000" step="500" value="'+s.p+'" oninput="loanState.p=+this.value;loanInput()"/>'
@@ -792,19 +844,19 @@ function renderLoanCalc(){
 /* ════════════════════════════════════════════════════════════════════════
  *  MORTGAGE CALCULATOR
  * ════════════════════════════════════════════════════════════════════════ */
-var mortState={price:450000,down:10,rate:5,years:25};
+var mortState={price:450000,down:10,rate:5,years:25,extra:0,extraOpen:false};
 /* Output card markup split out so price/rate slider drags refresh only the
  * numbers + donut, never the <input> being dragged (which caused jank). */
 function mortOutHTML(s){
   var downAmt=s.price*s.down/100;var loan=s.price-downAmt;var months=s.years*12;
   var pay=monthlyPayment(loan,s.rate,months);var totalPaid=pay*months;var interest=totalPaid-loan;
   var iPct=totalPaid>0?Math.round(interest/totalPaid*100):0;
-  var donut=miniDonut([{v:(100-iPct)/100,c:'#6f659a'},{v:iPct/100,c:'#cf5a40'}],108,iPct+'%','interest');
+  var donut=miniDonut([{v:(100-iPct)/100,c:'#c96a2e'},{v:iPct/100,c:'#9f2f1e'}],108,iPct+'%','interest');/* segment hexes = --loan / --loan-int */
   return '<div class="co-label">Monthly payment</div><div class="co-big tnum">'+money(pay)+'</div>'
     +'<div class="mort-donut">'+donut+'<div class="md-rows">'
       +'<div class="cs"><label>Mortgage</label><b class="tnum">'+money0(loan)+'</b></div>'
       +'<div class="cs"><label>Down payment</label><b class="tnum">'+money0(downAmt)+'</b></div>'
-      +'<div class="cs"><label>Total interest</label><b class="tnum" style="color:var(--red)">'+money0(interest)+'</b></div>'
+      +'<div class="cs"><label>Total interest</label><b class="tnum" style="color:var(--loan-int)">'+money0(interest)+'</b></div>'
       +'<div class="cs"><label>Total paid</label><b class="tnum">'+money0(totalPaid+downAmt)+'</b></div>'
     +'</div></div>';
 }
@@ -814,6 +866,14 @@ function mortInput(){
   var out=document.getElementById('mortOut');if(out)out.innerHTML=mortOutHTML(s);
   var pv=document.getElementById('mortPVal');if(pv)pv.textContent=money0(s.price);
   var rv=document.getElementById('mortRVal');if(rv)rv.textContent=s.rate.toFixed(1)+'%';
+  if(s.extraOpen)mortExtraInput();
+}
+function mortExtraInput(){
+  var s=mortState;
+  var loan=s.price*(1-s.down/100),months=s.years*12;
+  var ev=document.getElementById('mortExtraVal');if(ev)ev.textContent=money0(s.extra);
+  var sc=document.getElementById('mortExtraSav');
+  if(sc)sc.innerHTML=extraSavingsHTML(monthlyPayment(loan,s.rate,months),s.extra,calcExtraPayoff(loan,s.rate,months,s.extra));
 }
 function renderMortgageCalc(){
   var el=document.getElementById('mortBody');if(!el)return;var s=mortState;
@@ -821,6 +881,8 @@ function renderMortgageCalc(){
   var amorts=[{y:15,l:'15 yr'},{y:20,l:'20 yr'},{y:25,l:'25 yr'},{y:30,l:'30 yr'}];
   var h=gameHead('🏠','Mortgage Calculator','Estimate the monthly payment on a home.');
   h+='<div class="card calc-out" id="mortOut">'+mortOutHTML(s)+'</div>';
+  var mLoan=s.price*(1-s.down/100),mMonths=s.years*12;
+  h+=extraSectionHTML('mort',s,monthlyPayment(mLoan,s.rate,mMonths),mLoan,s.rate,mMonths);
   h+='<div class="card calc-form">'
     +'<div class="cf-row"><label>Home price</label><span class="tnum cf-val" id="mortPVal">'+money0(s.price)+'</span></div>'
     +'<input type="range" min="100000" max="1500000" step="10000" value="'+s.price+'" oninput="mortState.price=+this.value;mortInput()"/>'

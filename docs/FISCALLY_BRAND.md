@@ -42,7 +42,7 @@ Both share one need: **learn and practice without ever feeling overwhelmed or at
 | Fear of being wrong / looking dumb | No hearts/punishment; ranges not predictions; Mia coaches, never scolds |
 | Too many choices | Always guide to the single next step, never a 10-option dashboard |
 
-**Aesthetic = strategy.** Soft lavender, rounded everything, generous whitespace, slow gentle motion, pastel semantics. The calm look isn't decoration — it's how we keep both audiences from bouncing off an intimidating topic. Hard rule: **avoid the "finance-bro" aesthetic** entirely — no hype-green candles, no Lambos, no red-alert dashboards.
+**Aesthetic = strategy.** Soft warm beige, rounded everything, generous whitespace, slow gentle motion, pastel semantics. The calm look isn't decoration — it's how we keep both audiences from bouncing off an intimidating topic. Hard rule: **avoid the "finance-bro" aesthetic** entirely — no hype-green candles, no Lambos, no red-alert dashboards.
 
 ---
 
@@ -114,17 +114,17 @@ Two characters, **strictly distinct roles** — this is what keeps them from fee
 
 ## 4. Color system (tokens)
 
-Lavender is **the** brand. Everything else is semantic and used sparingly. These are the real values already in the prototype — formalized with semantic intent.
+Warm beige is **the** brand (was lavender-purple — same lightness/saturation "shade" per token and the same [gradient recipe](#gradient-recipe-the-level-every-gradient-shares), only the hue rotated warm). Everything else is semantic and used sparingly. Token names below keep the `--purple-*` naming from the lavender era to avoid touching every call site in code — treat the *name* as legacy, the *hex* as current. **Confusingly-but-deliberately**, the original lavender-purple hex didn't disappear — it lives on as its own `--invest` feature color (see Feature colors below), so "purple" now means two different things depending on context: the `--purple-*` *token name* (→ beige hex, generic brand chrome) vs. the *color* purple (→ `--invest` hex, investing only). When in doubt, check which container you're in.
 
-### Brand (lavender)
+### Brand (beige)
 | Token | Hex | Use |
 |---|---|---|
-| `--purple` | `#9084b4` | Brand accent, secondary text emphasis |
-| `--purple-strong` | `#6f659a` | Labels, section headers |
-| `--purple-deep` | `#565072` | Primary text-on-light emphasis, deep CTA end |
-| `--purple-soft` | `#e7e1f4` | Mia bubbles, soft chips, highlight fills |
-| `--purple-soft2` | `#d4cbea` | Borders, rings |
-| **Brand gradient** | `#a78bfa → #5546b0` | Primary buttons, hero, the "Trade" nav center |
+| `--purple` | `#b4a284` | Brand accent, secondary text emphasis |
+| `--purple-strong` | `#9a8765` | Labels, section headers |
+| `--purple-deep` | `#726650` | Primary text-on-light emphasis, deep CTA end |
+| `--purple-soft` | `#f4ede1` | Mia bubbles, soft chips, highlight fills |
+| `--purple-soft2` | `#eadfcb` | Borders, rings |
+| **Brand gradient** | `#fad18b → #b08946` | Primary buttons, onboarding splash, the "Trade" nav center. *Not* the Practice/portfolio hero — that's `--invest` purple, see Feature colors below. |
 
 ### Semantic
 | Token | Hex | Meaning — used ONLY for this |
@@ -134,11 +134,38 @@ Lavender is **the** brand. Everything else is semantic and used sparingly. These
 | `--red` / `--red-soft` | `#cf5a40` / `#fbeae6` | Loss, "rough case", caution — sparingly, never to scare |
 | `--blue` | `#5b8def` | Forecast "if it goes well" line only |
 
+### Feature colors — which money area a screen belongs to
+
+A second, separate layer from the semantic table above: these identify *which feature/account area* a screen or component belongs to. They never override green (gain) or red (loss), and they are not the same thing as `--gold`/`--amber` (Learn gamification only, see above) — a Saving-yellow chip is not an XP chip.
+
+| Feature | Token | Hex | Where it shows up |
+|---|---|---|---|
+| **Investing** | `--invest` / `--invest-strong` / `--invest-deep` | `#9084b4` / `#6f659a` / `#565072` | The original lavender-purple, kept as its **own** dedicated feature color (no longer "brand doing double duty" now that brand is beige — see below). Practice (portfolio hero, holdings, trade), Scenarios, the Investment Style/Risk page, Stock Finder, the Invest Game, and the Investing Accounts section in My Accounts. Anything investment-related is purple, full stop. |
+| **Saving** | `--save` / `--save-soft` / `--save-deep` | `#e3b23c` / `#f6edcf` / `#b9862a` | Savings accounts section, savings goals. |
+| **Spending** | `--spend` / `--spend-soft` / `--spend-deep` | `#e08a4f` / `#fbe7e0` / `#c06a34` | Spending accounts section, budget/expense tools. |
+| **Loan** | `--loan` / `--loan-soft` / `--loan-deep` | `#c96a2e` / `#f5ddc9` / `#9c4f20` | Loan accounts, the Loan Calculator, the Mortgage Calculator. A deeper, more burnt shade than Spending — same orange family (loans render inside the Spending section in My Accounts today), but distinguishable as their own thing. |
+
+For a scoped one-off screen that shares generic markup with unrelated screens (e.g. the Loan/Mortgage calculators, which share `.calc-chip`/`.game-head` with every other Tools screen), override the specific properties keyed off that screen's container id instead of touching the shared class — see `#loanBody`/`#mortBody` rules in `app.css` for the pattern.
+
+**Investing is the one feature color that re-themes shared components wholesale** rather than overriding one property at a time: `#page-journey` (Practice), `#page-scenario`, `#page-risk`, `#page-stockfinder`, `#page-game-invest`, and `.acct-sec.invest` all locally override `--purple`/`--purple-strong`/`--purple-deep`/`--purple-soft`/`--purple-soft2`/`--purple-line`/`--grad-a`/`--grad-b` to point at `--invest*` instead of the beige brand tokens. Every shared component that already reads `var(--purple-strong)` etc. (buttons, sliders, subtabs, pills, borders) automatically renders purple inside those containers with zero per-component overrides — new Practice/investing UI gets this for free just by living inside one of those containers. When adding a new component to one of these containers, check it doesn't hardcode a literal beige hex that would fight the scope. Only hardcoded literal hexes (not `var(...)`) need a manual purple value: `.hero` (note: `#page-home .hero` is the only purple instance — the base `.hero` class is also used by Budget/Goals/Spending/Net Worth and must stay beige), `.mc-scenario`, and any inline SVG chart color (candlesticks, forecast/equity lines, `investSVG()`, the Invest Game's palette) — these should match `--invest`/`--invest-strong`/`--invest-deep` exactly. `.dash-hero` is the one deliberate exception: it keeps the original, more saturated "brand gradient" (`#a78bfa → #5546b0`) rather than the standard `--invest` mid-tone, matching how hero-weight surfaces have always used the punchier gradient variant while buttons/chips use the standard one.
+
 ### Neutrals
 `--bg #f7f5fc` · `--surface #ffffff` · `--surface-soft #f1edf8` · `--ink #322e44` · `--muted #847f9c` · `--faint #aaa4c0` · `--line #eae6f4`
 
+### Gradient recipe (the "level" every gradient shares)
+
+Every soft gradient in the app follows the same recipe — only the hue changes:
+
+- **Two stops, one hue family**, light/mid tone → deeper shade of the same color (never two different hues).
+- **135deg diagonal** for buttons/CTAs/badges (140deg for larger hero surfaces; 90deg for horizontal progress fills).
+- **Paired soft shadow**, same hue tinted at low opacity, never pure black: `0 8px 20px -6px rgba(<hue>,.5)`.
+
+In code: there is no shared "apply this class" utility for this — every gradient is a plain `linear-gradient(...)` declaration on its own selector, hand-matched to the recipe above (same angle, same light→deep same-hue pattern, same tinted-shadow formula). When adding a new gradient, copy the *shape* of an existing one (e.g. `.btn-pur`, `.acct.tfsa`) and swap only the hue — don't invent a new angle or contrast level. The one place color is *shared* across many components at once is whole-page theming (see Investing above): a container overrides `--purple*`/`--grad-a`/`--grad-b`, and every descendant that already reads those variables re-colors for free — that's the mechanism to reach for when an entire section (not a single gradient) needs to change hue, not a new utility class.
+
+---
+
 **Usage laws**
-- **Purple = brand & primary action.** Greens, golds, reds never compete for "primary."
+- **Beige (brand) = primary action.** Greens, golds, reds never compete for "primary."
 - **Gold is sacred to Learn.** A gold streak pill on the Trade screen = wrong. It signals "this is the game zone."
 - **Green does double duty** (gains + nav) — that's fine; both mean "good / go."
 - **Red is rare.** Loss numbers and the rough-case, nothing else. We don't paint warnings red; Mia's words carry caution.
@@ -157,7 +184,7 @@ Lavender is **the** brand. Everything else is semantic and used sparingly. These
 ## 6. Shape, depth, motion
 
 - **Radii:** cards `16` (`--r`), large cards/sheets `22` (`--r-lg`), small `11`, pills `20–30`, avatars/nodes full-circle.
-- **Depth:** one soft shadow, not hard borders. `--shadow: 0 4px 18px -6px rgba(86,80,114,.16)` · `--shadow-lg` for sheets/heroes. Lavender-tinted shadow, never pure black.
+- **Depth:** one soft shadow, not hard borders. `--shadow: 0 4px 18px -6px rgba(86,80,114,.16)` · `--shadow-lg` for sheets/heroes. Cool neutral-tinted shadow (unchanged by the beige rebrand — it's a neutral, not a brand color), never pure black.
 - **Motion:** gentle and purposeful. 0.2–0.3s transitions. Progressive reveals (the "See the numbers" expand). Personality motion is **Penny's** (idle bob, completion jump) and lives in Learn. The money screens don't bounce.
 - **Spacing rhythm:** 16px screen gutter, 13px between cards.
 
@@ -202,15 +229,15 @@ If a screen's playfulness doesn't match its row, that's the incoherence to fix.
 
 - **Style:** rounded, friendly, flat with soft depth. Consistent corner radius and weight.
 - **Emoji** are fine as quick semantic markers (lesson icons, status). **Brand illustrations** — Mia, Penny, account types (TFSA/RRSP), the fan-chart — are custom SVG with the palette above, so they feel made-for-Fiscally, not pasted.
-- **Charts** are hand-built SVG in the brand palette: green = past + likely, blue = good case, red = rough case, lavender = neutral/UI.
+- **Charts** are hand-built SVG in the brand palette: green = past + likely, blue = good case, red = rough case, lavender = neutral/UI (chart gridlines/tracks/labels deliberately stayed cool-lavender-grey through the beige rebrand — they're neutral chart scaffolding, not brand identity; only primary/data-series purple converted to beige).
 
 ---
 
 ## 10. Logo / wordmark (direction, not final)
 
-- **"Fiscally"** wordmark in a warm rounded sans, `--purple-deep` → brand-gradient.
+- **"Fiscally"** wordmark in a warm rounded sans, `--purple-deep` → brand-gradient (now beige/tan, see §4).
 - Optional mark: a coin or a tiny **Penny** silhouette as the brand icon / app icon (foxes read as "clever with money").
-- App icon: lavender field + the mark. Friendly, not corporate.
+- App icon: warm beige field + the mark. Friendly, not corporate.
 
 ---
 
@@ -227,4 +254,4 @@ If a screen's playfulness doesn't match its row, that's the incoherence to fix.
 ---
 
 ### TL;DR
-Fiscally is a **warm, plain-language money guide** in **lavender**, voiced by **Mia** everywhere, that turns **gamified play on** (gold, XP, **Penny**) **only inside Learn**. Every metric carries a sentence, every lesson carries a number, forecasts show ranges not predictions — and the per-screen coherence map (§8) keeps the playfulness dial honest so five features read as one product.
+Fiscally is a **warm, plain-language money guide** in **warm beige** (rebranded from lavender-purple, same shade/gradient recipe, hue rotated warm) — **except investing, which keeps the original purple as its own dedicated feature color** (Practice, Scenarios, Risk/Investment Style, Stock Finder, Invest Game, Investing Accounts). Voiced by **Mia** everywhere, that turns **gamified play on** (gold, XP, **Penny**) **only inside Learn**. Every metric carries a sentence, every lesson carries a number, forecasts show ranges not predictions — and the per-screen coherence map (§8) keeps the playfulness dial honest so five features read as one product.

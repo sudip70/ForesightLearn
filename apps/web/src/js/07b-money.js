@@ -22,6 +22,20 @@ var LOANS=[{id:'l_seed',name:'Student loan',balance:6000,monthly:75}];
    Net Worth screens show the same savings balance on load. */
 var SAVINGS={balance:4200};
 
+/* Keep the Net Worth ledger in step with the My Accounts balances: the savings
+   balance writes through to the "Savings account" asset, and each loan writes
+   through to the same-named debt. Only existing rows are updated (except addLoan,
+   which registers the new debt) — deleting a row on the Net Worth page is
+   respected, we never resurrect it. */
+function syncNetworthMirror(){
+  var a=NETWORTH.assets.filter(function(x){return x.name==='Savings account';})[0];
+  if(a)a.value=numVal(SAVINGS.balance);
+  NETWORTH.debts.forEach(function(d){
+    var l=LOANS.filter(function(x){return x.name===d.name;})[0];
+    if(l)d.value=numVal(l.balance);
+  });
+}
+
 function moneyUid(){return 'm'+Math.random().toString(36).slice(2,9);}
 /* Escape user-entered text before interpolating it into HTML (category, loan, note names). */
 function escHtml(s){return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -231,7 +245,7 @@ function lpaRow(learn,practice,activate){
 }
 /* ── inline graphics ── */
 function bankCardSVG(kind){
-  var c=kind==='debit'?{a:'#4f9c7e',chip:'#dbeee6',t:'DEBIT'}:{a:'#565072',chip:'#e7e1f4',t:'CREDIT'};
+  var c=kind==='debit'?{a:'#4f9c7e',chip:'#dbeee6',t:'DEBIT'}:{a:'#726650',chip:'#f4ede1',t:'CREDIT'};
   var gid='cardSheen_'+kind;
   return '<svg viewBox="0 0 80 52" width="62" height="40" style="display:block;border-radius:8px;box-shadow:var(--shadow);flex-shrink:0">'
     +'<rect width="80" height="52" rx="8" fill="'+c.a+'"/>'
@@ -243,10 +257,10 @@ function bankCardSVG(kind){
     +'<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs></svg>';
 }
 function loanSVG(){
-  return '<svg viewBox="0 0 48 48" width="48" height="48" style="flex-shrink:0"><rect x="3" y="3" width="42" height="42" rx="12" fill="#f7d9ce"/>'
-    +'<path d="M13 30c3-2 6-2 9 0 3 2 7 1 9-2" stroke="#cf5a40" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
-    +'<circle cx="31" cy="18" r="6.5" fill="#fff" stroke="#cf5a40" stroke-width="2.4"/>'
-    +'<text x="31" y="21.5" font-size="9" font-weight="800" fill="#cf5a40" text-anchor="middle" font-family="\'Plus Jakarta Sans\',sans-serif">$</text></svg>';
+  return '<svg viewBox="0 0 48 48" width="48" height="48" style="flex-shrink:0"><rect x="3" y="3" width="42" height="42" rx="12" fill="#f5ddc9"/>'
+    +'<path d="M13 30c3-2 6-2 9 0 3 2 7 1 9-2" stroke="#c96a2e" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
+    +'<circle cx="31" cy="18" r="6.5" fill="#fff" stroke="#c96a2e" stroke-width="2.4"/>'
+    +'<text x="31" y="21.5" font-size="9" font-weight="800" fill="#c96a2e" text-anchor="middle" font-family="\'Plus Jakarta Sans\',sans-serif">$</text></svg>';
 }
 function piggySVG(){
   return '<svg viewBox="0 0 48 48" width="48" height="48" style="flex-shrink:0"><rect x="2" y="2" width="44" height="44" rx="13" fill="#f4eccf"/>'
@@ -391,7 +405,7 @@ function renderAcctLoans(){
   var h='<div class="acct-card" style="display:block">'
     +'<div class="row" style="margin-bottom:'+(LOANS.length?'12px':'10px')+'"><div style="display:flex;align-items:center;gap:11px">'+loanSVG()
     +'<div><div class="ac-name" style="margin:0">Loan Accounts</div>'+(mo>0?'<div class="ac-note" style="margin-top:2px">'+money0(mo)+'/mo in payments</div>':'')+'</div></div>'
-    +'<div style="display:flex;align-items:center;gap:9px"><span class="pill pill-red">owe '+money0(owe)+'</span>'+helpDot('loan_acct')+'</div></div>';
+    +'<div style="display:flex;align-items:center;gap:9px"><span class="pill pill-loan">owe '+money0(owe)+'</span>'+helpDot('loan_acct')+'</div></div>';
   LOANS.forEach(function(l,i){
     h+='<div class="cat-row"><div class="cat-top"><span class="cat-n">'+escHtml(l.name)+'</span>'
       +'<span class="cat-v over">'+money0(l.balance)+(numVal(l.monthly)>0?' · '+money0(l.monthly)+'/mo':'')+'</span></div>'
@@ -410,14 +424,18 @@ function renderAcctLoans(){
 function addLoan(){
   var n=((document.getElementById('loName')||{}).value||'').trim();
   if(!n){showToast('Name the loan');return;}
-  LOANS.push({id:moneyUid(),name:n,balance:numVal((document.getElementById('loBal')||{}).value),monthly:numVal((document.getElementById('loMo')||{}).value)});
-  saveState();renderAcctLoans();renderAcctSummary();showToast('✓ Added '+n);
+  var bal=numVal((document.getElementById('loBal')||{}).value);
+  LOANS.push({id:moneyUid(),name:n,balance:bal,monthly:numVal((document.getElementById('loMo')||{}).value)});
+  var d=NETWORTH.debts.filter(function(x){return x.name===n;})[0];
+  if(d)d.value=bal;else NETWORTH.debts.push({name:n,value:bal});
+  saveState();renderAcctLoans();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();showToast('✓ Added '+n);
 }
 function payLoan(i){
   var l=LOANS[i];if(!l)return;
   var amt=numVal((document.getElementById('lpay'+i)||{}).value);
   if(amt<=0){showToast('Enter a payment');return;}
   l.balance=Math.max(0,numVal(l.balance)-amt);
+  syncNetworthMirror();
   saveState();renderAcctLoans();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
   showToast(l.balance<=0?'🎉 '+l.name+' paid off!':'✓ Paid '+money0(amt)+' · '+l.name);
 }
@@ -436,13 +454,13 @@ function renderAcctSave(){
 }
 function addSavings(){
   var f=document.getElementById('svAmt'),amt=numVal(f&&f.value);if(amt<=0){showToast('Enter an amount');return;}
-  SAVINGS.balance=numVal(SAVINGS.balance)+amt;saveState();renderAcctSave();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
+  SAVINGS.balance=numVal(SAVINGS.balance)+amt;syncNetworthMirror();saveState();renderAcctSave();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
   var nf=document.getElementById('svAmt');if(nf){nf.value='';nf.focus();}
   showToast('🐷 Added '+money0(amt)+' to savings');
 }
 function withdrawSavings(){
   var amt=numVal((document.getElementById('svAmt')||{}).value);if(amt<=0){showToast('Enter an amount');return;}
-  SAVINGS.balance=Math.max(0,numVal(SAVINGS.balance)-amt);saveState();renderAcctSave();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
+  SAVINGS.balance=Math.max(0,numVal(SAVINGS.balance)-amt);syncNetworthMirror();saveState();renderAcctSave();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
   showToast('✓ Withdrew '+money0(amt)+' from savings');
 }
 
@@ -520,7 +538,7 @@ function renderAccounts(){
 }
 
 /* ── Home tiles (informational, like the Practice / My Goals tiles) ──── */
-var MONEY_PALETTE=['#6f659a','#5b8def','#4f9c7e','#e0a92f','#cf5a40','#9084b4'];
+var MONEY_PALETTE=['#9a8765','#5b8def','#4f9c7e','#e0a92f','#cf5a40','#b4a284'];
 function miniDonut(segs,size,centerTop,centerSub){
   size=size||92;var r=size/2-8,C=2*Math.PI*r,cx=size/2,cy=size/2,off=0;
   var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#f0edfa" stroke-width="13"/>';

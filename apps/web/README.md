@@ -35,7 +35,7 @@ The backend API base lives in `src/js/07-tools-api.js` (`var API=...`).
 | `06-stock-finder.js` | Stock Finder forecast page |
 | `07-tools-api.js` / `07b-money.js` | Backend API + money/budget/goals |
 | `08-learn-init.js` | Learn tab: lessons, XP/streaks, and the winding lesson **trail** (`renderUnitPath`/`trailSVG`) |
-| `09-tools-games.js` | Tools tab mini-games + loan/mortgage calculators |
+| `09-tools-games.js` | Explore (Tools) tab mini-games + loan/mortgage calculators |
 
 ## Tools — "Play & Learn" games
 Self-contained mini-games in `09-tools-games.js` (state → render → inline `onclick`), each awarding XP via `gameXP()` and registered as a sub-page in `02-nav-onboarding.js`:

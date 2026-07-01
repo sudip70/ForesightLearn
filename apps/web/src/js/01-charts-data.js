@@ -1,6 +1,6 @@
 /* ── Mia avatar (inline SVG) ─────────────────── */
 function avatar(){return '<svg viewBox="0 0 48 48" width="100%" height="100%">'
-+'<rect width="48" height="48" fill="#e7e1f4"/>'
++'<rect width="48" height="48" fill="#f4ede1"/>'
 +'<path d="M9 27 Q9 7 24 7 Q39 7 39 27 L39 40 Q33 44 24 44 Q15 44 9 40 Z" fill="#43301f"/>'
 +'<circle cx="24" cy="27" r="13" fill="#f0b896"/>'
 +'<path d="M11 24 Q12 9 24 9 Q36 9 37 24 Q34 16 24 16 Q14 16 11 24 Z" fill="#43301f"/>'
@@ -241,7 +241,7 @@ renderGauge(20);renderDonut(10);
    it depends on `var API` which is assigned further down. */
 
 function renderDonut(pct){
-  var segs=[{v:pct/100,c:'#9084b4'},{v:0.30,c:'#609c84'},{v:0.22,c:'#d9b84e'},{v:0.18,c:'#cc5a3c'},{v:1-pct/100-0.70,c:'#c0b4d8'}];
+  var segs=[{v:pct/100,c:'#b4a284'},{v:0.30,c:'#609c84'},{v:0.22,c:'#d9b84e'},{v:0.18,c:'#cc5a3c'},{v:1-pct/100-0.70,c:'#d8cbb4'}];
   document.getElementById('obDonut').innerHTML=donutChart(segs,190,pct);
 }
 function renderGauge(v){document.getElementById('gaugeWrap').innerHTML=gaugeChart(v/100);}

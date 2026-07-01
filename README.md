@@ -62,7 +62,7 @@ python3 -m http.server 3333
 | `06-stock-finder.js` | Stock Finder forecast page with interactive hover chart |
 | `07-tools-api.js` / `07b-money.js` | Backend API calls + money/budget/goals |
 | `08-learn-init.js` | Learn tab: lessons, XP/streaks, winding lesson trail |
-| `09-tools-games.js` | Tools tab: mini-games + loan/mortgage calculators |
+| `09-tools-games.js` | Explore (Tools) tab: mini-games + loan/mortgage calculators |
 
 ### Tools — "Play & Learn" games
 

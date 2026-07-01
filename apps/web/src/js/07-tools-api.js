@@ -86,7 +86,7 @@ function openTip(k){
   document.getElementById('sheetTerm').textContent=g.t;
   document.getElementById('sheetDef').textContent=g.d;
   document.getElementById('sheetOv').classList.add('open');
-  if(!seen[k]){seen[k]=1;var n=Object.keys(seen).length;document.getElementById('conceptCount').textContent=n+' explored';}
+  if(!seen[k]){seen[k]=1;var n=Object.keys(seen).length;var cc=document.getElementById('conceptCount');if(cc)cc.textContent=n+' explored';saveState();}
 }
 function closeTip(e){if(e.target===document.getElementById('sheetOv'))closeTipBtn();}
 function closeTipBtn(){document.getElementById('sheetOv').classList.remove('open');}
