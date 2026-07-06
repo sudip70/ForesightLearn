@@ -611,7 +611,11 @@ function renderAccounts(){
 }
 
 /* ── Home tiles (informational, like the Practice / My Goals tiles) ──── */
-var MONEY_PALETTE=['#9a8765','#5b8def','#4f9c7e','#e0a92f','#cf5a40','#b4a284'];
+/* Categorical palette for the money donuts — stays inside the money families
+ * (brand beige, --save gold, --spend orange, --blue, --loan burnt, taupe).
+ * Semantic green/red are deliberately absent: green means gains and red means
+ * loss app-wide, so neither may color an arbitrary "Transport" slice. */
+var MONEY_PALETTE=['#9a8765','#e3b23c','#e08a4f','#6f8fd6','#c96a2e','#a59c92'];
 function miniDonut(segs,size,centerTop,centerSub){
   size=size||92;var r=size/2-8,C=2*Math.PI*r,cx=size/2,cy=size/2,off=0;
   var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#f0edfa" stroke-width="13"/>';

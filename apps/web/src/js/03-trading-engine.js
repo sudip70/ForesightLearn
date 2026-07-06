@@ -124,7 +124,7 @@ function reviewTrade(){
 /* standard-normal sampler, used by the scenario engine */
 function gauss(){var u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
 function equityChart(hist,w,h,color,labelFn){
-  color=color||'#7a5cae';var pad=8,padB=20,padT=10;
+  color=color||'#6f659a';var pad=8,padB=20,padT=10;
   var vals=hist.map(function(p){return p.total;});
   var lf=labelFn||function(p){return 'Day '+(p.day!=null?p.day:p.i);};
   var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals),rg=(mx-mn)||1,n=vals.length;
@@ -195,14 +195,14 @@ function renderPortfolioChart(){
       var line=win.map(function(p,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(p.total).toFixed(1);}).join(' ');
       var area=line+' L'+X(n-1).toFixed(1)+' '+baseY+' L'+X(0).toFixed(1)+' '+baseY+' Z';
       var refY=Y(win[0].total).toFixed(1),ex=X(n-1).toFixed(1),ey=Y(win[n-1].total).toFixed(1);
-      return '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5cae" stop-opacity="0.16"/><stop offset="0.92" stop-color="#7a5cae" stop-opacity="0"/></linearGradient></defs>'
-        +'<line x1="8" y1="'+refY+'" x2="292" y2="'+refY+'" stroke="#7a5cae" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>'
+      return '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f659a" stop-opacity="0.16"/><stop offset="0.92" stop-color="#6f659a" stop-opacity="0"/></linearGradient></defs>'
+        +'<line x1="8" y1="'+refY+'" x2="292" y2="'+refY+'" stroke="#6f659a" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>'
         +'<path d="'+area+'" fill="url(#'+gid+')"/>'
-        +'<path d="'+line+'" fill="none" stroke="#7a5cae" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
-        +'<circle cx="'+ex+'" cy="'+ey+'" r="3.5" fill="#7a5cae" stroke="#fff" stroke-width="1.6"/>';
+        +'<path d="'+line+'" fill="none" stroke="#6f659a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+        +'<circle cx="'+ex+'" cy="'+ey+'" r="3.5" fill="#6f659a" stroke="#fff" stroke-width="1.6"/>';
     },
     xLabels:function(v){var lo=Math.max(0,Math.ceil(v.lo)),hi=Math.min(n-1,Math.floor(v.hi)),mid=Math.round((lo+hi)/2);return [{i:lo,a:'start',t:fmtDate(win[lo].date)},{i:mid,a:'middle',t:fmtDate(win[mid].date)},{i:hi,a:'end',t:fmtDate(win[hi].date)}];},
-    pointAt:function(idx){return {date:fmtDate(win[idx].date)||('Point '+(idx+1)),anchorVal:win[idx].total,rows:[{color:'#7a5cae',label:'Value',value:win[idx].total,disp:money(win[idx].total)}]};}
+    pointAt:function(idx){return {date:fmtDate(win[idx].date)||('Point '+(idx+1)),anchorVal:win[idx].total,rows:[{color:'#6f659a',label:'Value',value:win[idx].total,disp:money(win[idx].total)}]};}
   });
   var lab=document.getElementById('pfRangeChg');if(!lab)return;
   if(win.length>=2&&win[0].date){var a=win[0].total,b=win[win.length-1].total,d=b-a,pct=a?d/a*100:0;

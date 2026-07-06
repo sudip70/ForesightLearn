@@ -73,7 +73,7 @@ var LESSONS_L={
   /* ── Unit 1 · Money foundations ── */
   f_budget:{xp:40,celeb:'You\'ve got a plan for every paycheque now.',steps:[
     {say:'Before investing, know where your money goes. One simple split keeps it automatic: <b>50 / 30 / 20</b>. 🧾'},
-    {say:'<b>50%</b> to needs (rent, groceries), <b>30%</b> to wants (fun, takeout), <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#ae905c">50% needs</div><div style="width:30%;background:#5b8def">30% wants</div><div style="width:20%;background:#4f9c7e">20% save</div></div>';}},
+    {say:'<b>50%</b> to needs (rent, groceries), <b>30%</b> to wants (fun, takeout), <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#9a8765">50% needs</div><div style="width:30%;background:#6f8fd6">30% wants</div><div style="width:20%;background:#4f9c7e">20% save</div></div>';}},
     {q:'You take home $2,000 a month. Using 50/30/20, how much goes to saving &amp; debt?',opts:['$100','$400','$1,000'],correct:1,yes:'Exactly!',why:'20% × $2,000 = $400. Even automating a piece of this changes everything.'},
     {say:'The <b>pay-yourself-first</b> trick: move that 20% on payday — before it can disappear on wants. Future-you always wins this one. 💪'},
     {q:'Which best describes "pay yourself first"?',opts:['Spend freely, save whatever\'s left','Transfer savings the moment you\'re paid','Invest only when you have extra'],correct:1,yes:'Yes!',why:'Moving money before you can spend it is what actually makes saving happen. Willpower alone rarely works.'},
@@ -114,7 +114,7 @@ var LESSONS_L={
   ]},
   v_compound:{xp:50,celeb:'You just met the most powerful force in money.',steps:[
     {say:'The closest thing to magic in money: <b>compounding</b> — when your returns start earning their own returns. The longer you wait to start, the less magic you get. ❄️'},
-    {say:'$200/month invested at 7%/yr grows to about <b>$243,000</b> in 30 years. You only contributed $72,000 — the rest is compounding doing the heavy lifting.',viz:function(){return '<div class="viz-split"><div style="width:30%;background:#ae905c">$72K you put in</div><div style="width:70%;background:#4f9c7e">$171K growth</div></div>';}},
+    {say:'$200/month invested at 7%/yr grows to about <b>$243,000</b> in 30 years. You only contributed $72,000 — the rest is compounding doing the heavy lifting.',viz:function(){return '<div class="viz-split"><div style="width:30%;background:#9a8765">$72K you put in</div><div style="width:70%;background:#4f9c7e">$171K growth</div></div>';}},
     {q:'What matters most for compounding to work?',opts:['Picking the perfect stock','Starting early and staying in','Making one huge deposit'],correct:1,yes:'Exactly!',why:'Time is the secret ingredient. Starting 10 years earlier often beats investing twice as much later.'},
     {say:'You invest $1,000 today vs waiting 10 years to invest the same $1,000. At 7%/yr and 30-year horizon, the early start gives you <b>roughly twice the outcome</b>. 😬'},
     {q:'Friend A invests $1,000 today. Friend B waits 10 years, then invests $1,000. At 7%/yr over 30 years, who has more?',opts:['Friend A — started today','Friend B — saved longer before investing','They end up equal'],correct:0,yes:'Right!',why:'Friend A: ~$7,600. Friend B: ~$3,870. One decade of delay costs almost half the final amount.'},
@@ -155,7 +155,7 @@ var LESSONS_L={
   ]},
   p_mix:{xp:45,celeb:'You can design a mix you\'ll actually stick with.',steps:[
     {say:'Your <b>asset mix</b> — how much in stocks vs bonds vs other — shapes most of your long-run results. Get this right and you can sleep through any dip. 🥗'},
-    {say:'A classic start for a 25-year-old: <b>80% stocks / 20% bonds</b> — lean to growth when young, shift toward stability as your goal nears.',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#ae905c">80% stocks</div><div style="width:20%;background:#5b8def">20% bonds</div></div>';}},
+    {say:'A classic start for a 25-year-old: <b>80% stocks / 20% bonds</b> — lean to growth when young, shift toward stability as your goal nears.',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#9084b4">80% stocks</div><div style="width:20%;background:#6f8fd6">20% bonds</div></div>';}},
     {q:'You\'re 25, investing for retirement in 40 years. A reasonable tilt?',opts:['Mostly bonds — safe','Mostly stocks — long horizon','All cash — wait and see'],correct:1,yes:'Yes.',why:'40 years gives you time to ride out every dip stocks throw. Lean into growth when your horizon is long.'},
     {say:'<b>Rebalancing</b>: if stocks boom and grow to 90% of your portfolio, sell a little and buy bonds to drift back to your 80/20 target. Once a year is usually enough.'},
     {q:'Your target is 80% stocks. After a great year it\'s grown to 90% stocks. What do you do?',opts:['Do nothing — let it run','Sell some stocks, buy bonds to get back to 80/20','Sell everything and restart'],correct:1,yes:'Right!',why:'Rebalancing keeps your risk at the level you chose. Let stocks run unchecked and one bad year hits far harder.'},
