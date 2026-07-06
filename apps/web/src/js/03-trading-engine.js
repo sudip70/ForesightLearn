@@ -99,6 +99,19 @@ function renderWatch(){
 }
 function watchTrade(t){tradeTicker=t;tradeAction='buy';jTab(document.querySelectorAll('#page-journey .subtab')[1],'trade');}
 
+/* projected concentration if this buy goes through: (existing + new value) / (existing invested + new value),
+ * same "% of your practice money" math homeNudge() uses for the after-the-fact concentration rule (08-learn-init.js) —
+ * this is the before-the-fact version, checked at order review instead of waiting for Home to notice.
+ * Returns 0 (no signal) unless there's at least one OTHER holding to have spread into instead — same reason
+ * homeNudge() requires PF.pos.length>=2 before judging big.pct: your first-ever trade, or topping up your
+ * only holding, is always "100%" and isn't a concentration mistake, there's nothing else to compare it to. */
+function projectedConcentration(t,addVal){
+  var otherTickers=PF.pos.filter(function(x){return x.t!==t;}).length;
+  if(otherTickers<1)return 0;
+  var sx=pfStats(),ex=PF.pos.filter(function(x){return x.t===t;})[0];
+  var exVal=ex?ex.sh*curPx(t):0,newInv=sx.inv+addVal,newTickerVal=exVal+addVal;
+  return newInv>0?newTickerVal/newInv:0;
+}
 /* ── Order review → confirm (two-step, like a real broker ticket) ───── */
 function reviewTrade(){
   var sh=parseFloat((document.getElementById('tradeSh')||{}).value);
@@ -117,6 +130,13 @@ function reviewTrade(){
     +'<div style="height:1px;background:var(--purple-line);margin:9px 0"></div>'
     +r('Buying power after',money(after),after<0?'var(--red)':'')
     +'<div class="mrow-s" style="margin:8px 0 0">Paper trade · virtual cash. Fills at '+bn+'\'s latest closing price ('+money(p)+'). Real brokers fill market orders at the next available market price.</div></div>';
+  if(tradeAction==='buy'){
+    var pct=projectedConcentration(t,val);
+    if(pct>=0.4){
+      var pctR=Math.round(pct*100);
+      h+='<div class="mia" style="margin-top:12px"><div class="face">'+avatar()+'</div><div><div class="bubble">Heads up — this makes <b>'+bn+'</b> <b>'+pctR+'%</b> of your practice money. Spreading it out means one bad day can\'t take the whole portfolio with it.</div></div></div>';
+    }
+  }
   h+='<div class="row" style="gap:10px;margin-top:12px"><button class="btn btn-ghost" style="flex:1" onclick="renderTradePanel()">Cancel</button><button class="btn btn-pur" style="flex:1.4" onclick="execTrade()">Confirm '+(tradeAction==='buy'?'buy':'sell')+'</button></div>';
   document.getElementById('tradePanel').innerHTML=h;
 }
