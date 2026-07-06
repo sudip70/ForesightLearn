@@ -195,6 +195,7 @@ header.hidden{display:none}
 .acct-sec{border-radius:var(--r);padding:15px;margin-bottom:16px}
 .acct-sec.spend{background:linear-gradient(135deg,#fbe7e0,#f6d6ca)}
 .acct-sec.save{background:linear-gradient(135deg,#f6edcf,#efe0b3)}
+.acct-sec.loan{background:linear-gradient(135deg,#f5ddc9,#ecc4a0)}
 .acct-sec.invest{background:linear-gradient(135deg,#e9e3f5,#d8ccf0);--purple:var(--invest);--purple-strong:var(--invest-strong);--purple-deep:var(--invest-deep);--purple-soft:var(--invest-soft);--purple-soft2:var(--invest-soft2);--purple-line:var(--invest-line);--grad-a:var(--grad-invest-a);--grad-b:var(--grad-invest-b)}
 .acct-sec.invest .btn-pur,.acct-sec.invest .lpa-btn.lpa-go{box-shadow:0 8px 20px -6px rgba(111,101,154,.5)}
 .acct-sec-t{font-size:16px;font-weight:800;letter-spacing:-.2px;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:8px}
@@ -210,6 +211,7 @@ header.hidden{display:none}
 .ac-toggle{flex:1;background:var(--purple-soft);color:var(--purple-deep);border:none;border-radius:10px;padding:8px 6px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);transition:transform .12s,filter .12s}
 .ac-toggle.alt{background:var(--surface-soft);color:var(--muted);border:1.5px solid var(--line)}
 .ac-toggle:hover{transform:translateY(-1px);filter:brightness(.98)}
+.ac-toggle.sel{background:var(--purple-strong);color:#fff;border-color:transparent}
 .acct-q{width:32px;height:32px;border-radius:50%;border:2px solid var(--purple-line);background:var(--surface);color:var(--purple-deep);font-size:16px;font-weight:800;cursor:pointer;flex-shrink:0;font-family:var(--font);transition:transform .12s,background .12s;line-height:1}
 .acct-q:hover{transform:scale(1.08);background:var(--purple-soft)}
 /* compact inline help dot — sits next to a label, opens the What's-That sheet */
@@ -236,13 +238,29 @@ header.hidden{display:none}
 .cat-add{display:flex;gap:7px;margin-top:8px}
 .cat-add .f-in{padding:8px 11px;font-size:13px;margin:0}
 .cat-add .btn{width:auto;flex:0 0 auto;padding:8px 15px;font-size:12px}
-.acct-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px}
+/* each loan gets its own tinted card, instead of thin cat-row dividers — easier to scan at a glance
+   when there's more than one loan */
+.loan-row{background:var(--loan-soft);border-radius:12px;padding:12px 13px;margin-bottom:10px}
+.loan-row:last-of-type{margin-bottom:0}
+.loan-row-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.loan-row-name{font-size:14px;font-weight:800;color:var(--ink)}
+.loan-row-bal{font-size:15px;font-weight:800;color:var(--loan-deep)}
+.loan-row-mo{font-size:12px;font-weight:700;color:var(--loan-deep);opacity:.75;margin-top:2px}
+.loan-row-pay{display:flex;gap:7px;margin-top:10px}
+.loan-row-pay .f-in{background:var(--surface);padding:8px 11px;font-size:13px}
+.loan-row-pay .btn{width:auto;flex:0 0 auto;padding:8px 15px;font-size:12px}
+.loan-row-x{width:36px;height:36px;border-radius:50%;border:1.6px solid rgba(0,0,0,.08);background:var(--surface);color:var(--muted);font-size:14px;cursor:pointer;flex-shrink:0;font-family:var(--font);transition:transform .12s,background .12s,color .12s}
+.loan-row-x:hover{transform:scale(1.08);background:var(--loan-soft);color:var(--loan-deep)}
+/* stacked add-loan form: one field per line reads far clearer than three crammed inputs in a row */
+.loan-add{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.acct-sum{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:18px}
 .sum-tile{background:var(--surface);border-radius:14px;padding:13px 14px;box-shadow:var(--shadow)}
 .sum-tile .st-l{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sum-tile .st-v{font-size:20px;font-weight:800;letter-spacing:-.4px;margin-top:4px;color:var(--ink)}
 .logrow{display:flex;gap:8px;align-items:center}
 .logrow .f-in{flex:1;min-width:0}
 .logrow #axCat,.logrow #axPay{flex:1.15}
+@media(max-width:780px){.acct-sum{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:560px){.acct-sum{grid-template-columns:repeat(2,1fr)}.logrow{flex-wrap:wrap}.logrow .f-in{flex:1 1 100%}.logrow .btn{flex:1 1 100%!important;width:100%!important}}
 .donut-wrap{display:flex;align-items:center;gap:16px;margin-top:16px}
 .donut-legend{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}

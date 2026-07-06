@@ -13,7 +13,8 @@ var SKILLS=[
 ];
 var WHYS=['To save for a big expense','So my money can grow safely','To save for the future','As a way to make money'];
 var ACCTS=[{k:'TFSA',d:'Tax-free growth · recommended',cls:'tfsa'},{k:'RRSP',d:'Retirement plan',cls:'rrsp'},{k:'ETFs',d:'Bundled funds',cls:'etf'}];
-function money0(n){return '$'+Math.round(n).toLocaleString();}
+/* sign goes before the $ ("-$12", not "$-12") — see money() in 03-trading-engine.js */
+function money0(n){n=Math.round(n);var neg=n<0;return (neg?'-':'')+'$'+Math.abs(n).toLocaleString();}
 function lclsOf(t){var a=ASSETS.filter(function(x){return x.t===t;})[0];return a?a.c:'stock';}
 function pfStats(){var inv=0,byCls={},big={t:'',v:0};PF.pos.forEach(function(p){var v=p.sh*curPx(p.t);inv+=v;var c=lclsOf(p.t);byCls[c]=(byCls[c]||0)+v;if(v>big.v)big={t:p.t,v:v};});return {inv:inv,classes:Object.keys(byCls).length,big:{t:big.t,pct:inv?big.v/inv:0}};}
 function pfClasses(){return pfStats().classes;}

@@ -15,23 +15,33 @@ var GOALS=[
 ];
 var SPENDING=[];
 var NETWORTH={assets:[{name:'Savings account',value:4200},{name:'Chequing',value:800}],
-              debts:[{name:'Student loan',value:6000},{name:'Credit card',value:450}]};
+              debts:[{name:'Student loan',value:6000,loanId:'l_seed'},{name:'Credit card',value:450}]};
 /* My Accounts ledgers (recorded from the My Accounts screen) */
 var LOANS=[{id:'l_seed',name:'Student loan',balance:6000,monthly:75}];
 /* Mirrors the "Savings account" asset in NETWORTH so the My Accounts hub and
    Net Worth screens show the same savings balance on load. */
 var SAVINGS={balance:4200};
+/* Mirrors the "Chequing" asset in NETWORTH — same pattern as Savings above. Deposits
+   (paycheck, etc.) add to it; logging a Debit card purchase in My Accounts spends
+   from it, same as a real chequing account. */
+var CHEQUING={balance:800};
+/* 'have' | 'need' | null — which credit-card toggle the user picked in My Accounts */
+var CREDIT_CARD=null;
 
 /* Keep the Net Worth ledger in step with the My Accounts balances: the savings
-   balance writes through to the "Savings account" asset, and each loan writes
-   through to the same-named debt. Only existing rows are updated (except addLoan,
-   which registers the new debt) — deleting a row on the Net Worth page is
-   respected, we never resurrect it. */
+   and chequing balances write through to their matching NETWORTH asset rows, and
+   each loan writes through to the debt row linked by loanId (matching by name is
+   only a fallback for saves from before rows carried ids). Only existing rows are
+   updated (except addLoan, which registers the new debt, and delLoan, which
+   retires it) — deleting a row on the Net Worth page is respected, we never
+   resurrect it. */
 function syncNetworthMirror(){
   var a=NETWORTH.assets.filter(function(x){return x.name==='Savings account';})[0];
   if(a)a.value=numVal(SAVINGS.balance);
+  var c=NETWORTH.assets.filter(function(x){return x.name==='Chequing';})[0];
+  if(c)c.value=numVal(CHEQUING.balance);
   NETWORTH.debts.forEach(function(d){
-    var l=LOANS.filter(function(x){return x.name===d.name;})[0];
+    var l=LOANS.filter(function(x){return d.loanId?x.id===d.loanId:x.name===d.name;})[0];
     if(l)d.value=numVal(l.balance);
   });
 }
@@ -185,7 +195,12 @@ function addExpense(){
   var date=(document.getElementById('exDate')||{}).value||todayISO();
   SPENDING.push({id:moneyUid(),date:date,amount:amt,category:cat,note:note});saveState();renderSpending();showToast('✓ Logged '+money0(amt)+' · '+cat);
 }
-function delExpense(id){SPENDING=SPENDING.filter(function(x){return x.id!==id;});saveState();renderSpending();}
+function delExpense(id){
+  var s=SPENDING.filter(function(x){return x.id===id;})[0];
+  if(s&&s.acct==='Debit card'){CHEQUING.balance=numVal(CHEQUING.balance)+numVal(s.amount);syncNetworthMirror();}
+  SPENDING=SPENDING.filter(function(x){return x.id!==id;});
+  saveState();renderSpending();if(typeof renderAcctDebit==='function')renderAcctDebit();
+}
 
 /* ── Net Worth ───────────────────────────────── */
 function networthRows(){
@@ -229,19 +244,15 @@ function delNW(kind,i){NETWORTH[kind].splice(i,1);saveState();renderNetworth();}
 /* Mirrors the real-life money map: Spending · Saving · Investing. No balances to
  * edit here, it's a guided intro that hands off to Learn / Practice / a help sheet.
  * Net Worth stays the place to record numbers. */
-function acctHelp(t,d){return "openSheet('"+t.replace(/'/g,"\\'")+"','"+d.replace(/'/g,"\\'")+"')";}
+/* the result is always embedded inside a double-quoted onclick="..." attribute, so
+ * escape both JS-string quotes (') and HTML-attribute quotes (") — a literal " in t/d
+ * used to silently truncate the handler (e.g. help text quoting a term like "avalanche"). */
+function acctHelp(t,d){function esc(s){return (''+s).replace(/'/g,"\\'").replace(/"/g,'&quot;');}return "openSheet('"+esc(t)+"','"+esc(d)+"')";}
 function helpDot(term){return '<button class="acct-q" onclick="openTip(\''+term+'\')" title="What\'s this?">?</button>';}
 function acctChat(text,onclick){
   return '<div class="acct-chat" onclick="'+onclick+'"><div class="ac-ic">'
     +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 4z"/><path d="M8 9h6M8 12h3"/></svg>'
     +'</div><div class="ac-tx">'+text+'</div><div class="ac-go">›</div></div>';
-}
-/* Learn → Practice → Activate trio, echoes the welcome loop (💡 🪙 🌱). */
-function lpaRow(learn,practice,activate){
-  return '<div class="lpa">'
-    +'<button class="lpa-btn" onclick="'+learn+'"><span class="lpa-e">💡</span>Learn</button>'
-    +'<button class="lpa-btn" onclick="'+practice+'"><span class="lpa-e">🪙</span>Practice</button>'
-    +'<button class="lpa-btn lpa-go" onclick="'+activate+'"><span class="lpa-e">🌱</span>Activate</button></div>';
 }
 /* ── inline graphics ── */
 function bankCardSVG(kind){
@@ -346,11 +357,56 @@ function renderAcctSummary(){
   var owe=LOANS.reduce(function(a,l){return a+numVal(l.balance);},0);
   function tile(ic,label,val,cls){return '<div class="sum-tile"><div class="st-l">'+ic+' '+label+'</div><div class="st-v tnum '+(cls||'')+'">'+val+'</div></div>';}
   box.innerHTML='<div class="acct-sum">'
-    +tile('⚡','Buying power',money0(bp),'')
+    +tile('💳','Chequing',money0(CHEQUING.balance),numVal(CHEQUING.balance)<0?'down':'')
     +tile('🐷','Savings',money0(SAVINGS.balance),'up')
+    +tile('⚡','Buying power',money0(bp),'')
     +tile('📉','Owed',money0(owe),'down')
     +tile('🧾','Spent this month',money0(monthTotal()),'')
     +'</div>';
+}
+
+/* ── Debit Card: a real chequing balance, like Savings — "Add money" deposits into
+ * it, and logging a Debit-card purchase below spends from it. Recent purchases are
+ * filtered from the same SPENDING ledger the logger writes to. ── */
+function renderAcctDebit(){
+  var box=document.getElementById('acctDebitBox');if(!box)return;
+  var bal=numVal(CHEQUING.balance);
+  var txns=SPENDING.filter(function(s){return s.acct==='Debit card';})
+    .sort(function(a,b){return (b.date||'').localeCompare(a.date||'');}).slice(0,3);
+  var h='<div class="acct-card" style="display:block">'
+    +'<div class="row" style="margin-bottom:11px"><div style="display:flex;align-items:center;gap:12px">'+bankCardSVG('debit')
+    +'<div><div class="ac-name" style="margin:0">Debit Card</div><div class="ac-note" style="margin-top:2px">Balance</div></div></div>'
+    +'<div style="display:flex;align-items:center;gap:9px"><span class="tnum" style="font-size:19px;font-weight:800;color:'+(bal<0?'var(--red)':'var(--green)')+'">'+money0(bal)+'</span>'+helpDot('debit_card')+'</div></div>';
+  if(txns.length){
+    txns.forEach(function(s){h+='<div class="txn"><span>'+escHtml(s.note||s.category)+'</span><span class="down">-'+money0(s.amount)+'</span></div>';});
+  }else{
+    h+='<div class="ac-note" style="margin-bottom:2px">No debit purchases logged yet</div>';
+  }
+  h+='<div class="cat-add" style="margin-top:10px"><input class="f-in" id="chAmt" inputmode="decimal" placeholder="Amount" style="margin:0" onkeydown="if(event.key===\'Enter\')addChequing()"/>'
+    +'<button class="btn btn-soft" onclick="addChequing()">Add money</button></div>';
+  box.innerHTML=h+'</div>';
+}
+function addChequing(){
+  var f=document.getElementById('chAmt'),amt=numVal(f&&f.value);if(amt<=0){showToast('Enter an amount');return;}
+  CHEQUING.balance=numVal(CHEQUING.balance)+amt;syncNetworthMirror();saveState();renderAcctDebit();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
+  var nf=document.getElementById('chAmt');if(nf){nf.value='';nf.focus();}
+  showToast('💳 Added '+money0(amt)+' to chequing');
+}
+
+/* ── Credit Card: a real, persisted toggle (not just two tooltip triggers) ── */
+var CREDIT_HELP={
+  have:{t:'Nice, you have a credit card',d:'The golden rule: pay the full balance every month. Do that and the card is free to use, protects your purchases, and steadily builds your credit score. Carry a balance and you get charged high interest (often ~20% a year). Treat it like a debit card you pay off, not extra money.'},
+  need:{t:'Thinking about a first credit card',d:'Look for a no-annual-fee starter or student card with a low limit. Used well, a credit card is the easiest way to build the credit score you\'ll need for a phone plan, apartment or car loan later. The rule never changes: only charge what you can pay off in full each month.'}
+};
+function renderAcctCredit(){
+  var box=document.getElementById('acctCreditBox');if(!box)return;
+  box.innerHTML='<div class="ac-toggle-row">'
+    +'<button class="ac-toggle'+(CREDIT_CARD==='have'?' sel':'')+'" onclick="pickCreditCard(\'have\')">Have one</button>'
+    +'<button class="ac-toggle alt'+(CREDIT_CARD==='need'?' sel':'')+'" onclick="pickCreditCard(\'need\')">Need one</button></div>';
+}
+function pickCreditCard(which){
+  CREDIT_CARD=which;saveState();renderAcctCredit();
+  var h=CREDIT_HELP[which];openSheet(h.t,h.d);
 }
 
 /* ── Spending: one logger row + read-only category bars + recent ── */
@@ -388,13 +444,17 @@ function addAcctExpense(){
   var pay=(document.getElementById('axPay')||{}).value||acctPay||'';
   acctCat=cat;acctPay=pay;
   SPENDING.push({id:moneyUid(),date:todayISO(),amount:amt,category:cat,note:'',acct:pay});
-  saveState();renderAcctSpend();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
+  if(pay==='Debit card'){CHEQUING.balance=numVal(CHEQUING.balance)-amt;syncNetworthMirror();}
+  saveState();renderAcctSpend();renderAcctSummary();renderAcctDebit();if(typeof renderMoneyHome==='function')renderMoneyHome();
   var nf=document.getElementById('axAmt');if(nf){nf.value='';nf.focus();}/* ready for the next one */
   showToast('✓ Logged '+money0(amt)+' · '+cat);
 }
 function delAcctExpense(id){
+  var s=SPENDING.filter(function(x){return x.id===id;})[0];
+  /* deleting a logged purchase is a correction — credit the chequing balance back */
+  if(s&&s.acct==='Debit card'){CHEQUING.balance=numVal(CHEQUING.balance)+numVal(s.amount);syncNetworthMirror();}
   SPENDING=SPENDING.filter(function(x){return x.id!==id;});
-  saveState();renderAcctSpend();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
+  saveState();renderAcctSpend();renderAcctSummary();renderAcctDebit();if(typeof renderMoneyHome==='function')renderMoneyHome();
 }
 
 /* ── Loans: record loans and log payments against them ── */
@@ -402,32 +462,36 @@ function renderAcctLoans(){
   var box=document.getElementById('acctLoansBox');if(!box)return;
   var owe=LOANS.reduce(function(a,l){return a+numVal(l.balance);},0);
   var mo=LOANS.reduce(function(a,l){return a+numVal(l.monthly);},0);
+  var sub=LOANS.length?(mo>0?money0(mo)+'/mo total':LOANS.length+' loan'+(LOANS.length===1?'':'s')):'No loans added yet';
   var h='<div class="acct-card" style="display:block">'
-    +'<div class="row" style="margin-bottom:'+(LOANS.length?'12px':'10px')+'"><div style="display:flex;align-items:center;gap:11px">'+loanSVG()
-    +'<div><div class="ac-name" style="margin:0">Loan Accounts</div>'+(mo>0?'<div class="ac-note" style="margin-top:2px">'+money0(mo)+'/mo in payments</div>':'')+'</div></div>'
-    +'<div style="display:flex;align-items:center;gap:9px"><span class="pill pill-loan">owe '+money0(owe)+'</span>'+helpDot('loan_acct')+'</div></div>';
+    +'<div class="row" style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:11px">'+loanSVG()
+    +'<div><div class="ac-name" style="margin:0">Loan Accounts</div><div class="ac-note" style="margin-top:2px">'+sub+'</div></div></div>'
+    +(LOANS.length?'<div style="display:flex;align-items:center;gap:9px"><span class="pill pill-loan">owe '+money0(owe)+'</span>'+helpDot('loan_acct')+'</div>':helpDot('loan_acct'))+'</div>';
   LOANS.forEach(function(l,i){
-    h+='<div class="cat-row"><div class="cat-top"><span class="cat-n">'+escHtml(l.name)+'</span>'
-      +'<span class="cat-v over">'+money0(l.balance)+(numVal(l.monthly)>0?' · '+money0(l.monthly)+'/mo':'')+'</span></div>'
-      +'<div class="cat-add">'+moneyInput('lpay'+i,null,'Payment')
+    h+='<div class="loan-row">'
+      +'<div class="loan-row-head"><span class="loan-row-name">'+escHtml(l.name)+'</span><span class="loan-row-bal">'+money0(l.balance)+'</span></div>'
+      +(numVal(l.monthly)>0?'<div class="loan-row-mo">'+money0(l.monthly)+'/mo</div>':'')
+      +'<div class="loan-row-pay">'+moneyInput('lpay'+i,null,'Payment amount','margin:0')
       +'<button class="btn btn-soft" onclick="payLoan('+i+')">Pay</button>'
-      +'<button class="acct-q" style="width:36px;height:36px;border-color:var(--line)" title="Remove" onclick="delLoan('+i+')">✕</button></div></div>';
+      +'<button class="loan-row-x" title="Remove loan" onclick="delLoan('+i+')">✕</button></div></div>';
   });
-  h+='<div style="margin-top:13px"><label class="f-label">Add a loan</label>'
-    +'<div class="row" style="gap:7px;align-items:flex-end">'
-    +'<div style="flex:2"><input class="f-in" id="loName" placeholder="e.g. Car loan" style="margin:0"/></div>'
-    +'<div style="flex:1.1">'+moneyInput('loBal',null,'Owed','margin:0')+'</div>'
-    +'<div style="flex:1">'+moneyInput('loMo',null,'$/mo','margin:0')+'</div>'
-    +'<button class="btn btn-soft" style="width:auto;flex:0 0 auto;padding:9px 14px" onclick="addLoan()">Add</button></div></div>';
+  h+='<div class="loan-add"><label class="f-label">Add a loan</label>'
+    +'<input class="f-in" id="loName" placeholder="Loan name (e.g. Car loan)"/>'
+    +'<div style="display:flex;gap:8px">'
+    +'<div style="flex:1">'+moneyInput('loBal',null,'Amount owed')+'</div>'
+    +'<div style="flex:1">'+moneyInput('loMo',null,'Monthly payment')+'</div></div>'
+    +'<button class="btn btn-soft" style="width:100%" onclick="addLoan()">Add loan</button></div>';
   box.innerHTML=h+'</div>';
 }
 function addLoan(){
   var n=((document.getElementById('loName')||{}).value||'').trim();
   if(!n){showToast('Name the loan');return;}
   var bal=numVal((document.getElementById('loBal')||{}).value);
-  LOANS.push({id:moneyUid(),name:n,balance:bal,monthly:numVal((document.getElementById('loMo')||{}).value)});
-  var d=NETWORTH.debts.filter(function(x){return x.name===n;})[0];
-  if(d)d.value=bal;else NETWORTH.debts.push({name:n,value:bal});
+  var loan={id:moneyUid(),name:n,balance:bal,monthly:numVal((document.getElementById('loMo')||{}).value)};
+  LOANS.push(loan);
+  /* adopt a legacy same-named row (pre-loanId saves); otherwise each loan gets its own debt row */
+  var d=NETWORTH.debts.filter(function(x){return !x.loanId&&x.name===n;})[0];
+  if(d){d.value=bal;d.loanId=loan.id;}else NETWORTH.debts.push({name:n,value:bal,loanId:loan.id});
   saveState();renderAcctLoans();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();showToast('✓ Added '+n);
 }
 function payLoan(i){
@@ -439,7 +503,11 @@ function payLoan(i){
   saveState();renderAcctLoans();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
   showToast(l.balance<=0?'🎉 '+l.name+' paid off!':'✓ Paid '+money0(amt)+' · '+l.name);
 }
-function delLoan(i){LOANS.splice(i,1);saveState();renderAcctLoans();renderAcctSummary();}
+function delLoan(i){
+  var l=LOANS.splice(i,1)[0];
+  if(l)NETWORTH.debts=NETWORTH.debts.filter(function(d){return d.loanId?d.loanId!==l.id:d.name!==l.name;});
+  saveState();renderAcctLoans();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
+}
 
 /* ── Savings balance: deposit / withdraw ── */
 function renderAcctSave(){
@@ -475,7 +543,7 @@ function renderAcctInvest(){
     +'<div style="display:flex;align-items:center;gap:9px"><span class="tnum" style="font-size:19px;font-weight:800;color:var(--purple-deep)">'+money0(live)+'</span>'+helpDot('investing_acct')+'</div></div>'
     +'<div class="row" style="margin:0 0 10px;padding:9px 11px;background:var(--purple-soft);border-radius:11px"><span style="font-size:12.5px;font-weight:800;color:var(--purple-deep)">⚡ Buying power</span><span class="tnum" style="font-weight:800;color:var(--purple-deep)">'+money(bp)+'</span></div>'
     +'<div class="cat-add"><input class="f-in" id="ivAmt" inputmode="decimal" placeholder="Add cash" style="margin:0" onkeydown="if(event.key===\'Enter\')addInvestCash()"/>'
-    +'<button class="btn btn-soft" onclick="addInvestCash()">Add to buying power</button></div>'
+    +'<button class="btn btn-soft" onclick="addInvestCash()">Add to investment account</button></div>'
     +'<div class="ac-note" style="margin-top:8px">Deposits become virtual cash you can invest over in <b>Practice</b>.</div></div>';
 }
 function addInvestCash(){
@@ -505,17 +573,11 @@ function renderAccounts(){
   h+='<div class="grid-2"><div class="stack">';
   /* ── Spending ── */
   h+='<div class="acct-sec spend"><div class="acct-sec-t">🪙 Spending Accounts</div>'
-    +'<div class="acct-card">'+bankCardSVG('debit')
-      +'<div class="ac-mid"><div class="ac-name">Debit Card</div>'
-      +'<div class="txn"><span>Payroll deposit</span><span class="up">+$426</span></div>'
-      +'<div class="txn"><span>Interac e-Transfer</span><span class="up">+$126</span></div></div>'
-      +helpDot('debit_card')+'</div>'
+    +'<div id="acctDebitBox"></div>'
     +'<div class="acct-card">'+bankCardSVG('credit')
-      +'<div class="ac-mid"><div class="ac-name">Credit Card</div>'
-      +'<div class="ac-toggle-row"><button class="ac-toggle" onclick="'+acctHelp('Nice, you have a credit card','The golden rule: pay the full balance every month. Do that and the card is free to use, protects your purchases, and steadily builds your credit score. Carry a balance and you get charged high interest (often ~20% a year). Treat it like a debit card you pay off, not extra money.')+'">Have one</button>'
-      +'<button class="ac-toggle alt" onclick="'+acctHelp('Thinking about a first credit card','Look for a no-annual-fee starter or student card with a low limit. Used well, a credit card is the easiest way to build the credit score you\'ll need for a phone plan, apartment or car loan later. The rule never changes: only charge what you can pay off in full each month.')+'">Need one</button></div></div>'
+      +'<div class="ac-mid"><div class="ac-name">Credit Card</div><div id="acctCreditBox"></div></div>'
       +helpDot('credit_card')+'</div>'
-    +'<div id="acctLoansBox"></div><div id="acctSpendBox"></div>'
+    +'<div id="acctSpendBox"></div>'
     +acctChat('Help me set up an account',acctHelp('Setting up your first account','Pick one bank you like (many have free everyday accounts), then open a chequing account for spending and a savings account for setting money aside. You\'ll need photo ID and a SIN. Once it\'s open you get a debit card for day-to-day spending, that\'s the foundation everything else builds on.'))
     +'</div></div>';
 
@@ -523,18 +585,29 @@ function renderAccounts(){
   h+='<div class="stack">'
     +'<div class="acct-sec save"><div class="acct-sec-t">🐷 Savings Accounts</div>'
     +'<div id="acctSaveBox"></div>'
-    +lpaRow("goTab('learn')","push('goals')",acctHelp('Open a savings account','Almost every bank offers a free high-interest savings account, open one online in minutes. Then automate it: set a small auto-transfer (even $25) from chequing each payday. Aim to build a starter emergency fund of about one month of expenses first.'))
-    +acctChat('Help me set up a savings account',acctHelp('Open a savings account','Almost every bank offers a free high-interest savings account, open one online in minutes. Then automate it: set a small auto-transfer (even $25) from chequing each payday. Aim to build a starter emergency fund of about one month of expenses first.'))
+    +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 10px">'
+    +'<button class="lpa-btn" style="flex:1" onclick="goTab(\'learn\')"><span class="lpa-e">💡</span>Learn</button>'
+    +'<div style="flex:0 0 auto;display:flex">'+acctChat('Help me set up a savings account',acctHelp('Open a savings account','Almost every bank offers a free high-interest savings account, open one online in minutes. Then automate it: set a small auto-transfer (even $25) from chequing each payday. Aim to build a starter emergency fund of about one month of expenses first.'))+'</div>'
+    +'</div>'
     +'</div>'
     +'<div class="acct-sec invest"><div class="acct-sec-t">📈 Investing Accounts</div>'
     +'<div id="acctInvestBox"></div>'
-    +lpaRow("openTip('tfsa')","goTab('journey')",acctHelp('Open a real investing account','When you\'re ready, most banks and brokerages let you open a TFSA online for free. Start with a TFSA (growth is tax-free), pick a low-cost broad ETF, and contribute a small amount regularly. Everything you practise here, buying, holding, diversifying, applies the same way with real money.'))
-    +acctChat('Help me set up an investing account',acctHelp('Open a real investing account','When you\'re ready, most banks and brokerages let you open a TFSA online for free. Start with a TFSA (growth is tax-free), pick a low-cost broad ETF, and contribute a small amount regularly. Everything you practise here, buying, holding, diversifying, applies the same way with real money.'))
+    +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 10px">'
+    +'<button class="lpa-btn" style="flex:1" onclick="openTip(\'tfsa\')"><span class="lpa-e">💡</span>Learn</button>'
+    +'<div style="flex:0 0 auto;display:flex">'+acctChat('Help me set up an investing account',acctHelp('Open a real investing account','When you\'re ready, most banks and brokerages let you open a TFSA online for free. Start with a TFSA (growth is tax-free), pick a low-cost broad ETF, and contribute a small amount regularly. Everything you practise here, buying, holding, diversifying, applies the same way with real money.'))+'</div>'
+    +'</div>'
+    +'</div>'
+    +'<div class="acct-sec loan"><div class="acct-sec-t">🏦 Loan Accounts</div>'
+    +'<div id="acctLoansBox"></div>'
+    +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 10px">'
+    +'<button class="lpa-btn" style="flex:1" onclick="push(\'loan-calc\')"><span class="lpa-e">💡</span>Learn</button>'
+    +'<div style="flex:0 0 auto;display:flex">'+acctChat('Help me pay off debt faster',acctHelp('Paying off debt faster','List your debts by interest rate. Send any extra money to the highest-rate debt first (the "avalanche" method) — it saves the most interest overall. Prefer quick wins to stay motivated? Pay off the smallest balance first (the "snowball" method) instead. Either way, keep paying at least the minimum on everything else.'))+'</div>'
+    +'</div>'
     +'</div></div>';
 
   h+='</div>'; // grid-2
   el.innerHTML=h;
-  renderAcctSummary();renderAcctLoans();renderAcctSpend();renderAcctSave();renderAcctInvest();
+  renderAcctSummary();renderAcctDebit();renderAcctCredit();renderAcctLoans();renderAcctSpend();renderAcctSave();renderAcctInvest();
 }
 
 /* ── Home tiles (informational, like the Practice / My Goals tiles) ──── */

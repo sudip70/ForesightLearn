@@ -40,7 +40,9 @@ function anchorInit(){
   PF.cash=+(START_CAPITAL-cost).toFixed(2);initDone=true;saveState();
 }
 function refreshHeldPrices(){PF.pos.forEach(function(p){if(!LIVE[p.t]||!HIST[p.t])fetchLive(p.t,function(){anchorInit();renderPortfolio();var jh=document.getElementById('jHold');if(jh&&jh.style.display!=='none')renderHoldings();});});}
-function money(n){return '$'+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+/* sign goes before the $ ("-$12.00", not "$-12.00") — matters now that balances
+ * (chequing overdraft, net worth) can legitimately go negative. */
+function money(n){n=Number(n);var neg=n<0;return (neg?'-':'')+'$'+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function signed(n){return (n>=0?'+':'-')+'$'+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtSh(n){n=+n;return Number.isInteger(n)?(''+n):(''+ +n.toFixed(4));}
 function totals(){var inv=0,val=0;PF.pos.forEach(function(p){inv+=p.sh*p.avg;val+=p.sh*curPx(p.t);});return {inv:inv,val:val,unreal:val-inv,total:val+PF.cash};}
