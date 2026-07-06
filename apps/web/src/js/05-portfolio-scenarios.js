@@ -329,6 +329,7 @@ function execTrade(){
     openSheet((realized>=0?'🎉 ':'')+'Trade complete, '+signed(realized)+' realized','You bought '+bn+' at an average of '+money(pos.avg)+' and sold at '+money(p)+'. That\'s a '+signed(realized)+' '+(realized>=0?'gain':'loss')+', now locked in as realized P&L. '+(realized>=0?'Nice work!':'Every trade is a lesson on the way.'));
   }
   pendingSh=0;
+  if(typeof touchStreak==='function')touchStreak();/* a practice trade counts as today's activity */
   renderPortfolio();renderTradePanel();refreshLearn();saveState();
 }
 function renderActivity(){

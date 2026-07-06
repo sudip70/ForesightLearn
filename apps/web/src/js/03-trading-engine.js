@@ -17,14 +17,13 @@ var ACTIVITY=[
   {ic:'💵',main:'Opening deposit',sub:'Day 1 · Virtual cash',amt:'+$10,000.00',cls:'up'}
 ];
 var contrib={amt:100,freq:'Weekly'},tradeTicker='AAPL',tradeAction='buy',explainerShown=false,pendingSh=0;
-var SIM={day:4};/* vestigial day counter, kept only for the activity-log label */
 function curPx(t){return LIVE[t]||SEED[t]||100;}/* real live price, seed fallback offline */
 function nameOf(t){var a=ASSETS.filter(function(x){return x.t===t;})[0];return a?a.n:t;}
 function fetchLive(t,cb){
   var key=t+'_90';
   if(SF_CACHE[key]&&SF_CACHE[key].latest_price){LIVE[t]=SF_CACHE[key].latest_price;if(SF_CACHE[key].returns)TRADE_FC[t]=SF_CACHE[key].returns;if(SF_CACHE[key].historical_prices)HIST[t]=SF_CACHE[key].historical_prices;if(cb)cb();return;}
   wakeFetch(API+'/api/forecasts/ticker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticker:t,horizon_days:90})})
-    .then(function(d){if(d&&d.latest_price){LIVE[t]=d.latest_price;if(d.returns)TRADE_FC[t]=d.returns;if(d.historical_prices)HIST[t]=d.historical_prices;}if(cb)cb();})
+    .then(function(d){if(d&&d.latest_price){LIVE[t]=d.latest_price;if(d.returns)TRADE_FC[t]=d.returns;if(d.historical_prices)HIST[t]=d.historical_prices;if(typeof savePriceCache==='function')savePriceCache();}if(cb)cb();})
     .catch(function(){if(cb)cb();});
 }
 var initDone=false;

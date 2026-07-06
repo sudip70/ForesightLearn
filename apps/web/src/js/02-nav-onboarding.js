@@ -61,7 +61,7 @@ function obGoalDraft(){
 }
 function renderOBSummary(){
   var g=obGoalDraft(),el=document.getElementById('obGoalSum');
-  if(el)el.innerHTML='<b style="color:var(--purple-strong);font-size:18px">Save $'+g.amt.toLocaleString()+'</b><br/>for '+(g.what.charAt(0).toLowerCase()+g.what.slice(1))+', over '+g.years+' year'+(g.years===1?'':'s');
+  if(el)el.innerHTML='<b style="color:var(--purple-strong);font-size:18px">Save $'+g.amt.toLocaleString()+'</b><br/>for '+escHtml(g.what.charAt(0).toLowerCase()+g.what.slice(1))+', over '+g.years+' year'+(g.years===1?'':'s');
   var m=document.getElementById('obMs3');
   if(m)m.textContent='Contribute '+obPct+'% of your earnings monthly';
 }
