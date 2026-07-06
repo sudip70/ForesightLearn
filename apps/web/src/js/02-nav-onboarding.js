@@ -12,7 +12,7 @@ function show(id){
   if(id==='journey'){applyPracticeLevel();refreshHeldPrices();}
   if(id==='scenario')renderScenario();
   if(id==='social')renderProfile();
-  if(id==='home'){renderMoneyHome();renderGoalCard();renderQOTD();renderPlan();}
+  if(id==='home'){renderMoneyHome();renderGoalCard();}
   if(id==='budget')renderBudget();
   if(id==='goals')renderGoals();
   if(id==='spending')renderSpending();
@@ -56,7 +56,7 @@ function obNext(){if(obStep<OB_MAX){obStep++;renderOB();}else finishOB();}
 /* what the user actually typed on the goal screen (falling back to the placeholders) */
 function obGoalDraft(){
   function txt(id){return ((document.getElementById(id)||{}).value||'').trim();}
-  function num(id,dflt){var n=parseInt(txt(id).replace(/[^0-9]/g,''),10);return n>0?n:dflt;}
+  function num(id,dflt){var n=Math.round(parseFloat(txt(id).replace(/[^0-9.]/g,'')));return n>0?n:dflt;}
   return {what:txt('goalWhat')||'A car',amt:num('goalAmt',10000),years:num('goalTime',5)};
 }
 function renderOBSummary(){
@@ -73,7 +73,9 @@ function applyOBGoal(){
   if(typeof GOALS!=='undefined'){
     if(!GOALS.length)GOALS.unshift({id:moneyUid(),saved:0,account:'TFSA'});
     var g0=GOALS[0];
-    g0.what=g.what;g0.target=g.amt;if(g0.saved==null)g0.saved=0;
+    /* a different goal than what sat in the slot — don't inherit the old one's progress */
+    if(g0.what!==g.what||g0.target!==g.amt||g0.saved==null)g0.saved=0;
+    g0.what=g.what;g0.target=g.amt;
     g0.years=g.years;g0.why=obWhy;g0.pct=obPct;
   }
   if(typeof syncPrimaryGoal==='function')syncPrimaryGoal();

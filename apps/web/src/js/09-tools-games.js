@@ -776,23 +776,32 @@ function fmtPeriod(months){
   return y+' yr '+m+' mo';
 }
 function extraSavingsHTML(basePayment,extra,result){
-  if(!result||result.monthsSaved<=0)return '<div class="ep-savings ep-savings-none">Drag the slider — even a little extra each month chips away at the interest.</div>';
+  if(!result)return '<div class="ep-savings ep-savings-none">Drag the slider — even a little extra each month chips away at the interest.</div>';
+  var sooner=result.monthsSaved>0;
   return '<div class="ep-savings">'
-    +'<div class="ep-stat"><span class="ep-label">Paid off</span><span class="ep-val ep-green tnum">'+fmtPeriod(result.monthsSaved)+' sooner</span></div>'
+    +'<div class="ep-stat"><span class="ep-label">Paid off</span><span class="ep-val'+(sooner?' ep-green':'')+' tnum">'+(sooner?fmtPeriod(result.monthsSaved)+' sooner':'Same timeline')+'</span></div>'
     +'<div class="ep-stat"><span class="ep-label">Interest saved</span><span class="ep-val ep-green tnum">'+money0(result.interestSaved)+'</span></div>'
     +'<div class="ep-stat"><span class="ep-label">New monthly</span><span class="ep-val tnum">'+money(basePayment+extra)+'</span></div>'
-    +'</div>';
+    +'<div class="ep-note">'+(sooner
+      ?'That extra '+money0(extra)+' a month goes straight at the balance — the loan ends '+fmtPeriod(result.monthsSaved)+' early, and '+money0(result.interestSaved)+' stays in your pocket instead of turning into interest.'
+      :'At '+money0(extra)+' a month extra the payoff date barely moves, but you still keep '+money0(result.interestSaved)+' that would have gone to interest.')
+    +'</div></div>';
 }
-/* Collapsible "pay extra" card shared by both calculators; prefix is 'loan'|'mort'. */
-function extraSectionHTML(prefix,state,basePayment,principal,annualPct,originalMonths){
-  var rerender='render'+(prefix==='loan'?'Loan':'Mortgage')+'Calc()';
-  if(!state.extraOpen)return '<button class="ep-toggle" onclick="'+prefix+'State.extraOpen=true;'+rerender+'">+ What if I pay extra each month?</button>';
+/* Collapsible "pay extra" card shared by both calculators; prefix is 'loan'|'mort'.
+ * Handler names are written out in full per branch so renaming a function can't
+ * silently break these string-built onclicks (grep finds them). */
+function extraSectionHTML(prefix,state,principal,annualPct,originalMonths){
+  var fns=prefix==='loan'
+    ?{rerender:'renderLoanCalc()',input:'loanState.extra=+this.value;loanExtraInput()',open:'loanState.extraOpen=true',close:'loanState.extraOpen=false;loanState.extra=0'}
+    :{rerender:'renderMortgageCalc()',input:'mortState.extra=+this.value;mortExtraInput()',open:'mortState.extraOpen=true',close:'mortState.extraOpen=false;mortState.extra=0'};
+  if(!state.extraOpen)return '<button class="sf-toggle ep-toggle" onclick="'+fns.open+';'+fns.rerender+'">+ What if I pay extra each month?</button>';
+  var basePay=monthlyPayment(principal,annualPct,originalMonths);
   var res=calcExtraPayoff(principal,annualPct,originalMonths,state.extra);
   return '<div class="card calc-form">'
     +'<div class="cf-row"><label>Extra monthly payment</label><span class="tnum cf-val" id="'+prefix+'ExtraVal">'+money0(state.extra)+'</span></div>'
-    +'<input type="range" min="0" max="2000" step="25" value="'+state.extra+'" oninput="'+prefix+'State.extra=+this.value;'+prefix+'ExtraInput()"/>'
-    +'<div id="'+prefix+'ExtraSav">'+extraSavingsHTML(basePayment,state.extra,res)+'</div>'
-    +'<button class="ep-toggle ep-close" onclick="'+prefix+'State.extraOpen=false;'+prefix+'State.extra=0;'+rerender+'">✕ Remove extra payment</button>'
+    +'<input type="range" min="0" max="2000" step="25" value="'+state.extra+'" oninput="'+fns.input+'"/>'
+    +'<div id="'+prefix+'ExtraSav">'+extraSavingsHTML(basePay,state.extra,res)+'</div>'
+    +'<button class="sf-toggle ep-toggle ep-close" onclick="'+fns.close+';'+fns.rerender+'">✕ Remove extra payment</button>'
     +'</div>';
 }
 /* Output card markup, kept separate so slider drags can refresh just the
@@ -827,7 +836,7 @@ function renderLoanCalc(){
   var terms=[{m:12,l:'1 yr'},{m:24,l:'2 yr'},{m:36,l:'3 yr'},{m:60,l:'5 yr'},{m:84,l:'7 yr'}];
   var h=gameHead('💳','Loan Calculator','See what a loan really costs once interest is added.');
   h+='<div class="card calc-out" id="loanOut">'+loanOutHTML(s)+'</div>';
-  h+=extraSectionHTML('loan',s,monthlyPayment(s.p,s.rate,s.term),s.p,s.rate,s.term);
+  h+=extraSectionHTML('loan',s,s.p,s.rate,s.term);
   h+='<div class="card calc-form">'
     +'<div class="cf-row"><label>Loan amount</label><span class="tnum cf-val" id="loanPVal">'+money0(s.p)+'</span></div>'
     +'<input type="range" min="1000" max="100000" step="500" value="'+s.p+'" oninput="loanState.p=+this.value;loanInput()"/>'
@@ -845,10 +854,13 @@ function renderLoanCalc(){
  *  MORTGAGE CALCULATOR
  * ════════════════════════════════════════════════════════════════════════ */
 var mortState={price:450000,down:10,rate:5,years:25,extra:0,extraOpen:false};
+/* One place to turn price + down% into the actual mortgage — every consumer
+ * (output card, what-if card, render) derives from here so they can't drift. */
+function mortParts(s){var down=s.price*s.down/100;return {down:down,loan:s.price-down,months:s.years*12};}
 /* Output card markup split out so price/rate slider drags refresh only the
  * numbers + donut, never the <input> being dragged (which caused jank). */
 function mortOutHTML(s){
-  var downAmt=s.price*s.down/100;var loan=s.price-downAmt;var months=s.years*12;
+  var mp=mortParts(s),downAmt=mp.down,loan=mp.loan,months=mp.months;
   var pay=monthlyPayment(loan,s.rate,months);var totalPaid=pay*months;var interest=totalPaid-loan;
   var iPct=totalPaid>0?Math.round(interest/totalPaid*100):0;
   var donut=miniDonut([{v:(100-iPct)/100,c:'#c96a2e'},{v:iPct/100,c:'#9f2f1e'}],108,iPct+'%','interest');/* segment hexes = --loan / --loan-int */
@@ -870,7 +882,7 @@ function mortInput(){
 }
 function mortExtraInput(){
   var s=mortState;
-  var loan=s.price*(1-s.down/100),months=s.years*12;
+  var mp=mortParts(s),loan=mp.loan,months=mp.months;
   var ev=document.getElementById('mortExtraVal');if(ev)ev.textContent=money0(s.extra);
   var sc=document.getElementById('mortExtraSav');
   if(sc)sc.innerHTML=extraSavingsHTML(monthlyPayment(loan,s.rate,months),s.extra,calcExtraPayoff(loan,s.rate,months,s.extra));
@@ -881,8 +893,8 @@ function renderMortgageCalc(){
   var amorts=[{y:15,l:'15 yr'},{y:20,l:'20 yr'},{y:25,l:'25 yr'},{y:30,l:'30 yr'}];
   var h=gameHead('🏠','Mortgage Calculator','Estimate the monthly payment on a home.');
   h+='<div class="card calc-out" id="mortOut">'+mortOutHTML(s)+'</div>';
-  var mLoan=s.price*(1-s.down/100),mMonths=s.years*12;
-  h+=extraSectionHTML('mort',s,monthlyPayment(mLoan,s.rate,mMonths),mLoan,s.rate,mMonths);
+  var mp=mortParts(s);
+  h+=extraSectionHTML('mort',s,mp.loan,s.rate,mp.months);
   h+='<div class="card calc-form">'
     +'<div class="cf-row"><label>Home price</label><span class="tnum cf-val" id="mortPVal">'+money0(s.price)+'</span></div>'
     +'<input type="range" min="100000" max="1500000" step="10000" value="'+s.price+'" oninput="mortState.price=+this.value;mortInput()"/>'
