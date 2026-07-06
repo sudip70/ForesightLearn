@@ -1,5 +1,5 @@
 /* ── Navigation ──────────────────────────────── */
-var TAB_OF={home:'home',learn:'learn',tools:'tools',social:'social',journey:'journey',scenario:'journey',risk:'journey',stockfinder:'tools',budget:'home',goals:'home',spending:'home',networth:'home',accounts:'accounts',
+var TAB_OF={home:'home',learn:'learn',tools:'tools',social:'social',journey:'journey',scenario:'journey',risk:'journey',stockfinder:'tools',budget:'home',goals:'home',spending:'home',networth:'accounts',accounts:'accounts',
   'loan-calc':'tools','mortgage-calc':'tools','game-swipe':'tools','game-wnb':'tools','game-scam':'tools','game-wordle':'tools','game-xword':'tools','game-quiz':'tools','game-hangman':'tools','game-invest':'tools'};
 var TITLES={home:"Fiscally",learn:'Learn',tools:'Explore',social:'Profile',journey:'Practice',scenario:'Scenarios',risk:'Risk Level',stockfinder:'Stock Finder',budget:'Budget',goals:'Savings Goals',spending:'Spending',networth:'Net Worth',accounts:'My Accounts',
   'loan-calc':'Loan Calculator','mortgage-calc':'Mortgage Calculator','game-swipe':'Budget Swipe','game-wnb':'Wants vs Needs','game-scam':'Scammer Scanner','game-wordle':'Finance Wordle','game-xword':'Finance Crossword','game-quiz':'Quick Count','game-hangman':"Debtor's Tower",'game-invest':'Invest Game'};
@@ -17,7 +17,7 @@ function show(id){
   if(id==='goals')renderGoals();
   if(id==='spending')renderSpending();
   if(id==='networth')renderNetworth();
-  if(id==='accounts')renderAccounts();
+  if(id==='accounts'){renderAccounts();renderMoneyHome();}
   if(id==='loan-calc')renderLoanCalc();
   if(id==='mortgage-calc')renderMortgageCalc();
   if(id==='game-swipe')initBudgetSwipe();
@@ -61,7 +61,7 @@ function obGoalDraft(){
 }
 function renderOBSummary(){
   var g=obGoalDraft(),el=document.getElementById('obGoalSum');
-  if(el)el.innerHTML='<b style="color:var(--purple-strong);font-size:18px">Save $'+g.amt.toLocaleString()+'</b><br/>for '+(g.what.charAt(0).toLowerCase()+g.what.slice(1))+', over '+g.years+' year'+(g.years===1?'':'s');
+  if(el)el.innerHTML='<b style="color:var(--purple-strong);font-size:18px">Save $'+g.amt.toLocaleString()+'</b><br/>for '+escHtml(g.what.charAt(0).toLowerCase()+g.what.slice(1))+', over '+g.years+' year'+(g.years===1?'':'s');
   var m=document.getElementById('obMs3');
   if(m)m.textContent='Contribute '+obPct+'% of your earnings monthly';
 }

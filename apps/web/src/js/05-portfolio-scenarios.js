@@ -80,7 +80,7 @@ function scnLabelFn(spec,d){
 function drawScenarioChart(spec,d,upto){
   var c=document.getElementById('scenarioChart');if(!c)return;var lf=scnLabelFn(spec,d);
   if(spec.compare){c.innerHTML=compareChart(d.curveA.slice(0,upto),d.curveB.slice(0,upto),300,150,lf);}
-  else{c.innerHTML=equityChart(d.curveA.slice(0,upto),300,150,'#7a5cae',lf);}
+  else{c.innerHTML=equityChart(d.curveA.slice(0,upto),300,150,'#6f659a',lf);}
 }
 function scnStatBox(label,val,cls){return '<div class="scn-stat"><label>'+label+'</label><div class="v '+(cls||'')+'">'+val+'</div></div>';}
 function renderScnSummary(spec,d){
@@ -223,7 +223,7 @@ function renderHoldings(){
   var html='';
   var mix=pfMix();
   if(mix.inv&&pfLevel>=2){
-    var COLW={stock:'#9084b4',etf:'#5b8def',crypto:'#e0a92f'};
+    var COLW={stock:'#9084b4',etf:'#6f8fd6',crypto:'#c19a34'};/* --invest / --blue / --amber — gold stays Learn-only */
     var seg=Object.keys(mix.by).map(function(c){return '<div style="width:'+(mix.by[c]/mix.inv*100)+'%;background:'+(COLW[c]||'#9084b4')+'"></div>';}).join('');
     var labels=Object.keys(mix.by).map(function(c){return Math.round(mix.by[c]/mix.inv*100)+'% '+c;}).join(' · ');
     var read=mix.classes>=3?'Nicely spread across '+mix.classes+' asset types 🧺':'Mostly in '+mix.classes+' type'+(mix.classes>1?'s':'')+', spreading out lowers risk';
@@ -329,6 +329,7 @@ function execTrade(){
     openSheet((realized>=0?'🎉 ':'')+'Trade complete, '+signed(realized)+' realized','You bought '+bn+' at an average of '+money(pos.avg)+' and sold at '+money(p)+'. That\'s a '+signed(realized)+' '+(realized>=0?'gain':'loss')+', now locked in as realized P&L. '+(realized>=0?'Nice work!':'Every trade is a lesson on the way.'));
   }
   pendingSh=0;
+  if(typeof touchStreak==='function')touchStreak();/* a practice trade counts as today's activity */
   renderPortfolio();renderTradePanel();refreshLearn();saveState();
 }
 function renderActivity(){

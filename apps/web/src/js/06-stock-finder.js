@@ -67,15 +67,15 @@ function renderForecastChart(id,hist,bear,base,bull,histDates,fcDates){
       var tx=X(s).toFixed(1),gid='fc'+Math.round(Math.random()*1e6);
       var histArea=histP+' L'+tx+' '+baseY+' L'+X(0).toFixed(1)+' '+baseY+' Z';
       function dot(arr,off,col){return '<circle cx="'+X(off+arr.length-1).toFixed(1)+'" cy="'+Y(arr[arr.length-1]).toFixed(1)+'" r="3.5" fill="'+col+'" stroke="#fff" stroke-width="1.6"/>';}
-      return '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5cae" stop-opacity="0.16"/><stop offset="0.92" stop-color="#7a5cae" stop-opacity="0"/></linearGradient></defs>'
-        +'<path d="'+band+'" fill="rgba(122,92,174,.10)"/>'
+      return '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f659a" stop-opacity="0.16"/><stop offset="0.92" stop-color="#6f659a" stop-opacity="0"/></linearGradient></defs>'
+        +'<path d="'+band+'" fill="rgba(111,101,154,.10)"/>'
         +'<path d="'+histArea+'" fill="url(#'+gid+')"/>'
         +'<line x1="'+tx+'" y1="10" x2="'+tx+'" y2="'+baseY+'" stroke="#cdc4e4" stroke-width="1" stroke-dasharray="2 4" opacity="0.8"/>'
-        +'<path d="'+histP+'" fill="none" stroke="#7a5cae" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'
-        +'<path d="'+baseP+'" fill="none" stroke="#7a5cae" stroke-width="1.9" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
+        +'<path d="'+histP+'" fill="none" stroke="#6f659a" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'
+        +'<path d="'+baseP+'" fill="none" stroke="#6f659a" stroke-width="1.9" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
         +'<path d="'+bullP+'" fill="none" stroke="#4f9c7e" stroke-width="1.7" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
         +'<path d="'+bearP+'" fill="none" stroke="#cf5a40" stroke-width="1.7" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'
-        +dot(bear,s,'#cf5a40')+dot(bull,s,'#4f9c7e')+dot(base,s,'#7a5cae');
+        +dot(bear,s,'#cf5a40')+dot(bull,s,'#4f9c7e')+dot(base,s,'#6f659a');
     },
     xLabels:function(v){
       var lo=Math.max(0,Math.ceil(v.lo)),hi=Math.min(n-1,Math.floor(v.hi)),mid=Math.round((lo+hi)/2);
@@ -84,9 +84,9 @@ function renderForecastChart(id,hist,bear,base,bull,histDates,fcDates){
     pointAt:function(idx){
       if(idx>=s){var fi=idx-s;return {date:dateAt(idx),anchorVal:base[fi],rows:[
         {color:'#4f9c7e',label:'Bull',value:bull[fi],disp:sfMoney(bull[fi])},
-        {color:'#7a5cae',label:'Base',value:base[fi],disp:sfMoney(base[fi])},
+        {color:'#6f659a',label:'Base',value:base[fi],disp:sfMoney(base[fi])},
         {color:'#cf5a40',label:'Bear',value:bear[fi],disp:sfMoney(bear[fi])}]};}
-      return {date:dateAt(idx),anchorVal:hist[idx],rows:[{color:'#7a5cae',label:'Price',value:hist[idx],disp:sfMoney(hist[idx])}]};
+      return {date:dateAt(idx),anchorVal:hist[idx],rows:[{color:'#6f659a',label:'Price',value:hist[idx],disp:sfMoney(hist[idx])}]};
     }
   };
   interactiveChart(id,cfg);
@@ -117,7 +117,7 @@ function paintSF(a,d,p){
     +'<div class="hz-row">'+hChips+'<span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:600">next '+hWords(H)+'</span></div>'
     +'<div id="sfChart"></div>'
     +'<div class="chart-hint">Hover for values · scroll to zoom · drag to pan · double-click to reset</div>'
-    +'<div class="sf-legend"><span><i style="background:#7a5cae"></i>Past &amp; most likely</span><span><i style="background:#4f9c7e"></i>If it goes well</span><span><i style="background:#cf5a40"></i>If it goes poorly</span><span style="color:var(--faint)">┊ now</span></div>'
+    +'<div class="sf-legend"><span><i style="background:#6f659a"></i>Past &amp; most likely</span><span><i style="background:#4f9c7e"></i>If it goes well</span><span><i style="background:#cf5a40"></i>If it goes poorly</span><span style="color:var(--faint)">┊ now</span></div>'
     +'</div>';
   // Mia verdict, the gist in plain words
   html+='<div class="mia"><div class="face">'+avatar()+'</div><div><div class="bubble">Nobody can predict this, but over the next <b>'+hWords(H)+'</b>, '+bn+' could realistically land anywhere from ~'+sfMoney(d.target_prices.bear)+' to ~'+sfMoney(d.target_prices.bull)+', most likely near <b>'+sfMoney(d.target_prices.base)+'</b> ('+pc(d.returns.base)+').</div><button class="whats" onclick="openSheet(\'Why three numbers?\',\''+(lit.bear_base_bull||'Bear, base and bull are scenario ranges, not guaranteed prices.').replace(/'/g,"\\'")+'\')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>Why three numbers?</button></div></div>';

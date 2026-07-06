@@ -94,7 +94,7 @@ function renderBudget(){
   BUDGET.categories.forEach(function(c,i){
     var sp=monthSpent(c.name),lim=numVal(c.limit),pct=lim>0?Math.min(100,Math.round(sp/lim*100)):0,over=sp>lim&&lim>0;
     h+='<div style="margin-bottom:13px"><div class="row" style="margin-bottom:5px">'
-      +'<span style="font-weight:700;font-size:13px">'+c.name+'</span>'
+      +'<span style="font-weight:700;font-size:13px">'+escHtml(c.name)+'</span>'
       +'<span style="display:flex;align-items:center;gap:8px"><span class="tnum '+(over?'down':'')+'" style="font-size:12px;font-weight:700">'+money0(sp)+' / '+money0(lim)+'</span>'
       +'<button class="adjust" title="Remove" style="padding:4px 8px" onclick="delBudgetCat('+i+')">✕</button></span></div>'
       +'<div class="bar"><div class="bar-fill" style="width:'+pct+'%'+(over?';background:var(--red)':'')+'"></div></div></div>';
@@ -130,7 +130,7 @@ function renderGoals(){
   if(!GOALS.length)h+='<div class="card"><div class="muted-note" style="text-align:left">No goals yet — add your first above.</div></div>';
   GOALS.forEach(function(g){
     var gp=numVal(g.target)>0?Math.min(100,Math.round(numVal(g.saved)/numVal(g.target)*100)):0,done=gp>=100;
-    h+='<div class="goal-card"><div class="row"><div style="font-size:14px;font-weight:800">'+(done?'🏆 ':'🎯 ')+g.what+'</div>'
+    h+='<div class="goal-card"><div class="row"><div style="font-size:14px;font-weight:800">'+(done?'🏆 ':'🎯 ')+escHtml(g.what)+'</div>'
       +'<span class="pill '+(done?'pill-grn':'pill-pur')+'">'+gp+'%</span></div>'
       +'<div class="bar"><div class="bar-fill" style="width:'+gp+'%"></div></div>'
       +'<div class="row"><span style="font-size:11px;color:var(--muted)">'+money0(g.saved)+' of '+money0(g.target)+(g.account?' · '+g.account:'')+'</span></div>'
@@ -165,7 +165,7 @@ function renderSpending(){
     +'<div class="row" style="gap:8px;align-items:flex-end">'
     +'<div style="flex:1"><label class="f-label">Amount</label>'+moneyInput('exAmt',null,'0')+'</div>'
     +'<div style="flex:1.4"><label class="f-label">Category</label><select class="f-in" id="exCat">'
-      +cats.map(function(c){return '<option>'+c+'</option>';}).join('')+'</select></div></div>'
+      +cats.map(function(c){return '<option>'+escHtml(c)+'</option>';}).join('')+'</select></div></div>'
     +'<label class="f-label">Note (optional)</label><input class="f-in" id="exNote" placeholder="What was it for?"/>'
     +'<label class="f-label">Date</label><input class="f-in" id="exDate" type="date" value="'+todayISO()+'"/>'
     +'<button class="btn btn-pur" style="margin-top:11px" onclick="addExpense()">Add expense</button></div>';
@@ -174,7 +174,7 @@ function renderSpending(){
   var catKeys=Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a];});
   if(catKeys.length){
     h+='<div class="card"><div class="card-t">This month by category</div>';
-    catKeys.forEach(function(c){h+='<div class="lrow"><div class="l-n">'+c+'</div><div class="l-v"><div class="l-p tnum">'+money0(byCat[c])+'</div></div></div>';});
+    catKeys.forEach(function(c){h+='<div class="lrow"><div class="l-n">'+escHtml(c)+'</div><div class="l-v"><div class="l-p tnum">'+money0(byCat[c])+'</div></div></div>';});
     h+='</div>';
   }
   // recent list
@@ -182,7 +182,7 @@ function renderSpending(){
   h+='<div class="card"><div class="card-t">Recent</div>';
   if(!recent.length)h+='<div class="muted-note" style="text-align:left">No expenses logged yet.</div>';
   recent.forEach(function(s){
-    h+='<div class="lrow"><div style="min-width:0"><div class="l-n">'+(s.note||s.category)+'</div><div class="l-s">'+s.category+' · '+(s.date||'')+'</div></div>'
+    h+='<div class="lrow"><div style="min-width:0"><div class="l-n">'+escHtml(s.note||s.category)+'</div><div class="l-s">'+escHtml(s.category)+' · '+(s.date||'')+'</div></div>'
       +'<div style="display:flex;align-items:center;gap:10px"><div class="l-v"><div class="l-p tnum down">-'+money0(s.amount)+'</div></div>'
       +'<button class="adjust" title="Delete" style="padding:4px 8px" onclick="delExpense(\''+s.id+'\')">✕</button></div></div>';
   });
@@ -220,14 +220,14 @@ function renderNetworth(){
   h+='<div class="card"><div class="card-t">Assets</div>';
   h+='<div class="lrow"><div class="l-n">Practice portfolio <span class="pill pill-grn" style="font-size:10px">live</span></div><div class="l-v"><div class="l-p tnum">'+money0(t.live)+'</div></div></div>';
   NETWORTH.assets.forEach(function(a,i){
-    h+='<div class="lrow"><div class="l-n">'+a.name+'</div><div style="display:flex;align-items:center;gap:10px"><div class="l-v"><div class="l-p tnum">'+money0(a.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'assets\','+i+')">✕</button></div></div>';
+    h+='<div class="lrow"><div class="l-n">'+escHtml(a.name)+'</div><div style="display:flex;align-items:center;gap:10px"><div class="l-v"><div class="l-p tnum">'+money0(a.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'assets\','+i+')">✕</button></div></div>';
   });
   h+='<div class="row" style="gap:8px;margin-top:9px;align-items:flex-end"><div style="flex:2"><input class="f-in" id="naName" placeholder="Asset (e.g. Car)"/></div><div style="flex:1">'+moneyInput('naVal',null,'0')+'</div><button class="btn btn-soft" style="width:auto;padding:11px 16px" onclick="addNW(\'assets\')">Add</button></div></div>';
   // debts
   h+='<div class="card"><div class="card-t">Debts</div>';
   if(!NETWORTH.debts.length)h+='<div class="muted-note" style="text-align:left">No debts — nice.</div>';
   NETWORTH.debts.forEach(function(d,i){
-    h+='<div class="lrow"><div class="l-n">'+d.name+'</div><div style="display:flex;align-items:center;gap:10px"><div class="l-v"><div class="l-p tnum down">-'+money0(d.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'debts\','+i+')">✕</button></div></div>';
+    h+='<div class="lrow"><div class="l-n">'+escHtml(d.name)+'</div><div style="display:flex;align-items:center;gap:10px"><div class="l-v"><div class="l-p tnum down">-'+money0(d.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'debts\','+i+')">✕</button></div></div>';
   });
   h+='<div class="row" style="gap:8px;margin-top:9px;align-items:flex-end"><div style="flex:2"><input class="f-in" id="ndName" placeholder="Debt (e.g. Credit card)"/></div><div style="flex:1">'+moneyInput('ndVal',null,'0')+'</div><button class="btn btn-soft" style="width:auto;padding:11px 16px" onclick="addNW(\'debts\')">Add</button></div></div>';
   el.innerHTML=h;
@@ -611,7 +611,11 @@ function renderAccounts(){
 }
 
 /* ── Home tiles (informational, like the Practice / My Goals tiles) ──── */
-var MONEY_PALETTE=['#9a8765','#5b8def','#4f9c7e','#e0a92f','#cf5a40','#b4a284'];
+/* Categorical palette for the money donuts — stays inside the money families
+ * (brand beige, --save gold, --spend orange, --blue, --loan burnt, taupe).
+ * Semantic green/red are deliberately absent: green means gains and red means
+ * loss app-wide, so neither may color an arbitrary "Transport" slice. */
+var MONEY_PALETTE=['#9a8765','#e3b23c','#e08a4f','#6f8fd6','#c96a2e','#a59c92'];
 function miniDonut(segs,size,centerTop,centerSub){
   size=size||92;var r=size/2-8,C=2*Math.PI*r,cx=size/2,cy=size/2,off=0;
   var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#f0edfa" stroke-width="13"/>';
@@ -637,6 +641,7 @@ function renderHomeGreet(){
 }
 function renderMoneyHome(){
   renderHomeGreet();
+  if(typeof renderHomeNudge==='function')renderHomeNudge();/* Mia's one thing for today (08-learn-init.js) */
   /* ── Budget tile: donut of how income is allocated across categories ── */
   var bt=document.getElementById('tileBudget');
   if(bt){
@@ -646,7 +651,7 @@ function renderMoneyHome(){
     var cats=BUDGET.categories.slice().sort(function(a,b){return numVal(b.limit)-numVal(a.limit);});
     var segs=cats.slice(0,6).map(function(c,i){return {v:planned>0?numVal(c.limit)/planned:0,c:MONEY_PALETTE[i%MONEY_PALETTE.length]};});
     var legend=cats.slice(0,3).map(function(c,i){
-      return '<div class="row" style="margin:0 0 3px"><span style="font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:'+MONEY_PALETTE[i%MONEY_PALETTE.length]+'"></span>'+c.name+'</span><span class="tnum" style="font-size:11px;color:var(--muted)">'+money0(c.limit)+'</span></div>';
+      return '<div class="row" style="margin:0 0 3px"><span style="font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:'+MONEY_PALETTE[i%MONEY_PALETTE.length]+'"></span>'+escHtml(c.name)+'</span><span class="tnum" style="font-size:11px;color:var(--muted)">'+money0(c.limit)+'</span></div>';
     }).join('')||'<div class="muted-note" style="text-align:left">No categories yet.</div>';
     bt.innerHTML='<div class="card" style="cursor:pointer;margin:0;height:100%" onclick="push(\'budget\')">'
       +'<div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">💰 Budget</div><span class="pill '+(left>=0?'pill-grn':'pill-red')+'">'+money0(left)+' left</span></div>'
@@ -664,7 +669,7 @@ function renderMoneyHome(){
     st.innerHTML='<div class="card" style="cursor:pointer;margin:0;height:100%" onclick="push(\'spending\')">'
       +'<div class="row" style="margin-bottom:8px"><div class="card-t" style="margin-bottom:0">🧾 Spending</div><span class="pill pill-pur">this month</span></div>'
       +'<div class="tnum" style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--ink)">'+money(tot)+'</div>'
-      +'<div class="muted-note" style="text-align:left;margin-top:2px">'+rows.length+' transaction'+(rows.length===1?'':'s')+(top?' · top: '+top:'')+'</div>'
+      +'<div class="muted-note" style="text-align:left;margin-top:2px">'+rows.length+' transaction'+(rows.length===1?'':'s')+(top?' · top: '+escHtml(top):'')+'</div>'
       +'<div class="bar" style="margin-top:10px"><div class="bar-fill" style="width:'+sp+'%"></div></div>'
       +'<div class="muted-note" style="text-align:left;margin-top:4px">'+sp+'% of '+money0(inc)+' income</div></div>';
   }

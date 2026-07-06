@@ -24,12 +24,25 @@ function checkSkillUnlocks(){
   if(_gotSnap===null){_gotSnap={};SKILLS.forEach(function(s){_gotSnap[s.id]=skillGot(s.id);});return;}
   SKILLS.forEach(function(s){var g=skillGot(s.id);if(g&&!_gotSnap[s.id]){learnXP(80);showToast('🏅 Skill unlocked: '+s.name+' · +80 XP');}_gotSnap[s.id]=g;});
 }
-function learnXP(n){LEARN.xp+=n;LEARN.dailyXP=Math.min(99,LEARN.dailyXP+n);if(LEARN.xp>=LEARN.xpToNext){LEARN.xp-=LEARN.xpToNext;LEARN.level++;LEARN.xpToNext=Math.round(LEARN.xpToNext*1.25);setTimeout(function(){showToast('🎉 Level up! Level '+LEARN.level);},900);}saveState();}
+/* ── Day streak: real consecutive-day tracking, not a seeded number ──
+ * A day "counts" when you do something that earns XP or place a practice trade.
+ * Same day → no-op · consecutive day → +1 · gap → back to 1. A broken streak
+ * shows 0 on load until the next qualifying action (see boot below). */
+function yesterdayISO(){var d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function touchStreak(){
+  if(demoActive)return;/* the showcase keeps its pretty seeded streak */
+  var t=todayISO();
+  if(LEARN.lastActive===t)return;
+  LEARN.streak=(LEARN.lastActive===yesterdayISO())?(LEARN.streak||0)+1:1;
+  LEARN.lastActive=t;
+  syncTopbar();
+}
+function learnXP(n){touchStreak();LEARN.xp+=n;LEARN.dailyXP=Math.min(99,LEARN.dailyXP+n);if(LEARN.xp>=LEARN.xpToNext){LEARN.xp-=LEARN.xpToNext;LEARN.level++;LEARN.xpToNext=Math.round(LEARN.xpToNext*1.25);setTimeout(function(){showToast('🎉 Level up! Level '+LEARN.level);},900);}saveState();}
 function refreshLearn(){checkSkillUnlocks();if(document.getElementById('page-learn').classList.contains('active'))renderLearn();}
 function lring(val,max){var r=11,c=2*Math.PI*r,off=c*(1-Math.min(1,val/max));return '<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#e9e4f3" stroke-width="4"/><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#e0a92f" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 15 15)"/></svg>';}
 function ldonutSVG(pct){var r=34,c=2*Math.PI*r,off=c*(1-Math.min(1,pct/20));return '<svg width="120" height="120" viewBox="0 0 90 90"><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#f4ede1" stroke-width="11"/><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#9a8765" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 45 45)"/></svg>';}
 function ldonutInner(pct,m){return ldonutSVG(pct)+'<div class="ldonut-c"><div class="ldonut-a">'+money0(m)+'</div><div class="ldonut-k">/month · '+pct+'%</div></div>';}
-function goalTitle(g){return 'Save '+money0(g.amt)+' for '+g.what;}
+function goalTitle(g){return 'Save '+money0(g.amt)+' for '+escHtml(g.what);}
 /* Home "My Goals" now reflects the unified GOALS list (see 07b-money.js) and opens the Goals page. */
 function renderGoalCard(){
   var el=document.getElementById('homeGoal');if(!el)return;
@@ -46,7 +59,7 @@ function renderGoalCard(){
     +'<div class="row"><div style="font-size:14px;font-weight:800">🎯 My Goals</div><span class="pill pill-pur">'+pct+'%</span></div>';
   list.slice(0,3).forEach(function(g){
     var gp=(+g.target>0)?Math.min(100,Math.round((+g.saved||0)/(+g.target)*100)):0;
-    h+='<div style="margin-top:9px"><div class="row" style="margin-bottom:4px"><span style="font-size:12px;font-weight:700">'+g.what+'</span>'
+    h+='<div style="margin-top:9px"><div class="row" style="margin-bottom:4px"><span style="font-size:12px;font-weight:700">'+escHtml(g.what)+'</span>'
       +'<span style="font-size:11px;color:var(--muted)" class="tnum">'+money0(g.saved)+' / '+money0(g.target)+'</span></div>'
       +'<div class="bar"><div class="bar-fill" style="width:'+gp+'%"></div></div></div>';
   });
@@ -60,7 +73,7 @@ var LESSONS_L={
   /* ── Unit 1 · Money foundations ── */
   f_budget:{xp:40,celeb:'You\'ve got a plan for every paycheque now.',steps:[
     {say:'Before investing, know where your money goes. One simple split keeps it automatic: <b>50 / 30 / 20</b>. 🧾'},
-    {say:'<b>50%</b> to needs (rent, groceries), <b>30%</b> to wants (fun, takeout), <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#ae905c">50% needs</div><div style="width:30%;background:#5b8def">30% wants</div><div style="width:20%;background:#4f9c7e">20% save</div></div>';}},
+    {say:'<b>50%</b> to needs (rent, groceries), <b>30%</b> to wants (fun, takeout), <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#9a8765">50% needs</div><div style="width:30%;background:#6f8fd6">30% wants</div><div style="width:20%;background:#4f9c7e">20% save</div></div>';}},
     {q:'You take home $2,000 a month. Using 50/30/20, how much goes to saving &amp; debt?',opts:['$100','$400','$1,000'],correct:1,yes:'Exactly!',why:'20% × $2,000 = $400. Even automating a piece of this changes everything.'},
     {say:'The <b>pay-yourself-first</b> trick: move that 20% on payday — before it can disappear on wants. Future-you always wins this one. 💪'},
     {q:'Which best describes "pay yourself first"?',opts:['Spend freely, save whatever\'s left','Transfer savings the moment you\'re paid','Invest only when you have extra'],correct:1,yes:'Yes!',why:'Moving money before you can spend it is what actually makes saving happen. Willpower alone rarely works.'},
@@ -101,7 +114,7 @@ var LESSONS_L={
   ]},
   v_compound:{xp:50,celeb:'You just met the most powerful force in money.',steps:[
     {say:'The closest thing to magic in money: <b>compounding</b> — when your returns start earning their own returns. The longer you wait to start, the less magic you get. ❄️'},
-    {say:'$200/month invested at 7%/yr grows to about <b>$243,000</b> in 30 years. You only contributed $72,000 — the rest is compounding doing the heavy lifting.',viz:function(){return '<div class="viz-split"><div style="width:30%;background:#ae905c">$72K you put in</div><div style="width:70%;background:#4f9c7e">$171K growth</div></div>';}},
+    {say:'$200/month invested at 7%/yr grows to about <b>$243,000</b> in 30 years. You only contributed $72,000 — the rest is compounding doing the heavy lifting.',viz:function(){return '<div class="viz-split"><div style="width:30%;background:#9a8765">$72K you put in</div><div style="width:70%;background:#4f9c7e">$171K growth</div></div>';}},
     {q:'What matters most for compounding to work?',opts:['Picking the perfect stock','Starting early and staying in','Making one huge deposit'],correct:1,yes:'Exactly!',why:'Time is the secret ingredient. Starting 10 years earlier often beats investing twice as much later.'},
     {say:'You invest $1,000 today vs waiting 10 years to invest the same $1,000. At 7%/yr and 30-year horizon, the early start gives you <b>roughly twice the outcome</b>. 😬'},
     {q:'Friend A invests $1,000 today. Friend B waits 10 years, then invests $1,000. At 7%/yr over 30 years, who has more?',opts:['Friend A — started today','Friend B — saved longer before investing','They end up equal'],correct:0,yes:'Right!',why:'Friend A: ~$7,600. Friend B: ~$3,870. One decade of delay costs almost half the final amount.'},
@@ -142,7 +155,7 @@ var LESSONS_L={
   ]},
   p_mix:{xp:45,celeb:'You can design a mix you\'ll actually stick with.',steps:[
     {say:'Your <b>asset mix</b> — how much in stocks vs bonds vs other — shapes most of your long-run results. Get this right and you can sleep through any dip. 🥗'},
-    {say:'A classic start for a 25-year-old: <b>80% stocks / 20% bonds</b> — lean to growth when young, shift toward stability as your goal nears.',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#ae905c">80% stocks</div><div style="width:20%;background:#5b8def">20% bonds</div></div>';}},
+    {say:'A classic start for a 25-year-old: <b>80% stocks / 20% bonds</b> — lean to growth when young, shift toward stability as your goal nears.',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#9084b4">80% stocks</div><div style="width:20%;background:#6f8fd6">20% bonds</div></div>';}},
     {q:'You\'re 25, investing for retirement in 40 years. A reasonable tilt?',opts:['Mostly bonds — safe','Mostly stocks — long horizon','All cash — wait and see'],correct:1,yes:'Yes.',why:'40 years gives you time to ride out every dip stocks throw. Lean into growth when your horizon is long.'},
     {say:'<b>Rebalancing</b>: if stocks boom and grow to 90% of your portfolio, sell a little and buy bonds to drift back to your 80/20 target. Once a year is usually enough.'},
     {q:'Your target is 80% stocks. After a great year it\'s grown to 90% stocks. What do you do?',opts:['Do nothing — let it run','Sell some stocks, buy bonds to get back to 80/20','Sell everything and restart'],correct:1,yes:'Right!',why:'Rebalancing keeps your risk at the level you chose. Let stocks run unchecked and one bad year hits far harder.'},
@@ -158,10 +171,13 @@ var LESSONS_L={
   ]},
   uncertainty:{xp:50,celeb:'You now read forecasts like a pro — ranges, not promises.',onDone:function(){LEARN.flags.uncertainty=true;},steps:[
     {say:'Ever seen an app promise an <b>exact</b> future price? 🤨 Nobody — not a computer, not a hedge fund, not Mia — can know it for certain.'},
-    {say:'That\'s why we show a <b>range</b>: a rough (bear) case, a most-likely middle (base), and a strong (bull) case. No single number is "the prediction."'},
+    {say:function(){var r=liveRangeSnippet();
+      return 'That\'s why we show a <b>range</b>. '+(r.live?'Right now':'For example')+', '+r.name+' trades near <b>'+r.px+'</b>'+(r.live?' — that\'s the real, live price':'')
+        +'. Over the next 90 days, '+(r.live?'our live forecast says':'a forecast might say')+' it could realistically land anywhere from <b>'+r.lo+'</b> to <b>'+r.hi+'</b>. No single number in there is "the prediction."';}},
     {q:'A <b>wider</b> range between bear and bull means…',opts:['More certainty — the model is confident','Less certainty — more possible outcomes','Guaranteed profit near the middle'],correct:1,yes:'Yes!',why:'Wider = more spread of possible outcomes = higher uncertainty. The model is saying "it could go quite differently either way."'},
     {say:'What <b>moves</b> a price? Earnings surprises, interest rate changes, investor sentiment, news cycles. The range captures those uncertainties — a map of possibilities, not a promise.'},
-    {say:'We never show one "prediction" because that would be dishonest. We show the range <b>and</b> what moves it — so you invest with eyes open. 🌱'}
+    {say:function(){var r=liveRangeSnippet();
+      return 'We never show one "prediction" because that would be dishonest. We show the range <b>and</b> what moves it — like that '+r.lo+'–'+r.hi+' spread on '+r.name+' — so you invest with eyes open. 🌱';}}
   ]},
   /* ── Unit 4 · Canadian accounts ── */
   c_tfsa:{xp:45,celeb:'You\'ve unlocked Canada\'s friendliest account.',steps:[
@@ -406,6 +422,52 @@ function nodeTap(id,mile,locked){
   if(LESSONS_L[id]&&LESSONS_L[id].steps){startLesson(id);return;}
   openL('<div class="ls-tag">Reviewed ✓</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><div class="lp-bubble" style="margin-top:10px">'+(RECAP[id]||'You\'ve got this one down. ✓')+'</div><button class="btn-ghost-l" onclick="closeL()">Close</button>');
 }
+/* ── Home nudge: Mia's ONE thing for today, drawn from real state ──────
+ * Priority-ordered heuristics (concentration → absence → idle cash → empty
+ * savings → next lesson). One nudge at a time, always with a real number and
+ * a single CTA — never a wall of advice. This is the behavioral seed the docs
+ * call the highest-leverage spot in the app; a real coach engine can replace
+ * homeNudge() without touching the render. */
+function homeNudge(){
+  var st=lessonStates(),act=st.activeId;
+  function lessonLabel(id){var lab='';learnUnits().forEach(function(u){u.lessons.forEach(function(l){if(l.id===id)lab=l.label;});});return lab;}
+  /* 1 · concentration: half your practice money on one holding */
+  if(PF.pos.length>=2){
+    var sx=pfStats();
+    if(sx.inv>0&&sx.big.pct>=0.5){
+      var pc=Math.round(sx.big.pct*100),bn=sx.big.t.replace('-USD','');
+      return {msg:'<b>'+pc+'%</b> of your practice money is riding on <b>'+bn+'</b>. Spreading it out means one bad day can\'t take the whole portfolio with it.',
+        cta:LEARN.done.risk_div?'Open Practice ›':'Learn: Spread it out ›',
+        go:LEARN.done.risk_div?"goTab('journey')":"goTab('learn');nodeTap('risk_div',false,false)"};
+    }
+  }
+  /* 2 · been away a few days */
+  if(LEARN.lastActive&&act){
+    var gap=Math.round((new Date(todayISO())-new Date(LEARN.lastActive))/86400000);
+    if(gap>=3)return {msg:'Welcome back! It\'s been '+gap+' days. Five quiet minutes on <b>'+lessonLabel(act)+'</b> gets things moving again.',
+      cta:'Continue learning ›',go:"goTab('learn');nodeTap('"+act+"',false,false)"};
+  }
+  /* 3 · cash drag — only nags once compounding has actually been learned */
+  var T=totals();
+  if(LEARN.done.v_compound&&T.total>0&&PF.cash/T.total>=0.8)
+    return {msg:'<b>'+money0(PF.cash)+'</b> of your practice cash is sitting on the sidelines. You know how compounding works now — want to put a little of it to work?',
+      cta:'Open Practice ›',go:"goTab('journey')"};
+  /* 4 · savings still empty after the emergency-fund lesson */
+  if(LEARN.done.f_emergency&&numVal(SAVINGS.balance)<=0)
+    return {msg:'Your savings account is still at <b>$0</b>. Even a small starter deposit begins the emergency-fund habit.',
+      cta:'Open My Accounts ›',go:"goTab('accounts')"};
+  /* 5 · fallback: the next real lesson on the trail (live Continue rail) */
+  if(act)return {msg:'Next up on your trail: <b>'+lessonLabel(act)+'</b> — about two minutes.',
+    cta:'Start lesson ›',go:"goTab('learn');nodeTap('"+act+"',false,false)"};
+  return {msg:'You\'ve finished the whole trail 🎉 Keep practising, or revisit any lesson for a refresher.',cta:'Open Practice ›',go:"goTab('journey')"};
+}
+function renderHomeNudge(){
+  var el=document.getElementById('homeNudge');if(!el)return;
+  var n=homeNudge();
+  el.innerHTML='<div class="mia" style="margin:2px 0 16px"><div class="face">'+avatar()+'</div><div>'
+    +'<div class="bubble">'+n.msg+'</div>'
+    +'<button class="whats" onclick="'+n.go+'">'+n.cta+'</button></div></div>';
+}
 function miaGuide(){
   var st=lessonStates(),act=st.activeId,msg;
   if(pfClasses()>=3)msg='Look at you, your money\'s spread across <b>'+pfClasses()+'</b> types now. '+PET.name+' is wagging her tail! 🦊 Keep that streak alive.';
@@ -414,6 +476,17 @@ function miaGuide(){
   else msg='Tap the glowing lesson to keep going, '+PET.name+'\'s following your trail! 🐾';
   return '<div class="mia-guide"><div class="mg-face">'+avatar()+'</div><div class="mg-bubble"><div class="mg-name">Mia · your guide</div>'+msg+'</div></div>';
 }
+/* ── live market snippet for lesson copy (T3: every lesson arrives with a number) ──
+ * Uses AAPL's real live price + 90-day forecast range when the backend has answered
+ * (boot fetches AAPL up front), and falls back to an honestly-labelled hypothetical
+ * offline. Lesson steps call this from their say-functions via sval(). */
+function liveRangeSnippet(){
+  var t='AAPL',px=LIVE[t],fc=TRADE_FC[t];
+  if(px&&fc&&fc.bear!=null&&fc.bull!=null)
+    return {live:true,name:'Apple (AAPL)',px:'$'+Math.round(px),lo:'$'+Math.round(px*(1+fc.bear)),hi:'$'+Math.round(px*(1+fc.bull))};
+  return {live:false,name:'Apple (AAPL)',px:'$310',lo:'$260',hi:'$370'};
+}
+
 /* ── interactive lesson player (Mia-guided, step by step) ── */
 var LP={id:null,i:0,answered:false};
 function sval(x,s){return (typeof x==='function')?x(s):x;}
@@ -473,7 +546,7 @@ function goalSheet(){
   var h='<div class="ls-tag">Your goal · the "why"</div><div class="ls-h">Set your goal</div>';
   h+='<div class="gs-q">Why are you investing?</div><div class="why-grid">'+WHYS.map(function(w,i){return '<div class="why '+(d.why===w?'sel':'')+'" onclick="pickWhyG(this,'+i+')">'+w+'</div>';}).join('')+'</div>';
   h+='<div class="gs-q">Make it specific</div>';
-  h+='<label class="f-label">What are you saving for?</label><input class="f-in" value="'+d.what+'" oninput="GOAL_DRAFT.what=this.value"/>';
+  h+='<label class="f-label">What are you saving for?</label><input class="f-in" value="'+escHtml(d.what)+'" oninput="GOAL_DRAFT.what=this.value"/>';
   h+='<label class="f-label">How much will it cost?</label><input class="f-in" inputmode="numeric" value="'+money0(d.amt)+'" oninput="setGAmt(this.value)"/>';
   h+='<label class="f-label">Over how many years?</label><input class="f-in" inputmode="numeric" value="'+d.years+'" oninput="GOAL_DRAFT.years=parseInt(this.value)||1"/>';
   h+='<div class="gs-q">How much to invest?</div><div class="ls-sub">We suggest 5–10% of your earnings to start.</div>';
@@ -595,7 +668,12 @@ function renderProfile(){
 }
 
 
-loadState();
+/* saved state wins; otherwise ?demo keeps the seeded showcase (straight into the
+   app, nothing persisted) and everyone else gets a genuinely fresh start */
+if(!loadState()){if(DEMO){demoActive=true;onboarded=true;}else freshStart();}
+/* a streak broken by absence shows honestly as 0 until the next qualifying action */
+if(!demoActive&&LEARN.lastActive&&LEARN.lastActive!==todayISO()&&LEARN.lastActive!==yesterdayISO())LEARN.streak=0;
+anchorInit();/* with a warm price cache all LIVE prices may already be here — no fetch callback will fire */
 syncPrimaryGoal();
 renderOB();
 renderPortfolio();renderHoldings();sfSelect('AAPL');

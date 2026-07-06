@@ -147,7 +147,7 @@ function interactiveChart(id,cfg){
   var labs=cfg.xLabels?cfg.xLabels(v):[];
   var labSvg=labs.map(function(L){return '<text x="'+X(L.i).toFixed(1)+'" y="'+(h-6)+'" font-size="9" fill="#aaa4c0" font-weight="700" text-anchor="'+L.a+'">'+L.t+'</text>';}).join('');
   var maxM=cfg.maxMarkers||3,dots='';
-  for(var k=0;k<maxM;k++)dots+='<circle id="'+id+'_hd'+k+'" r="3.4" fill="#7a5cae" stroke="#fff" stroke-width="1.5" style="display:none"/>';
+  for(var k=0;k<maxM;k++)dots+='<circle id="'+id+'_hd'+k+'" r="3.4" fill="#6f659a" stroke="#fff" stroke-width="1.5" style="display:none"/>';
   var svg='<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" style="display:block;touch-action:none">'
     +'<defs><clipPath id="'+clip+'"><rect x="'+pad+'" y="0" width="'+plotW+'" height="'+h+'"/></clipPath></defs>'
     +'<g clip-path="url(#'+clip+')">'+content+'</g>'

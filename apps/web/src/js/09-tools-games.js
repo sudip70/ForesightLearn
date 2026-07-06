@@ -1021,7 +1021,9 @@ var IG_TYPES=[
   {key:'etf',   name:'Sector ETF',       vol:1.1, ret:0.005,blurb:'A themed basket (tech, energy…). More focused, so it swings more than a broad index.'},
   {key:'stocks',name:'Individual Stocks',vol:1.4, ret:0.012,blurb:'Single companies — the biggest upside, and the biggest drops. Concentrated risk.'}
 ];
-var IG_PAL={spend:'#cf5a40',save:'#e0a92f',share:'#5b8def',invest:'#6f659a'};
+/* bucket colors follow the money-area families (--spend/--save/--blue/--invest);
+ * spending is orange like everywhere else — red would read as "loss/alarm" */
+var IG_PAL={spend:'#e08a4f',save:'#e3b23c',share:'#6f8fd6',invest:'#6f659a'};
 var IG={},igTimer=null;
 
 function initInvestGame(){

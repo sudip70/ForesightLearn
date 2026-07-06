@@ -2,6 +2,35 @@
 var API='https://foresight-backend-a5qx.onrender.com';
 function fmtNum(n){return n>=1000?n.toLocaleString(undefined,{maximumFractionDigits:2}):n.toFixed(2);}
 var fcCurrent='';
+
+/* ── Last-good price cache ────────────────────────────────────────────
+ * The backend sleeps on the free tier, so first-open used to mean "Sample"
+ * data for up to ~90s. Every successful fetch now writes LIVE prices, the
+ * forecast returns, daily HIST series (held/watched tickers only, to stay
+ * well under the localStorage quota) and the market-indices payload to
+ * localStorage; on boot we hydrate from it, so a returning user sees real
+ * last-close numbers instantly while the server wakes. Ignored after 7 days
+ * — at that point honest "Sample" beats stale realism. */
+var PRICE_CACHE_KEY='fiscally.web.prices.v1',PRICE_CACHE={IDX:null};
+(function hydratePriceCache(){
+  try{
+    var c=JSON.parse(localStorage.getItem(PRICE_CACHE_KEY)||'null');
+    if(!c||!c.ts||Date.now()-c.ts>7*86400000)return;
+    var t;for(t in c.LIVE||{})if(LIVE[t]==null)LIVE[t]=c.LIVE[t];
+    for(t in c.FC||{})if(TRADE_FC[t]==null)TRADE_FC[t]=c.FC[t];
+    for(t in c.HIST||{})if(HIST[t]==null)HIST[t]=c.HIST[t];
+    PRICE_CACHE.IDX=c.IDX||null;
+  }catch(e){}
+})();
+function savePriceCache(){
+  try{
+    var keep={};/* HIST only for tickers that matter to this user — LIVE/FC are tiny, keep all */
+    PF.pos.forEach(function(p){keep[p.t]=1;});(PF.watch||[]).forEach(function(t){keep[t]=1;});
+    keep[tradeTicker]=1;keep.AAPL=1;
+    var histLite={};for(var t in keep)if(HIST[t])histLite[t]=HIST[t];
+    localStorage.setItem(PRICE_CACHE_KEY,JSON.stringify({ts:Date.now(),LIVE:LIVE,FC:TRADE_FC,HIST:histLite,IDX:PRICE_CACHE.IDX}));
+  }catch(e){}
+}
 /* Cold-start-aware fetch: Render's free tier sleeps and takes ~40s to wake, so early
    requests fail (502 or timeout). Keep retrying for a time budget that outlasts the wake,
    instead of silently leaving the mock "Sample" data on the first failed request. */
@@ -21,18 +50,25 @@ function wakeFetch(url,opts,onWaking){
   return attempt(0);
 }
 function setMarketPill(text,cls){var b=document.getElementById('marketSrc');if(b){b.textContent=text;b.className='pill '+cls;}}
+function renderIndexRows(d){
+  var proxy={SP500:'SPY',NASDAQ:'QQQ',DOW:'DIA',TSX:'EWC'};
+  document.getElementById('marketRows').innerHTML=d.indices.map(function(ix){
+    var pct=ix.change_percent*100,cls=pct>=0?'up':'down',sg=pct>=0?'+':'';
+    return '<div class="lrow"><div><div class="l-n">'+ix.label+'</div><div class="l-s">'+(proxy[ix.symbol]||'')+' · '+ix.provider_symbol+'</div></div>'
+      +'<div class="l-v"><div class="l-p tnum">'+fmtNum(ix.value)+'</div><div class="l-c '+cls+'">'+sg+pct.toFixed(2)+'%</div></div></div>';
+  }).join('');
+}
 function loadIndices(){
-  setMarketPill('Loading…','pill-gry');
-  wakeFetch(API+'/api/market/indices',null,function(){setMarketPill('Waking server…','pill-gry');}).then(function(d){
-    if(!d||!d.indices||!d.indices.length){setMarketPill('Sample','pill-gry');return;}
-    var proxy={SP500:'SPY',NASDAQ:'QQQ',DOW:'DIA',TSX:'EWC'};
-    document.getElementById('marketRows').innerHTML=d.indices.map(function(ix){
-      var pct=ix.change_percent*100,cls=pct>=0?'up':'down',sg=pct>=0?'+':'';
-      return '<div class="lrow"><div><div class="l-n">'+ix.label+'</div><div class="l-s">'+(proxy[ix.symbol]||'')+' · '+ix.provider_symbol+'</div></div>'
-        +'<div class="l-v"><div class="l-p tnum">'+fmtNum(ix.value)+'</div><div class="l-c '+cls+'">'+sg+pct.toFixed(2)+'%</div></div></div>';
-    }).join('');
+  /* cached last-close beats the "Sample" placeholder while the server wakes */
+  var cached=PRICE_CACHE.IDX&&PRICE_CACHE.IDX.indices&&PRICE_CACHE.IDX.indices.length?PRICE_CACHE.IDX:null;
+  if(cached){renderIndexRows(cached);setMarketPill('Last close · cached','pill-gry');}
+  else setMarketPill('Loading…','pill-gry');
+  wakeFetch(API+'/api/market/indices',null,function(){if(!cached)setMarketPill('Waking server…','pill-gry');}).then(function(d){
+    if(!d||!d.indices||!d.indices.length){if(!cached)setMarketPill('Sample','pill-gry');return;}
+    renderIndexRows(d);
     setMarketPill('● Live','pill-grn');
-  }).catch(function(){setMarketPill('Sample · offline','pill-gry');});
+    PRICE_CACHE.IDX=d;savePriceCache();
+  }).catch(function(){setMarketPill(cached?'Last close · offline':'Sample · offline','pill-gry');});
 }
 function loadForecast(t){
   var map={BTC:'BTC-USD',ETH:'ETH-USD'},sym=map[t]||t;

@@ -17,14 +17,13 @@ var ACTIVITY=[
   {ic:'💵',main:'Opening deposit',sub:'Day 1 · Virtual cash',amt:'+$10,000.00',cls:'up'}
 ];
 var contrib={amt:100,freq:'Weekly'},tradeTicker='AAPL',tradeAction='buy',explainerShown=false,pendingSh=0;
-var SIM={day:4};/* vestigial day counter, kept only for the activity-log label */
 function curPx(t){return LIVE[t]||SEED[t]||100;}/* real live price, seed fallback offline */
 function nameOf(t){var a=ASSETS.filter(function(x){return x.t===t;})[0];return a?a.n:t;}
 function fetchLive(t,cb){
   var key=t+'_90';
   if(SF_CACHE[key]&&SF_CACHE[key].latest_price){LIVE[t]=SF_CACHE[key].latest_price;if(SF_CACHE[key].returns)TRADE_FC[t]=SF_CACHE[key].returns;if(SF_CACHE[key].historical_prices)HIST[t]=SF_CACHE[key].historical_prices;if(cb)cb();return;}
   wakeFetch(API+'/api/forecasts/ticker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticker:t,horizon_days:90})})
-    .then(function(d){if(d&&d.latest_price){LIVE[t]=d.latest_price;if(d.returns)TRADE_FC[t]=d.returns;if(d.historical_prices)HIST[t]=d.historical_prices;}if(cb)cb();})
+    .then(function(d){if(d&&d.latest_price){LIVE[t]=d.latest_price;if(d.returns)TRADE_FC[t]=d.returns;if(d.historical_prices)HIST[t]=d.historical_prices;if(typeof savePriceCache==='function')savePriceCache();}if(cb)cb();})
     .catch(function(){if(cb)cb();});
 }
 var initDone=false;
@@ -100,6 +99,19 @@ function renderWatch(){
 }
 function watchTrade(t){tradeTicker=t;tradeAction='buy';jTab(document.querySelectorAll('#page-journey .subtab')[1],'trade');}
 
+/* projected concentration if this buy goes through: (existing + new value) / (existing invested + new value),
+ * same "% of your practice money" math homeNudge() uses for the after-the-fact concentration rule (08-learn-init.js) —
+ * this is the before-the-fact version, checked at order review instead of waiting for Home to notice.
+ * Returns 0 (no signal) unless there's at least one OTHER holding to have spread into instead — same reason
+ * homeNudge() requires PF.pos.length>=2 before judging big.pct: your first-ever trade, or topping up your
+ * only holding, is always "100%" and isn't a concentration mistake, there's nothing else to compare it to. */
+function projectedConcentration(t,addVal){
+  var otherTickers=PF.pos.filter(function(x){return x.t!==t;}).length;
+  if(otherTickers<1)return 0;
+  var sx=pfStats(),ex=PF.pos.filter(function(x){return x.t===t;})[0];
+  var exVal=ex?ex.sh*curPx(t):0,newInv=sx.inv+addVal,newTickerVal=exVal+addVal;
+  return newInv>0?newTickerVal/newInv:0;
+}
 /* ── Order review → confirm (two-step, like a real broker ticket) ───── */
 function reviewTrade(){
   var sh=parseFloat((document.getElementById('tradeSh')||{}).value);
@@ -118,6 +130,13 @@ function reviewTrade(){
     +'<div style="height:1px;background:var(--purple-line);margin:9px 0"></div>'
     +r('Buying power after',money(after),after<0?'var(--red)':'')
     +'<div class="mrow-s" style="margin:8px 0 0">Paper trade · virtual cash. Fills at '+bn+'\'s latest closing price ('+money(p)+'). Real brokers fill market orders at the next available market price.</div></div>';
+  if(tradeAction==='buy'){
+    var pct=projectedConcentration(t,val);
+    if(pct>=0.4){
+      var pctR=Math.round(pct*100);
+      h+='<div class="mia" style="margin-top:12px"><div class="face">'+avatar()+'</div><div><div class="bubble">Heads up — this makes <b>'+bn+'</b> <b>'+pctR+'%</b> of your practice money. Spreading it out means one bad day can\'t take the whole portfolio with it.</div></div></div>';
+    }
+  }
   h+='<div class="row" style="gap:10px;margin-top:12px"><button class="btn btn-ghost" style="flex:1" onclick="renderTradePanel()">Cancel</button><button class="btn btn-pur" style="flex:1.4" onclick="execTrade()">Confirm '+(tradeAction==='buy'?'buy':'sell')+'</button></div>';
   document.getElementById('tradePanel').innerHTML=h;
 }
@@ -125,7 +144,7 @@ function reviewTrade(){
 /* standard-normal sampler, used by the scenario engine */
 function gauss(){var u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
 function equityChart(hist,w,h,color,labelFn){
-  color=color||'#7a5cae';var pad=8,padB=20,padT=10;
+  color=color||'#6f659a';var pad=8,padB=20,padT=10;
   var vals=hist.map(function(p){return p.total;});
   var lf=labelFn||function(p){return 'Day '+(p.day!=null?p.day:p.i);};
   var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals),rg=(mx-mn)||1,n=vals.length;
@@ -196,14 +215,14 @@ function renderPortfolioChart(){
       var line=win.map(function(p,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(p.total).toFixed(1);}).join(' ');
       var area=line+' L'+X(n-1).toFixed(1)+' '+baseY+' L'+X(0).toFixed(1)+' '+baseY+' Z';
       var refY=Y(win[0].total).toFixed(1),ex=X(n-1).toFixed(1),ey=Y(win[n-1].total).toFixed(1);
-      return '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5cae" stop-opacity="0.16"/><stop offset="0.92" stop-color="#7a5cae" stop-opacity="0"/></linearGradient></defs>'
-        +'<line x1="8" y1="'+refY+'" x2="292" y2="'+refY+'" stroke="#7a5cae" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>'
+      return '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f659a" stop-opacity="0.16"/><stop offset="0.92" stop-color="#6f659a" stop-opacity="0"/></linearGradient></defs>'
+        +'<line x1="8" y1="'+refY+'" x2="292" y2="'+refY+'" stroke="#6f659a" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>'
         +'<path d="'+area+'" fill="url(#'+gid+')"/>'
-        +'<path d="'+line+'" fill="none" stroke="#7a5cae" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
-        +'<circle cx="'+ex+'" cy="'+ey+'" r="3.5" fill="#7a5cae" stroke="#fff" stroke-width="1.6"/>';
+        +'<path d="'+line+'" fill="none" stroke="#6f659a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+        +'<circle cx="'+ex+'" cy="'+ey+'" r="3.5" fill="#6f659a" stroke="#fff" stroke-width="1.6"/>';
     },
     xLabels:function(v){var lo=Math.max(0,Math.ceil(v.lo)),hi=Math.min(n-1,Math.floor(v.hi)),mid=Math.round((lo+hi)/2);return [{i:lo,a:'start',t:fmtDate(win[lo].date)},{i:mid,a:'middle',t:fmtDate(win[mid].date)},{i:hi,a:'end',t:fmtDate(win[hi].date)}];},
-    pointAt:function(idx){return {date:fmtDate(win[idx].date)||('Point '+(idx+1)),anchorVal:win[idx].total,rows:[{color:'#7a5cae',label:'Value',value:win[idx].total,disp:money(win[idx].total)}]};}
+    pointAt:function(idx){return {date:fmtDate(win[idx].date)||('Point '+(idx+1)),anchorVal:win[idx].total,rows:[{color:'#6f659a',label:'Value',value:win[idx].total,disp:money(win[idx].total)}]};}
   });
   var lab=document.getElementById('pfRangeChg');if(!lab)return;
   if(win.length>=2&&win[0].date){var a=win[0].total,b=win[win.length-1].total,d=b-a,pct=a?d/a*100:0;
