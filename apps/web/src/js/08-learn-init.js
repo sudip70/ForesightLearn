@@ -594,89 +594,6 @@ function renderProfile(){
   if(bg)bg.innerHTML=BADGES.map(function(b){var g=b.got();return '<div class="badge'+(g?'':' locked')+'"><div class="be">'+b.ic+'</div><div class="bt">'+b.t+'</div></div>';}).join('');
 }
 
-/* ── Home: Question of the Day (daily bite-sized learning) ── */
-var QOTD=[
-  {q:'You invest <b>$100</b> and it grows about <b>8%</b> in a year. Roughly what\'s it worth?',opts:['$108','$180','$800'],correct:0,why:'8% of $100 is $8, so about $108. Small percentages snowball over many years — that\'s compounding.'},
-  {q:'Which of these usually <b>bounces around</b> the most in price?',opts:['A bond ETF','A big-company stock','A crypto coin'],correct:2,why:'Crypto is the bounciest — bigger ups and bigger downs. Bonds are the calmest of the three.'},
-  {q:'What does a <b>TFSA</b> let you do?',opts:['Grow money tax-free','Borrow at 0%','Guarantee profits'],correct:0,why:'A TFSA lets your investments grow and come out completely tax-free. Nothing guarantees profits.'},
-  {q:'Spreading money across different investments is called…',opts:['Chasing','Diversifying','Day-trading'],correct:1,why:'Diversifying — it softens the blow if any one thing drops. The closest thing to a free lunch in investing.'},
-  {q:'Your emergency fund should cover how many months of essential expenses?',opts:['1–2 weeks','3–6 months','10+ years'],correct:1,why:'3–6 months of essentials gives a real cushion — enough to handle job loss or a major repair without panic-selling investments.'},
-  {q:'$100 today at 3% inflation has roughly how much buying power in 10 years?',opts:['$134','About $74','Exactly $100'],correct:1,why:'At 3%/yr inflation, $100 loses about 26% of buying power in 10 years. Investing is how you fight the silent shrinkage.'},
-  {q:'Paying off a credit card charging <b>20%</b> is like earning a guaranteed __% return.',opts:['5%','20%','7%'],correct:1,why:'Exactly 20%. No mainstream investment reliably beats eliminating your highest interest rate.'},
-  {q:'An ETF is best described as:',opts:['A loan to a company','A basket of many stocks or bonds in one purchase','A single company\'s shares'],correct:1,why:'ETFs bundle hundreds of holdings, giving you instant diversification in one click — ideal for beginners.'},
-  {q:'<b>Dollar-cost averaging</b> means:',opts:['Buying only when prices drop','Investing a fixed amount on a regular schedule','Averaging costs across multiple brokers'],correct:1,why:'Regular fixed contributions remove the need to "time" the market. When prices fall, your money automatically buys more shares.'},
-  {q:'The S&P 500 has returned about how much per year on average, historically?',opts:['About 2%','About 10%','About 25%'],correct:1,why:'Roughly 10% nominal (or ~7% after inflation). Boring, broad, and reliable over decades.'},
-  {q:'You should build your emergency fund <i>before</i> investing mainly because:',opts:['Savings accounts pay more','A job loss could force you to sell investments at the worst time','Investing is only for the wealthy'],correct:1,why:'Without a safety net, any financial shock could force you to cash out investments at exactly the wrong moment.'},
-  {q:'What does <b>MER</b> stand for (on a fund)?',opts:['Minimum Entry Requirement','Management Expense Ratio','Market Earnings Rate'],correct:1,why:'MER (Management Expense Ratio) is the annual fee quietly deducted from the fund. Under 0.25% is excellent for index ETFs.'},
-  {q:'<b>Rebalancing</b> a portfolio means:',opts:['Selling everything and starting over','Adjusting holdings back to your target asset mix','Buying more of your best performers'],correct:1,why:'If stocks grow to 95% when you wanted 80%, you sell some and buy bonds to return to your target — keeping your risk level steady.'},
-  {q:'A <b>bond</b> in investing is:',opts:['A legal contract never to sell','A loan you make to a company or government that pays interest','A type of high-risk stock'],correct:1,why:'Bonds are loans. You lend money; they pay regular interest and return your principal at maturity. Calmer than stocks.'},
-  {q:'Short-term goal (under 2 years) — should the money be in stocks?',opts:['Yes — even short-term needs growth','No — markets can drop right when you need it','Yes, but only Canadian stocks'],correct:1,why:'Near-term money stays safe. Markets can fall 30%+ in a year. A savings account or short GIC is the right tool.'},
-  {q:'TFSA withdrawal room you use this year comes back:',opts:['Never — once used, it\'s gone','On January 1st of the following year','6 months after withdrawal'],correct:1,why:'One of the most misunderstood TFSA rules: the room you withdraw comes back the next calendar year, letting you re-contribute freely.'},
-  {q:'An <b>RRSP</b> is best used for:',opts:['Tax-free short-term savings','Long-term retirement savings with a tax deduction today','An emergency fund'],correct:1,why:'RRSP contributions reduce your taxable income now, and the money grows tax-sheltered until you withdraw in retirement at (usually) a lower rate.'},
-  {q:'Which strategy has historically beaten most active fund managers over 10+ years?',opts:['Picking individual stocks','Low-cost index fund investing','Switching funds frequently'],correct:1,why:'Index funds just track the market cheaply. After fees, most actively managed funds underperform the index over a decade.'},
-  {q:'$200/month invested for 30 years at 7%/yr grows to roughly:',opts:['$72,000','$243,000','$2,000,000'],correct:1,why:'About $243,000 — but you only contributed $72,000. The rest ($171K) is compounding at work. Time is the multiplier.'},
-  {q:'For most Canadian beginners, which account should be opened first?',opts:['A taxable brokerage account','A TFSA','An RRSP'],correct:1,why:'TFSA first for most: tax-free gains, withdraw anytime, no tax slip. Flexible, powerful, and perfect for learning to invest with real money.'}
-];
-/* rotates daily so "come back tomorrow" is true; the day's answer persists via LEARN.qotd */
-var qPick=Math.floor(Date.now()/86400000)%QOTD.length,qOpen=true,qDone=false,qChoice=-1;
-function renderQOTD(){
-  var el=document.getElementById('homeQuestion');if(!el)return;
-  if(LEARN.qotd&&LEARN.qotd.d===qPick){qDone=true;qChoice=LEARN.qotd.c;}
-  var Q=QOTD[qPick%QOTD.length];
-  var open=qOpen||qDone;
-  var top='<div class="q-top"'+(!open?' onclick="openQOTD()" style="cursor:pointer"':'')+'><div class="q-face">'+avatar()+'</div><div class="q-mid"><div class="q-q">'+Q.q+'</div>'+(!open?'<div class="q-cta">Answer ›</div>':'')+'</div></div>';
-  var h='<div class="qcard'+(open?' open':'')+'">'+top;
-  if(open){
-    if(!qDone){
-      h+='<div class="q-opts">'+Q.opts.map(function(o,i){return '<button class="q-opt" onclick="answerQOTD('+i+')">'+o+'</button>';}).join('')+'</div>';
-    }else{
-      h+='<div class="q-opts">'+Q.opts.map(function(o,i){var c=(i===Q.correct)?' right':((i===qChoice)?' wrong':'');return '<div class="q-opt'+c+'">'+o+'</div>';}).join('')+'</div>';
-      h+='<div class="q-fb '+(qChoice===Q.correct?'ok':'no')+'">'+(qChoice===Q.correct?'✓ Nice! +10 XP · ':'Not quite, ')+Q.why+'<div class="q-next">Come back tomorrow for a new one 🌱</div></div>';
-    }
-  }
-  el.innerHTML=h+'</div>';
-}
-function openQOTD(){qOpen=true;renderQOTD();}
-function answerQOTD(i){
-  qDone=true;qChoice=i;
-  LEARN.qotd={d:qPick,c:i};
-  if(i===QOTD[qPick%QOTD.length].correct)learnXP(10);else saveState();
-  renderQOTD();
-}
-/* ── Home: Your plan (milestones → graduation), computed from real progress ── */
-function planSteps(){
-  var total=0,done=0;
-  learnUnits().forEach(function(u){u.lessons.forEach(function(l){if(!l.mile){total++;if(LEARN.done[l.id])done++;}});});
-  var lessonsDone=done>=total,contributed=(PF.deposits||0)>0;
-  return [
-    {t:'Open your practice account',d:'Done, your $10,000 is ready to invest',st:'done'},
-    {t:'Learn the money & investing basics',d:lessonsDone?'All '+total+' lessons complete 🎉':done+' of '+total+' lessons · tap to continue',st:lessonsDone?'done':'now',go:"goTab('learn')"},
-    {t:'Practice contributing regularly',d:contributed?'You\'ve added practice cash — keep the habit going':'Add practice cash from My Accounts → Investing',st:contributed?'done':(lessonsDone?'now':'next'),go:"goTab('accounts')"},
-    {t:'Open a real account & invest for real',d:'Your graduation 🎓',st:(lessonsDone&&contributed)?'now':'next'}
-  ];
-}
-var planOpen=true;/* web: show the full plan stepper by default — no need to hide it */
-function renderPlan(){
-  var el=document.getElementById('homePlan');if(!el)return;
-  var PLAN=planSteps();
-  var doneN=PLAN.filter(function(s){return s.st==='done';}).length;
-  if(planOpen){
-    var h='<div class="plan">';/* web: full stepper sits naturally, no collapse toggle */
-    PLAN.forEach(function(s,i){
-      var ic=s.st==='done'?'✓':(i+1),click=s.go?(' onclick="'+s.go+'" style="cursor:pointer"'):'';
-      h+='<div class="pstep '+s.st+'"'+click+'><div class="pstep-l"><div class="pstep-ic">'+ic+'</div>'+(i<PLAN.length-1?'<div class="pstep-line"></div>':'')+'</div><div class="pstep-b"><div class="pstep-t">'+s.t+'</div><div class="pstep-d">'+s.d+'</div></div>'+(s.st==='now'?'<div class="pstep-go">›</div>':'')+'</div>';
-    });
-    el.innerHTML=h+'</div>';
-  }else{
-    var cur=PLAN.filter(function(s){return s.st==='now';})[0]||PLAN.filter(function(s){return s.st==='next';})[0]||PLAN[0],
-        idx=PLAN.indexOf(cur)+1,
-        click=cur&&cur.go?(' onclick="'+cur.go+'" style="cursor:pointer"'):'';
-    el.innerHTML='<div class="nextcard"'+click+'><div class="nextcard-k">Your next step</div>'
-      +'<div class="nextstep"><div class="nextstep-ic">'+idx+'</div><div class="nextstep-b"><div class="nextstep-t">'+cur.t+'</div><div class="nextstep-d">'+cur.d+'</div></div><div class="pstep-go">›</div></div></div>'
-      +'<div class="plan-more-row"><span class="plan-more" onclick="togglePlan()">See full plan · '+doneN+'/'+PLAN.length+' done ›</span></div>';
-  }
-}
-function togglePlan(){planOpen=!planOpen;renderPlan();}
 
 loadState();
 syncPrimaryGoal();
@@ -684,6 +601,6 @@ renderOB();
 renderPortfolio();renderHoldings();sfSelect('AAPL');
 renderFc('AAPL');loadIndices();
 checkSkillUnlocks();renderLearn();
-renderQOTD();renderPlan();renderGoalCard();renderProfile();renderMoneyHome();
+renderGoalCard();renderProfile();renderMoneyHome();
 if(onboarded)enterApp();
 refreshHeldPrices();/* load live prices up front so Home & Practice settle to the same live value at once, not only when Practice opens */
