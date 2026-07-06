@@ -128,12 +128,16 @@ var pfLevel=1;
 var LVL_NAME={1:'Starter',2:'Intermediate',3:'Pro'};
 var LVL_HELP={1:'Few numbers · welcoming. Slide right for more detail.',2:'More metrics, watchlist, activity and scenarios.',3:'Everything: accounts, plan and price sources.'};
 var LVL_VIS={hold:1,trade:1,watch:2,act:2,plan:3}; /* min level each sub-tab needs */
-function applyPracticeLevel(){
+/* fill % for a raw slider value (1..3); matches the thumb centre, with a small
+   nub at level 1 so the track never looks unset. Continuous so dragging is smooth. */
+function lvlFill(raw){return Math.max(14,(raw-1)/2*100);}
+function applyPracticeLevel(keepSlider){
   var pg=document.getElementById('page-journey');
   if(pg){pg.classList.remove('lvl-1','lvl-2','lvl-3');pg.classList.add('lvl-'+pfLevel);}
   var sl=document.getElementById('pfLevelSlider');
-  /* fill grows with level; level 1 keeps a small visible nub so it never looks unset */
-  if(sl){sl.value=pfLevel;sl.style.setProperty('--fill',({1:14,2:50,3:100}[pfLevel])+'%');}
+  /* keepSlider: leave the thumb/fill where the finger is mid-drag; otherwise snap to level */
+  if(sl&&!keepSlider){sl.value=pfLevel;sl.style.setProperty('--fill',lvlFill(pfLevel).toFixed(1)+'%');}
+  if(sl)sl.setAttribute('aria-valuetext',LVL_NAME[pfLevel]);
   var nm=document.getElementById('pfLevelName');if(nm)nm.textContent=LVL_NAME[pfLevel];
   var hp=document.getElementById('pfLevelHelp');if(hp)hp.textContent=LVL_HELP[pfLevel];
   document.querySelectorAll('.lvl-stops span').forEach(function(s){s.classList.toggle('on',+s.dataset.lvl===pfLevel);});
@@ -143,9 +147,26 @@ function applyPracticeLevel(){
     setRange('1M',rts[2]||null);
   }
 }
-function setPfLevel(v){
+/* live drag: glide the thumb/fill continuously, only re-render when the level flips */
+function pfLevelInput(raw){
+  var sl=document.getElementById('pfLevelSlider');
+  if(sl)sl.style.setProperty('--fill',lvlFill(raw).toFixed(1)+'%');
+  var lvl=Math.max(1,Math.min(3,Math.round(raw)));
+  if(lvl!==pfLevel)setPfLevel(lvl,true);
+}
+/* on release: snap thumb + fill to the chosen level */
+function pfLevelSnap(){applyPracticeLevel(false);}
+/* keyboard moves whole levels (step is tiny for smooth dragging, so override arrows) */
+function pfLevelKey(e){
+  var k=e.key;
+  if(k==='ArrowLeft'||k==='ArrowDown'){e.preventDefault();setPfLevel(pfLevel-1);}
+  else if(k==='ArrowRight'||k==='ArrowUp'){e.preventDefault();setPfLevel(pfLevel+1);}
+  else if(k==='Home'){e.preventDefault();setPfLevel(1);}
+  else if(k==='End'){e.preventDefault();setPfLevel(3);}
+}
+function setPfLevel(v,fromDrag){
   pfLevel=Math.max(1,Math.min(3,v|0))||1;
-  applyPracticeLevel();
+  applyPracticeLevel(fromDrag);
   /* a now-hidden sub-tab falls back to Holdings */
   if(LVL_VIS[jCur]>pfLevel){
     var st=document.querySelectorAll('#page-journey .subtab');

@@ -13,7 +13,8 @@ var SKILLS=[
 ];
 var WHYS=['To save for a big expense','So my money can grow safely','To save for the future','As a way to make money'];
 var ACCTS=[{k:'TFSA',d:'Tax-free growth · recommended',cls:'tfsa'},{k:'RRSP',d:'Retirement plan',cls:'rrsp'},{k:'ETFs',d:'Bundled funds',cls:'etf'}];
-function money0(n){return '$'+Math.round(n).toLocaleString();}
+/* sign goes before the $ ("-$12", not "$-12") — see money() in 03-trading-engine.js */
+function money0(n){n=Math.round(n);var neg=n<0;return (neg?'-':'')+'$'+Math.abs(n).toLocaleString();}
 function lclsOf(t){var a=ASSETS.filter(function(x){return x.t===t;})[0];return a?a.c:'stock';}
 function pfStats(){var inv=0,byCls={},big={t:'',v:0};PF.pos.forEach(function(p){var v=p.sh*curPx(p.t);inv+=v;var c=lclsOf(p.t);byCls[c]=(byCls[c]||0)+v;if(v>big.v)big={t:p.t,v:v};});return {inv:inv,classes:Object.keys(byCls).length,big:{t:big.t,pct:inv?big.v/inv:0}};}
 function pfClasses(){return pfStats().classes;}
@@ -26,7 +27,7 @@ function checkSkillUnlocks(){
 function learnXP(n){LEARN.xp+=n;LEARN.dailyXP=Math.min(99,LEARN.dailyXP+n);if(LEARN.xp>=LEARN.xpToNext){LEARN.xp-=LEARN.xpToNext;LEARN.level++;LEARN.xpToNext=Math.round(LEARN.xpToNext*1.25);setTimeout(function(){showToast('🎉 Level up! Level '+LEARN.level);},900);}saveState();}
 function refreshLearn(){checkSkillUnlocks();if(document.getElementById('page-learn').classList.contains('active'))renderLearn();}
 function lring(val,max){var r=11,c=2*Math.PI*r,off=c*(1-Math.min(1,val/max));return '<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#e9e4f3" stroke-width="4"/><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#e0a92f" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 15 15)"/></svg>';}
-function ldonutSVG(pct){var r=34,c=2*Math.PI*r,off=c*(1-Math.min(1,pct/20));return '<svg width="120" height="120" viewBox="0 0 90 90"><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#e7e1f4" stroke-width="11"/><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#6f659a" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 45 45)"/></svg>';}
+function ldonutSVG(pct){var r=34,c=2*Math.PI*r,off=c*(1-Math.min(1,pct/20));return '<svg width="120" height="120" viewBox="0 0 90 90"><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#f4ede1" stroke-width="11"/><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#9a8765" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 45 45)"/></svg>';}
 function ldonutInner(pct,m){return ldonutSVG(pct)+'<div class="ldonut-c"><div class="ldonut-a">'+money0(m)+'</div><div class="ldonut-k">/month · '+pct+'%</div></div>';}
 function goalTitle(g){return 'Save '+money0(g.amt)+' for '+g.what;}
 /* Home "My Goals" now reflects the unified GOALS list (see 07b-money.js) and opens the Goals page. */
@@ -59,7 +60,7 @@ var LESSONS_L={
   /* ── Unit 1 · Money foundations ── */
   f_budget:{xp:40,celeb:'You\'ve got a plan for every paycheque now.',steps:[
     {say:'Before investing, know where your money goes. One simple split keeps it automatic: <b>50 / 30 / 20</b>. 🧾'},
-    {say:'<b>50%</b> to needs (rent, groceries), <b>30%</b> to wants (fun, takeout), <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#7a5cae">50% needs</div><div style="width:30%;background:#5b8def">30% wants</div><div style="width:20%;background:#4f9c7e">20% save</div></div>';}},
+    {say:'<b>50%</b> to needs (rent, groceries), <b>30%</b> to wants (fun, takeout), <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#ae905c">50% needs</div><div style="width:30%;background:#5b8def">30% wants</div><div style="width:20%;background:#4f9c7e">20% save</div></div>';}},
     {q:'You take home $2,000 a month. Using 50/30/20, how much goes to saving &amp; debt?',opts:['$100','$400','$1,000'],correct:1,yes:'Exactly!',why:'20% × $2,000 = $400. Even automating a piece of this changes everything.'},
     {say:'The <b>pay-yourself-first</b> trick: move that 20% on payday — before it can disappear on wants. Future-you always wins this one. 💪'},
     {q:'Which best describes "pay yourself first"?',opts:['Spend freely, save whatever\'s left','Transfer savings the moment you\'re paid','Invest only when you have extra'],correct:1,yes:'Yes!',why:'Moving money before you can spend it is what actually makes saving happen. Willpower alone rarely works.'},
@@ -100,7 +101,7 @@ var LESSONS_L={
   ]},
   v_compound:{xp:50,celeb:'You just met the most powerful force in money.',steps:[
     {say:'The closest thing to magic in money: <b>compounding</b> — when your returns start earning their own returns. The longer you wait to start, the less magic you get. ❄️'},
-    {say:'$200/month invested at 7%/yr grows to about <b>$243,000</b> in 30 years. You only contributed $72,000 — the rest is compounding doing the heavy lifting.',viz:function(){return '<div class="viz-split"><div style="width:30%;background:#7a5cae">$72K you put in</div><div style="width:70%;background:#4f9c7e">$171K growth</div></div>';}},
+    {say:'$200/month invested at 7%/yr grows to about <b>$243,000</b> in 30 years. You only contributed $72,000 — the rest is compounding doing the heavy lifting.',viz:function(){return '<div class="viz-split"><div style="width:30%;background:#ae905c">$72K you put in</div><div style="width:70%;background:#4f9c7e">$171K growth</div></div>';}},
     {q:'What matters most for compounding to work?',opts:['Picking the perfect stock','Starting early and staying in','Making one huge deposit'],correct:1,yes:'Exactly!',why:'Time is the secret ingredient. Starting 10 years earlier often beats investing twice as much later.'},
     {say:'You invest $1,000 today vs waiting 10 years to invest the same $1,000. At 7%/yr and 30-year horizon, the early start gives you <b>roughly twice the outcome</b>. 😬'},
     {q:'Friend A invests $1,000 today. Friend B waits 10 years, then invests $1,000. At 7%/yr over 30 years, who has more?',opts:['Friend A — started today','Friend B — saved longer before investing','They end up equal'],correct:0,yes:'Right!',why:'Friend A: ~$7,600. Friend B: ~$3,870. One decade of delay costs almost half the final amount.'},
@@ -141,7 +142,7 @@ var LESSONS_L={
   ]},
   p_mix:{xp:45,celeb:'You can design a mix you\'ll actually stick with.',steps:[
     {say:'Your <b>asset mix</b> — how much in stocks vs bonds vs other — shapes most of your long-run results. Get this right and you can sleep through any dip. 🥗'},
-    {say:'A classic start for a 25-year-old: <b>80% stocks / 20% bonds</b> — lean to growth when young, shift toward stability as your goal nears.',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#7a5cae">80% stocks</div><div style="width:20%;background:#5b8def">20% bonds</div></div>';}},
+    {say:'A classic start for a 25-year-old: <b>80% stocks / 20% bonds</b> — lean to growth when young, shift toward stability as your goal nears.',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#ae905c">80% stocks</div><div style="width:20%;background:#5b8def">20% bonds</div></div>';}},
     {q:'You\'re 25, investing for retirement in 40 years. A reasonable tilt?',opts:['Mostly bonds — safe','Mostly stocks — long horizon','All cash — wait and see'],correct:1,yes:'Yes.',why:'40 years gives you time to ride out every dip stocks throw. Lean into growth when your horizon is long.'},
     {say:'<b>Rebalancing</b>: if stocks boom and grow to 90% of your portfolio, sell a little and buy bonds to drift back to your 80/20 target. Once a year is usually enough.'},
     {q:'Your target is 80% stocks. After a great year it\'s grown to 90% stocks. What do you do?',opts:['Do nothing — let it run','Sell some stocks, buy bonds to get back to 80/20','Sell everything and restart'],correct:1,yes:'Right!',why:'Rebalancing keeps your risk at the level you chose. Let stocks run unchecked and one bad year hits far harder.'},
@@ -616,9 +617,11 @@ var QOTD=[
   {q:'$200/month invested for 30 years at 7%/yr grows to roughly:',opts:['$72,000','$243,000','$2,000,000'],correct:1,why:'About $243,000 — but you only contributed $72,000. The rest ($171K) is compounding at work. Time is the multiplier.'},
   {q:'For most Canadian beginners, which account should be opened first?',opts:['A taxable brokerage account','A TFSA','An RRSP'],correct:1,why:'TFSA first for most: tax-free gains, withdraw anytime, no tax slip. Flexible, powerful, and perfect for learning to invest with real money.'}
 ];
-var qPick=0,qOpen=true,qDone=false,qChoice=-1;/* web: show the question's options inline — there's room */
+/* rotates daily so "come back tomorrow" is true; the day's answer persists via LEARN.qotd */
+var qPick=Math.floor(Date.now()/86400000)%QOTD.length,qOpen=true,qDone=false,qChoice=-1;
 function renderQOTD(){
   var el=document.getElementById('homeQuestion');if(!el)return;
+  if(LEARN.qotd&&LEARN.qotd.d===qPick){qDone=true;qChoice=LEARN.qotd.c;}
   var Q=QOTD[qPick%QOTD.length];
   var open=qOpen||qDone;
   var top='<div class="q-top"'+(!open?' onclick="openQOTD()" style="cursor:pointer"':'')+'><div class="q-face">'+avatar()+'</div><div class="q-mid"><div class="q-q">'+Q.q+'</div>'+(!open?'<div class="q-cta">Answer ›</div>':'')+'</div></div>';
@@ -628,23 +631,34 @@ function renderQOTD(){
       h+='<div class="q-opts">'+Q.opts.map(function(o,i){return '<button class="q-opt" onclick="answerQOTD('+i+')">'+o+'</button>';}).join('')+'</div>';
     }else{
       h+='<div class="q-opts">'+Q.opts.map(function(o,i){var c=(i===Q.correct)?' right':((i===qChoice)?' wrong':'');return '<div class="q-opt'+c+'">'+o+'</div>';}).join('')+'</div>';
-      h+='<div class="q-fb '+(qChoice===Q.correct?'ok':'no')+'">'+(qChoice===Q.correct?'✓ Nice! ':'Not quite, ')+Q.why+'<div class="q-next">Come back tomorrow for a new one 🌱</div></div>';
+      h+='<div class="q-fb '+(qChoice===Q.correct?'ok':'no')+'">'+(qChoice===Q.correct?'✓ Nice! +10 XP · ':'Not quite, ')+Q.why+'<div class="q-next">Come back tomorrow for a new one 🌱</div></div>';
     }
   }
   el.innerHTML=h+'</div>';
 }
 function openQOTD(){qOpen=true;renderQOTD();}
-function answerQOTD(i){qDone=true;qChoice=i;renderQOTD();}
-/* ── Home: Your plan (milestones → graduation) ── */
-var PLAN=[
-  {t:'Open your practice account',d:'Done, your $10,000 is ready to invest',st:'done'},
-  {t:'Learn risk & diversification',d:'Lesson 3 of 5 · tap to continue',st:'now',go:"goTab('learn')"},
-  {t:'Practice contributing regularly',d:'Build the habit with practice money',st:'next'},
-  {t:'Open a real account & invest for real',d:'Your graduation 🎓',st:'next'}
-];
+function answerQOTD(i){
+  qDone=true;qChoice=i;
+  LEARN.qotd={d:qPick,c:i};
+  if(i===QOTD[qPick%QOTD.length].correct)learnXP(10);else saveState();
+  renderQOTD();
+}
+/* ── Home: Your plan (milestones → graduation), computed from real progress ── */
+function planSteps(){
+  var total=0,done=0;
+  learnUnits().forEach(function(u){u.lessons.forEach(function(l){if(!l.mile){total++;if(LEARN.done[l.id])done++;}});});
+  var lessonsDone=done>=total,contributed=(PF.deposits||0)>0;
+  return [
+    {t:'Open your practice account',d:'Done, your $10,000 is ready to invest',st:'done'},
+    {t:'Learn the money & investing basics',d:lessonsDone?'All '+total+' lessons complete 🎉':done+' of '+total+' lessons · tap to continue',st:lessonsDone?'done':'now',go:"goTab('learn')"},
+    {t:'Practice contributing regularly',d:contributed?'You\'ve added practice cash — keep the habit going':'Add practice cash from My Accounts → Investing',st:contributed?'done':(lessonsDone?'now':'next'),go:"goTab('accounts')"},
+    {t:'Open a real account & invest for real',d:'Your graduation 🎓',st:(lessonsDone&&contributed)?'now':'next'}
+  ];
+}
 var planOpen=true;/* web: show the full plan stepper by default — no need to hide it */
 function renderPlan(){
   var el=document.getElementById('homePlan');if(!el)return;
+  var PLAN=planSteps();
   var doneN=PLAN.filter(function(s){return s.st==='done';}).length;
   if(planOpen){
     var h='<div class="plan">';/* web: full stepper sits naturally, no collapse toggle */

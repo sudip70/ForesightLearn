@@ -40,7 +40,9 @@ function anchorInit(){
   PF.cash=+(START_CAPITAL-cost).toFixed(2);initDone=true;saveState();
 }
 function refreshHeldPrices(){PF.pos.forEach(function(p){if(!LIVE[p.t]||!HIST[p.t])fetchLive(p.t,function(){anchorInit();renderPortfolio();var jh=document.getElementById('jHold');if(jh&&jh.style.display!=='none')renderHoldings();});});}
-function money(n){return '$'+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+/* sign goes before the $ ("-$12.00", not "$-12.00") — matters now that balances
+ * (chequing overdraft, net worth) can legitimately go negative. */
+function money(n){n=Number(n);var neg=n<0;return (neg?'-':'')+'$'+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function signed(n){return (n>=0?'+':'-')+'$'+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtSh(n){n=+n;return Number.isInteger(n)?(''+n):(''+ +n.toFixed(4));}
 function totals(){var inv=0,val=0;PF.pos.forEach(function(p){inv+=p.sh*p.avg;val+=p.sh*curPx(p.t);});return {inv:inv,val:val,unreal:val-inv,total:val+PF.cash};}
@@ -81,7 +83,7 @@ function watchBtnHtml(t){var on=inWatch(t);
 }
 function renderWatch(){
   var el=document.getElementById('jWatch');if(!el)return;
-  if(!PF.watch.length){el.innerHTML='<div class="card"><div class="card-t">Watchlist</div><div class="muted-note" style="text-align:left">Nothing on your watchlist yet. Open any asset in <b>Markets</b> and tap <b>☆ Add to Watchlist</b> to track it here, then trade it in one tap.</div></div>';return;}
+  if(!PF.watch.length){el.innerHTML='<div class="card"><div class="card-t">Watchlist</div><div class="muted-note" style="text-align:left">Nothing on your watchlist yet. Open any asset in <b>Stock Finder</b> (Explore tab) and tap <b>☆ Add to Watchlist</b> to track it here, then trade it in one tap.</div></div>';return;}
   var html='<div class="card"><div class="row" style="margin-bottom:13px"><div class="card-t" style="margin-bottom:0">Watchlist</div><span class="pill pill-pur">'+PF.watch.length+' tracked</span></div>';
   PF.watch.forEach(function(t){
     var a=ASSETS.filter(function(x){return x.t===t;})[0]||{t:t,n:t,c:'stock'},bn=t.replace('-USD',''),px=curPx(t),live=!!LIVE[t],dm=dayMove(t);
