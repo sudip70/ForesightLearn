@@ -24,7 +24,7 @@ var SAVINGS={balance:4200};
 /* Mirrors the "Chequing" asset in NETWORTH — same pattern as Savings above. Deposits
    (paycheck, etc.) add to it; logging a Debit card purchase in My Accounts spends
    from it, same as a real chequing account. */
-var CHEQUING={balance:800};
+var CHEQUING={balance:800,deposits:[]};
 /* 'have' | 'need' | null — which credit-card toggle the user picked in My Accounts */
 var CREDIT_CARD=null;
 
@@ -371,26 +371,35 @@ function renderAcctSummary(){
 function renderAcctDebit(){
   var box=document.getElementById('acctDebitBox');if(!box)return;
   var bal=numVal(CHEQUING.balance);
-  var txns=SPENDING.filter(function(s){return s.acct==='Debit card';})
-    .sort(function(a,b){return (b.date||'').localeCompare(a.date||'');}).slice(0,3);
+  var deps=(CHEQUING.deposits||[]).map(function(d){return {date:d.date,label:escHtml(d.source||'Deposit'),amount:d.amount,cls:'up',sign:'+'};});
+  var purchases=SPENDING.filter(function(s){return s.acct==='Debit card';})
+    .map(function(s){return {date:s.date,label:escHtml(s.note||s.category),amount:s.amount,cls:'down',sign:'-'};});
+  var txns=deps.concat(purchases).sort(function(a,b){return (b.date||'').localeCompare(a.date||'');}).slice(0,3);
   var h='<div class="acct-card" style="display:block">'
     +'<div class="row" style="margin-bottom:11px"><div style="display:flex;align-items:center;gap:12px">'+bankCardSVG('debit')
     +'<div><div class="ac-name" style="margin:0">Debit Card</div><div class="ac-note" style="margin-top:2px">Balance</div></div></div>'
     +'<div style="display:flex;align-items:center;gap:9px"><span class="tnum" style="font-size:19px;font-weight:800;color:'+(bal<0?'var(--red)':'var(--green)')+'">'+money0(bal)+'</span>'+helpDot('debit_card')+'</div></div>';
   if(txns.length){
-    txns.forEach(function(s){h+='<div class="txn"><span>'+escHtml(s.note||s.category)+'</span><span class="down">-'+money0(s.amount)+'</span></div>';});
+    txns.forEach(function(x){h+='<div class="txn"><span>'+x.label+'</span><span class="'+x.cls+'">'+x.sign+money0(x.amount)+'</span></div>';});
   }else{
-    h+='<div class="ac-note" style="margin-bottom:2px">No debit purchases logged yet</div>';
+    h+='<div class="ac-note" style="margin-bottom:2px">No debit activity logged yet</div>';
   }
   h+='<div class="cat-add" style="margin-top:10px"><input class="f-in" id="chAmt" inputmode="decimal" placeholder="Amount" style="margin:0" onkeydown="if(event.key===\'Enter\')addChequing()"/>'
+    +'<input class="f-in" id="chSrc" placeholder="Source (e.g. Paycheck)" style="margin:0" onkeydown="if(event.key===\'Enter\')addChequing()"/>'
     +'<button class="btn btn-soft" onclick="addChequing()">Add money</button></div>';
   box.innerHTML=h+'</div>';
 }
 function addChequing(){
   var f=document.getElementById('chAmt'),amt=numVal(f&&f.value);if(amt<=0){showToast('Enter an amount');return;}
-  CHEQUING.balance=numVal(CHEQUING.balance)+amt;syncNetworthMirror();saveState();renderAcctDebit();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
-  var nf=document.getElementById('chAmt');if(nf){nf.value='';nf.focus();}
-  showToast('💳 Added '+money0(amt)+' to chequing');
+  var src=((document.getElementById('chSrc')||{}).value||'').trim();
+  CHEQUING.balance=numVal(CHEQUING.balance)+amt;
+  if(!Array.isArray(CHEQUING.deposits))CHEQUING.deposits=[];
+  CHEQUING.deposits.unshift({id:moneyUid(),date:todayISO(),amount:amt,source:src||'Deposit'});
+  syncNetworthMirror();saveState();renderAcctDebit();renderAcctSummary();if(typeof renderMoneyHome==='function')renderMoneyHome();
+  var nf=document.getElementById('chAmt');if(nf)nf.value='';
+  var sf=document.getElementById('chSrc');if(sf)sf.value='';
+  if(nf)nf.focus();
+  showToast('💳 Added '+money0(amt)+' to chequing'+(src?' · '+src:''));
 }
 
 /* ── Credit Card: a real, persisted toggle (not just two tooltip triggers) ── */

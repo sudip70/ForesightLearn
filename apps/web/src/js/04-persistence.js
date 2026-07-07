@@ -17,7 +17,7 @@ function freshStart(){
   ACTIVITY=[{ic:'💵',main:'Opening deposit',sub:nowLabel()+' · Virtual cash',amt:'+$10,000.00',cls:'up'}];
   LEARN={level:1,levelName:'Getting Started',xp:0,xpToNext:500,streak:0,dailyXP:0,gems:0,checked:{},flags:{},done:{}};
   GOAL.saved=0;GOALS=[];SPENDING=[];LOANS=[];
-  SAVINGS={balance:0};CHEQUING={balance:0};CREDIT_CARD=null;
+  SAVINGS={balance:0};CHEQUING={balance:0,deposits:[]};CREDIT_CARD=null;
   NETWORTH={assets:[{name:'Savings account',value:0},{name:'Chequing',value:0}],debts:[]};
 }
 function loadState(){
@@ -31,7 +31,7 @@ function loadState(){
     if(d.BUDGET)BUDGET=d.BUDGET;if(Array.isArray(d.GOALS))GOALS=d.GOALS;
     if(Array.isArray(d.SPENDING))SPENDING=d.SPENDING;if(d.NETWORTH)NETWORTH=d.NETWORTH;
     if(Array.isArray(d.LOANS))LOANS=d.LOANS;if(d.SAVINGS)SAVINGS=d.SAVINGS;
-    if(d.CHEQUING)CHEQUING=d.CHEQUING;
+    if(d.CHEQUING)CHEQUING=d.CHEQUING;if(!Array.isArray(CHEQUING.deposits))CHEQUING.deposits=[];
     if(d.CREDIT_CARD)CREDIT_CARD=d.CREDIT_CARD;
     if(d.pfLevel)pfLevel=Math.max(1,Math.min(3,d.pfLevel|0))||1;
     onboarded=!!d.onboarded;return true;
