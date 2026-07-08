@@ -157,6 +157,10 @@ function paintSF(a,d,p){
   var about=(pf.sector?bn+' is a '+a.c+' in the '+pf.sector+' sector'+(pf.industry?' ('+pf.industry+')':'')+'. ':'')+(d.plain_language||'');
   html+='<div class="card"><div class="card-t">About '+bn+'</div><div style="font-size:13px;color:var(--muted);line-height:1.6">'+about+' <span style="font-size:11px">These are model estimates for learning, not advice. Data as of '+fmtDate(d.data_as_of||dq.as_of_date||'')+'.</span></div></div>';
   html+=watchBtnHtml(a.t);
+  // explore-more chips keep the rail useful below the fold (same asset class)
+  var more=ASSETS.filter(function(x){return x.c===a.c&&x.t!==a.t;}).slice(0,6);
+  if(more.length)html+='<div class="card"><div class="card-t">Explore more '+(a.c==='etf'?'ETFs':(a.c==='crypto'?'crypto':'stocks'))+'</div><div class="tkr-pick" style="margin:0">'
+    +more.map(function(x){return '<div class="tchip" onclick="sfSelect(\''+x.t+'\')">'+x.t.replace('-USD','')+'</div>';}).join('')+'</div></div>';
   html+='</div></div>';
   document.getElementById('sfDetail').innerHTML=html;
   renderForecastChart('sfChart',hist,bear,base,bull,histDates,fcDates);

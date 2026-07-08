@@ -225,8 +225,9 @@ header.hidden{display:none}
 .qa-prog{margin-top:auto;display:flex;align-items:center;justify-content:space-between}
 .qa-lbl{font-size:12px;font-weight:600;opacity:.9}
 .qa-pct{font-size:12px;font-weight:600}
-.qa-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.3);overflow:hidden;margin:8px 0 16px}
-.qa-bar-fill{height:100%;background:#fff;border-radius:4px;transition:width .5s}
+.qa-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.32);box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);overflow:hidden;margin:8px 0 16px}
+/* min-width keeps tiny percentages (6%…) visible as a starting cap, not nothing */
+.qa-bar-fill{height:100%;min-width:10px;background:#fff;border-radius:4px;transition:width .5s}
 /* white surface + feature-deep text (same recipe as .dh-bp on the Investing hero):
    the old rgba(0,0,0,.24) overlay went muddy on the olive/orange gradients */
 .qa-btn{width:100%;border:none;border-radius:12px;padding:12px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);background:rgba(255,255,255,.94);color:var(--ink);transition:background .15s}
@@ -267,8 +268,9 @@ header.hidden{display:none}
 .hc-btn{border:none;border-radius:12px;background:var(--taupe);color:#fff;font-family:var(--font);font-size:12px;font-weight:600;padding:7px 14px;cursor:pointer;transition:filter .15s}
 .hc-btn:hover{filter:brightness(1.06)}
 /* Your Goals list */
-.hg-list{display:flex;gap:14px;flex-wrap:wrap}
-.hg-item{flex:1 1 130px;min-width:0;display:flex;align-items:center;gap:10px}
+/* stacked rows (was a cramped side-by-side wrap) — each goal gets a full line */
+.hg-list{display:flex;flex-direction:column;gap:12px}
+.hg-item{min-width:0;display:flex;align-items:center;gap:12px}
 .hg-n{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hg-d{font-size:11.5px;color:var(--muted);margin-top:2px}
 /* Monthly Budget donut + legend */
@@ -357,13 +359,14 @@ header.hidden{display:none}
 .lp-col-meta{font-size:13px;font-weight:600;color:rgba(0,0,0,.62)}
 .lp-btn{margin-top:auto;border:none;border-radius:12px;background:var(--taupe);color:#fff;font-family:var(--font);font-size:14px;font-weight:600;padding:12px 16px;cursor:pointer;transition:filter .15s}
 .lp-btn:hover{filter:brightness(1.06)}
-.lp-invest{--pc:var(--invest)}
-.lp-credit{--pc:var(--loan)}
-.lp-home{--pc:var(--save)}
-/* upcoming pathway: honest single banner, no dead-end buttons */
+.lp-invest{--pc:var(--invest);--pc-soft:var(--invest-soft)}
+.lp-credit{--pc:var(--loan);--pc-soft:var(--loan-soft)}
+.lp-home{--pc:var(--save);--pc-soft:var(--save-soft)}
+/* upcoming pathway: honest single banner, no dead-end buttons — muted soft fill
+   with a feature-color left edge, so what's unavailable never out-shouts what is */
 .lp-soon-pill{font-size:12px;font-weight:600;color:var(--muted);background:var(--surface-soft);padding:5px 12px;border-radius:20px;white-space:nowrap}
-.lp-soon-banner{display:flex;align-items:center;gap:12px;background:var(--pc);border-radius:var(--r);padding:18px 20px;font-size:14px;font-weight:600;color:rgba(0,0,0,.6);min-height:64px}
-.lp-lock{width:22px;height:22px;flex:0 0 auto;stroke:rgba(0,0,0,.55);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lp-soon-banner{display:flex;align-items:center;gap:12px;background:var(--pc-soft);border-left:5px solid var(--pc);border-radius:var(--r);padding:16px 20px;font-size:14px;font-weight:600;color:rgba(0,0,0,.55);min-height:56px}
+.lp-lock{width:18px;height:18px;flex:0 0 auto;stroke:rgba(0,0,0,.45);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:1000px){.learn-top{grid-template-columns:1fr}}
 @media(max-width:760px){.lp-cols{grid-template-columns:1fr}.learn-start{flex-direction:column}}
 
@@ -549,7 +552,7 @@ header.hidden{display:none}
 .teach{display:flex;gap:12px;align-items:flex-start;background:#fbf6e9;border:1px solid #ecd9a6;border-radius:14px;padding:12px 16px;margin-bottom:12px;font-size:13px;line-height:1.5;color:#6f5512}
 .teach b{color:#5a4410}
 .teach-ic{font-size:20px;flex-shrink:0;line-height:1.2}
-.sf-toggle{width:100%;background:var(--surface);border:1.5px dashed var(--purple-line);color:var(--purple-strong);border-radius:12px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);margin-bottom:12px}
+.sf-toggle{width:100%;background:var(--surface);border:1.5px solid var(--purple-line);box-shadow:var(--shadow);color:var(--purple-strong);border-radius:12px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);margin-bottom:12px}
 .sf-toggle:active{transform:scale(.99)}
 .mrow{padding:12px 0;border-bottom:1px solid var(--line)}
 .mrow:last-child{border-bottom:none;padding-bottom:0}
@@ -601,6 +604,11 @@ header.hidden{display:none}
 .f-label{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px;display:block}
 .f-in,select{width:100%;border:1.6px solid var(--line);border-radius:var(--r-sm);padding:12px 12px;font-size:14px;font-family:var(--font);background:var(--surface);color:var(--ink);outline:none;margin-bottom:12px;appearance:none}
 .f-in:focus,select:focus{border-color:var(--purple)}
+/* Spending "Log an expense": one row on desktop, wraps gracefully when narrow */
+.exp-form{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.exp-form .f-in{margin-bottom:0}
+.ef-amt{flex:1 1 110px}.ef-cat{flex:1.2 1 150px}.ef-note{flex:2.2 1 220px}.ef-date{flex:1 1 150px}
+.ef-btn{flex:0 1 auto}.ef-btn .btn{width:auto;padding:12px 22px;font-size:14px}
 .toggle{display:flex;gap:8px;margin-bottom:12px}
 .tg{flex:1;padding:12px;border-radius:var(--r-sm);border:1.6px solid var(--line);font-size:13px;font-weight:800;cursor:pointer;background:var(--surface);color:var(--muted);font-family:var(--font)}
 .tg.buy.on{background:var(--green-soft);border-color:var(--green);color:var(--green)}
@@ -757,8 +765,12 @@ input[type=range].obb-rng::-moz-range-thumb{width:21px;height:21px;background:va
 .lb-n{flex:1;font-size:14px;font-weight:700}
 .lb-x{font-size:13px;font-weight:800;color:var(--purple-strong)}
 .badge-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.badge{text-align:center;background:var(--surface);border-radius:14px;padding:16px 8px;box-shadow:var(--shadow)}
-.badge.locked{opacity:.45}
+.badge{position:relative;text-align:center;background:var(--surface);border-radius:14px;padding:16px 8px;box-shadow:var(--shadow)}
+/* locked = explicit state (dashed outline + lock corner), not just a washed-out card */
+.badge.locked{background:var(--surface-soft);box-shadow:none;border:1.6px dashed var(--line)}
+.badge.locked .be{filter:grayscale(1);opacity:.45}
+.badge.locked .bt{color:var(--muted)}
+.badge-lock{position:absolute;top:8px;right:8px;width:13px;height:13px;stroke:var(--muted);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .badge .be{font-size:30px} .badge .bt{font-size:10px;font-weight:700;margin-top:4px;line-height:1.2}
 
 .muted-note{font-size:12px;color:var(--muted);line-height:1.5;text-align:center;padding:4px 8px}
@@ -799,7 +811,7 @@ svg.duo .duo-s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round
 .start-bubble{position:absolute;top:-33px;background:#fff;color:var(--purple-deep);font-weight:800;font-size:11px;padding:8px 12px;border-radius:11px;box-shadow:var(--shadow-lg);animation:bob 1.4s ease-in-out infinite;letter-spacing:.6px;pointer-events:none}
 .start-bubble:after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#fff}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.node-label{font-size:11px;font-weight:800;color:var(--muted);text-align:center;margin-top:8px;max-width:90px;line-height:1.2}
+.node-label{font-size:12px;font-weight:800;color:var(--ink);opacity:.62;text-align:center;margin-top:8px;max-width:120px;line-height:1.2}
 .node-btn.lock+.node-label,.node-btn.milelock+.node-label{color:var(--faint)}
 .skills{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .skill{background:var(--surface);border-radius:16px;padding:12px;box-shadow:var(--shadow);position:relative;border:1.5px solid transparent}
@@ -1058,8 +1070,8 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;overflow:
 .scn-chev svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 
 /* Learn: trail (left) + sticky rail (right); collapses to one lane on narrow */
-.learn-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:32px;align-items:start;max-width:1000px;margin:0 auto}
-.learn-trail{max-width:580px;min-width:0;margin:0 auto}
+.learn-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:32px;align-items:start;max-width:1180px;margin:0 auto}
+.learn-trail{max-width:680px;min-width:0;margin:0 auto}
 .learn-rail{position:sticky;top:18px;min-width:0}
 .learn-rail .section-t:first-child{margin-top:0}
 .learn-rail .skills{grid-template-columns:1fr 1fr}
@@ -1067,7 +1079,9 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;overflow:
 
 /* ════ Tools & Games ════ */
 /* hub: NYT-style mosaic of varied-size game tiles */
-.game-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px}
+/* uniform tile grid — 4-up on desktop (8 games = 2 clean rows), 2-up when narrow */
+.game-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px}
+@media(max-width:1100px){.game-grid{grid-template-columns:1fr 1fr}}
 .game-tile{position:relative;display:flex;flex-direction:column;background:var(--bg);border-radius:16px;padding:16px;cursor:pointer;min-height:140px;overflow:hidden;transition:transform .15s ease,box-shadow .15s ease}
 .game-tile:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
 .game-tile .gt-ico{width:46px;height:46px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 2px 7px rgba(50,46,68,.10);flex-shrink:0}
@@ -1077,9 +1091,6 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;overflow:
 .game-tile .gt-t.big{font-size:23px}
 .game-tile .gt-d{font-size:12.5px;color:var(--purple-deep);opacity:.72;margin-top:4px;font-weight:600}
 .game-tile .gt-meta{font-size:12px;font-weight:800;color:var(--ink);margin-top:8px}
-.game-tile.wide{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;min-height:120px}
-.game-tile.wide .gt-txt{margin-top:0}
-.game-tile.wide .gt-graphic{flex-shrink:0;margin-left:16px;line-height:0}
 
 /* shared game chrome */
 #bsBody,#wnbBody,#scamBody,#wordleBody,#xwordBody,#qcBody,#loanBody,#mortBody{max-width:640px;margin:0 auto}

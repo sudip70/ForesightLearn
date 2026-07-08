@@ -195,17 +195,20 @@ function renderGoals(){
   var el=document.getElementById('goalsBody');if(!el)return;
   var saved=GOALS.reduce(function(a,g){return a+numVal(g.saved);},0),target=GOALS.reduce(function(a,g){return a+numVal(g.target);},0);
   var pct=target>0?Math.min(100,Math.round(saved/target*100)):0;
-  var h='<div class="hero"><div class="hero-l">Saved across all goals</div>'
+  /* desktop: hero + add-form in the left column, goal cards in the right —
+     no more full-width rows over a half-empty page (collapses <960 via .grid-2) */
+  var left='<div class="hero"><div class="hero-l">Saved across all goals</div>'
     +'<div class="hero-v tnum">'+money0(saved)+'</div>'
     +'<div class="hero-c">'+pct+'% of '+money0(target)+' total</div></div>';
-  h+='<div class="card"><div class="row" style="gap:8px;align-items:flex-end">'
-    +'<div style="flex:2"><label class="f-label">New goal</label><input class="f-in" id="goName" placeholder="e.g. Trip to Japan"/></div>'
+  left+='<div class="card"><div class="card-t">New goal</div><div class="row" style="gap:8px;align-items:flex-end">'
+    +'<div style="flex:2"><label class="f-label">Name</label><input class="f-in" id="goName" placeholder="e.g. Trip to Japan"/></div>'
     +'<div style="flex:1"><label class="f-label">Target</label>'+moneyInput('goTarget',null,'0')+'</div>'
     +'<button class="btn btn-soft" style="flex:0 0 auto;width:auto;padding:12px 16px" onclick="addGoal()">Add</button></div></div>';
-  if(!GOALS.length)h+='<div class="card"><div class="muted-note" style="text-align:left">No goals yet — add your first above.</div></div>';
+  var right='';
+  if(!GOALS.length)right+='<div class="card"><div class="muted-note" style="text-align:left">No goals yet — add your first on the left.</div></div>';
   GOALS.forEach(function(g){
     var gp=numVal(g.target)>0?Math.min(100,Math.round(numVal(g.saved)/numVal(g.target)*100)):0,done=gp>=100;
-    h+='<div class="goal-card"><div class="row"><div style="font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px;color:'+(done?'var(--green)':'inherit')+'">'+mIcon(done?'checkRing':'target',15)+'<span style="color:var(--ink)">'+escHtml(g.what)+'</span></div>'
+    right+='<div class="goal-card"><div class="row"><div style="font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px;color:'+(done?'var(--green)':'inherit')+'">'+mIcon(done?'checkRing':'target',15)+'<span style="color:var(--ink)">'+escHtml(g.what)+'</span></div>'
       +'<span class="pill '+(done?'pill-grn':'pill-pur')+'">'+gp+'%</span></div>'
       +'<div class="bar"><div class="bar-fill" style="width:'+gp+'%"></div></div>'
       +'<div class="row"><span style="font-size:11px;color:var(--muted)">'+money0(g.saved)+' of '+money0(g.target)+(g.account?' · '+g.account:'')+'</span></div>'
@@ -213,7 +216,7 @@ function renderGoals(){
       +'<button class="btn btn-pur" style="width:auto;padding:8px 16px;white-space:nowrap" onclick="goalContribute(\''+g.id+'\')">Add to savings</button>'
       +'<button class="adjust" title="Delete goal" onclick="delGoal(\''+g.id+'\')">✕</button></div></div>';
   });
-  el.innerHTML=h;
+  el.innerHTML='<div class="grid-2"><div class="stack">'+left+'</div><div class="stack">'+right+'</div></div>';
 }
 function syncGoalHome(){if(typeof renderGoalCard==='function')renderGoalCard();}
 function addGoal(){
@@ -236,14 +239,16 @@ function renderSpending(){
   var h='<div class="hero"><div class="hero-l">Spent this month</div><div class="hero-v tnum">'+money(monthTotal())+'</div>'
     +'<div class="hero-c">'+SPENDING.filter(function(s){return (s.date||'').slice(0,7)===thisMonth();}).length+' transactions</div></div>';
   // add form
+  /* one desktop row: Amount | Category | Note | Date | Add (wraps on narrow) */
   h+='<div class="card"><div class="card-t">Log an expense</div>'
-    +'<div class="row" style="gap:8px;align-items:flex-end">'
-    +'<div style="flex:1"><label class="f-label">Amount</label>'+moneyInput('exAmt',null,'0')+'</div>'
-    +'<div style="flex:1.4"><label class="f-label">Category</label><select class="f-in" id="exCat">'
-      +cats.map(function(c){return '<option>'+escHtml(c)+'</option>';}).join('')+'</select></div></div>'
-    +'<label class="f-label">Note (optional)</label><input class="f-in" id="exNote" placeholder="What was it for?"/>'
-    +'<label class="f-label">Date</label><input class="f-in" id="exDate" type="date" value="'+todayISO()+'"/>'
-    +'<button class="btn btn-pur" style="margin-top:12px" onclick="addExpense()">Add expense</button></div>';
+    +'<div class="exp-form">'
+    +'<div class="ef-amt"><label class="f-label">Amount</label>'+moneyInput('exAmt',null,'0')+'</div>'
+    +'<div class="ef-cat"><label class="f-label">Category</label><select class="f-in" id="exCat">'
+      +cats.map(function(c){return '<option>'+escHtml(c)+'</option>';}).join('')+'</select></div>'
+    +'<div class="ef-note"><label class="f-label">Note (optional)</label><input class="f-in" id="exNote" placeholder="What was it for?"/></div>'
+    +'<div class="ef-date"><label class="f-label">Date</label><input class="f-in" id="exDate" type="date" value="'+todayISO()+'"/></div>'
+    +'<div class="ef-btn"><button class="btn btn-pur" onclick="addExpense()">Add expense</button></div>'
+    +'</div></div>';
   // by-category this month
   var byCat={};SPENDING.forEach(function(s){if((s.date||'').slice(0,7)===thisMonth())byCat[s.category]=(byCat[s.category]||0)+numVal(s.amount);});
   var catKeys=Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a];});
@@ -294,21 +299,20 @@ function renderNetworth(){
   var h='<div class="hero"><div class="hero-l">Net worth</div><div class="hero-v tnum">'+money(t.net)+'</div>'
     +'<div class="hero-row"><div class="s"><label>Assets</label><span class="tnum">'+money0(t.assets)+'</span></div>'
     +'<div class="s"><label>Debts</label><span class="tnum">'+money0(t.debts)+'</span></div></div></div>';
-  // assets
-  h+='<div class="card"><div class="card-t">Assets</div>';
-  h+='<div class="lrow"><div class="l-n">Practice portfolio <span class="pill pill-grn" style="font-size:10px">live</span></div><div class="l-v"><div class="l-p tnum">'+money0(t.live)+'</div></div></div>';
+  // assets (left) / debts (right) — natural own-vs-owe symmetry on desktop
+  var assets='<div class="card" style="margin:0"><div class="card-t">Assets</div>';
+  assets+='<div class="lrow"><div class="l-n">Practice portfolio <span class="pill pill-grn" style="font-size:10px">live</span></div><div class="l-v"><div class="l-p tnum">'+money0(t.live)+'</div></div></div>';
   NETWORTH.assets.forEach(function(a,i){
-    h+='<div class="lrow"><div class="l-n">'+escHtml(a.name)+'</div><div style="display:flex;align-items:center;gap:8px"><div class="l-v"><div class="l-p tnum">'+money0(a.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'assets\','+i+')">✕</button></div></div>';
+    assets+='<div class="lrow"><div class="l-n">'+escHtml(a.name)+'</div><div style="display:flex;align-items:center;gap:8px"><div class="l-v"><div class="l-p tnum">'+money0(a.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'assets\','+i+')">✕</button></div></div>';
   });
-  h+='<div class="row" style="gap:8px;margin-top:8px;align-items:flex-end"><div style="flex:2"><input class="f-in" id="naName" placeholder="Asset (e.g. Car)"/></div><div style="flex:1">'+moneyInput('naVal',null,'0')+'</div><button class="btn btn-soft" style="width:auto;padding:12px 16px" onclick="addNW(\'assets\')">Add</button></div></div>';
-  // debts
-  h+='<div class="card"><div class="card-t">Debts</div>';
-  if(!NETWORTH.debts.length)h+='<div class="muted-note" style="text-align:left">No debts — nice.</div>';
+  assets+='<div class="row" style="gap:8px;margin-top:8px;align-items:flex-end"><div style="flex:2"><input class="f-in" id="naName" placeholder="Asset (e.g. Car)" style="margin-bottom:0"/></div><div style="flex:1">'+moneyInput('naVal',null,'0','margin-bottom:0')+'</div><button class="btn btn-soft" style="width:auto;padding:12px 16px" onclick="addNW(\'assets\')">Add</button></div></div>';
+  var debts='<div class="card" style="margin:0"><div class="card-t">Debts</div>';
+  if(!NETWORTH.debts.length)debts+='<div class="muted-note" style="text-align:left">No debts — nice.</div>';
   NETWORTH.debts.forEach(function(d,i){
-    h+='<div class="lrow"><div class="l-n">'+escHtml(d.name)+'</div><div style="display:flex;align-items:center;gap:8px"><div class="l-v"><div class="l-p tnum down-soft">-'+money0(d.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'debts\','+i+')">✕</button></div></div>';
+    debts+='<div class="lrow"><div class="l-n">'+escHtml(d.name)+'</div><div style="display:flex;align-items:center;gap:8px"><div class="l-v"><div class="l-p tnum down-soft">-'+money0(d.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'debts\','+i+')">✕</button></div></div>';
   });
-  h+='<div class="row" style="gap:8px;margin-top:8px;align-items:flex-end"><div style="flex:2"><input class="f-in" id="ndName" placeholder="Debt (e.g. Credit card)"/></div><div style="flex:1">'+moneyInput('ndVal',null,'0')+'</div><button class="btn btn-soft" style="width:auto;padding:12px 16px" onclick="addNW(\'debts\')">Add</button></div></div>';
-  el.innerHTML=h;
+  debts+='<div class="row" style="gap:8px;margin-top:8px;align-items:flex-end"><div style="flex:2"><input class="f-in" id="ndName" placeholder="Debt (e.g. Credit card)" style="margin-bottom:0"/></div><div style="flex:1">'+moneyInput('ndVal',null,'0','margin-bottom:0')+'</div><button class="btn btn-soft" style="width:auto;padding:12px 16px" onclick="addNW(\'debts\')">Add</button></div></div>';
+  el.innerHTML=h+'<div class="grid-2"><div class="stack">'+assets+'</div><div class="stack">'+debts+'</div></div>';
 }
 function addNW(kind){
   var pre=kind==='assets'?'na':'nd';

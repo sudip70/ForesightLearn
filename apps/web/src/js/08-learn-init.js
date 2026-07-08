@@ -715,7 +715,9 @@ function renderProfile(){
     return '<div class="lb-row"><div class="lb-rank'+(i===0?' gold':'')+(r.me?' me':'')+'">'+(i+1)+'</div><div class="lb-av">'+av+'</div><div class="lb-n">'+r.n+'</div><div class="lb-x">'+r.xp.toLocaleString()+' XP</div></div>';
   }).join('');
   var bg=document.getElementById('badgeGrid');
-  if(bg)bg.innerHTML=BADGES.map(function(b){var g=b.got();return '<div class="badge'+(g?'':' locked')+'"><div class="be">'+b.ic+'</div><div class="bt">'+b.t+'</div></div>';}).join('');
+  if(bg)bg.innerHTML=BADGES.map(function(b){var g=b.got();return '<div class="badge'+(g?'':' locked')+'">'
+    +(g?'':'<svg class="badge-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>')
+    +'<div class="be">'+b.ic+'</div><div class="bt">'+b.t+'</div></div>';}).join('');
 }
 
 
