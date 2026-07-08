@@ -641,7 +641,7 @@ function renderLearnHub(){
   var courseK=nl?('Course '+(nl.ui+1)+': '+escHtml(nl.unit.t)):'Course 1: Money foundations';
   var moduleT=nl?escHtml(nl.lesson.label):'You’ve finished every lesson 🎉';
   var startCta=nl?'Start Lesson':'Review Lessons';
-  var soon="showToast('Coming soon — this learning path is on the way')";
+  /* live pathway with three working columns */
   function pathway(title,cls,meta,learnGo,practiceGo,productGo,productLbl){
     return '<div class="card learn-path '+cls+'">'
       +'<div class="lp-head"><h3 class="lp-title">'+title+'</h3><a class="see-all" onclick="'+learnGo+'">View All ›</a></div>'
@@ -651,6 +651,14 @@ function renderLearnHub(){
       +'<div class="lp-col"><div class="lp-col-head"><span class="lp-col-t">Product</span></div><button class="lp-btn" onclick="'+productGo+'">'+productLbl+'</button></div>'
       +'</div></div>';
   }
+  /* upcoming pathway: keeps the title + feature colour but shows an honest single
+     "coming soon" banner instead of buttons that go nowhere */
+  function pathwaySoon(title,cls,blurb){
+    return '<div class="card learn-path '+cls+' is-soon"><div class="lp-head"><h3 class="lp-title">'+title+'</h3>'
+      +'<span class="lp-soon-pill">Coming soon</span></div>'
+      +'<div class="lp-soon-banner"><svg viewBox="0 0 24 24" class="lp-lock"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>'
+      +'<span>'+blurb+'</span></div></div>';
+  }
   el.innerHTML=
     '<div class="learn-top">'
     +'<div class="card learn-start">'
@@ -658,14 +666,27 @@ function renderLearnHub(){
     +'<p class="ls-p">Not sure where to start? Let’s cover the money basics first!</p>'
     +'<button class="btn-taupe ls-btn" onclick="push(\'lessons\')">'+startCta+'</button></div>'
     +'<div class="ls-course"><div class="ls-c-k">'+courseK+'</div><div class="ls-c-t">'+moduleT+'</div>'
-    +'<div class="ls-c-art" aria-hidden="true">🙋‍♀️</div></div>'
+    +'<div class="ls-c-art" aria-hidden="true">'+learnArtSVG()+'</div></div>'
     +'</div>'
     +'<div id="learnAdvisor"></div>'
     +'</div>'
     +pathway('Grow my money through Investing','lp-invest',learnLessonCount()+' lessons',"push('lessons')","goTab('journey')","goTab('accounts')",'Start Investing')
-    +pathway('Build and improve my credit','lp-credit','Coming soon',soon,soon,soon,'Coming soon')
-    +pathway('Buy or refinance a home','lp-home','Coming soon',soon,soon,soon,'Coming soon');
+    +pathwaySoon('Build and improve my credit','lp-credit','Lessons and a practice sim for building credit are on the way.')
+    +pathwaySoon('Buy or refinance a home','lp-home','Lessons on mortgages, down payments and refinancing are on the way.');
   if(typeof renderAdvisorCard==='function')renderAdvisorCard('learnAdvisor');
+}
+/* Small inline illustration for the Start-Learning course card: an open book with a
+   coin — self-contained (no external asset), tinted to the invest-purple accent. */
+function learnArtSVG(){
+  return '<svg viewBox="0 0 96 80" width="96" height="80" role="img" aria-label="Learning">'
+    +'<ellipse cx="48" cy="70" rx="34" ry="5" fill="rgba(101,91,147,.14)"/>'
+    +'<path d="M48 26C40 20 28 20 20 24V64C28 60 40 60 48 66Z" fill="#c8c0e2"/>'
+    +'<path d="M48 26C56 20 68 20 76 24V64C68 60 56 60 48 66Z" fill="#aea2d2"/>'
+    +'<path d="M48 26V66" stroke="#8b7cba" stroke-width="3" stroke-linecap="round"/>'
+    +'<path d="M27 33C32 31 39 31 43 34M27 42C32 40 39 40 43 43M53 34C57 31 64 31 69 33M53 43C57 40 64 40 69 42" stroke="#8b7cba" stroke-width="2" stroke-linecap="round" opacity=".55" fill="none"/>'
+    +'<circle cx="48" cy="16" r="11" fill="#e4da82"/><circle cx="48" cy="16" r="7.5" fill="none" stroke="#a2973c" stroke-width="1.6"/>'
+    +'<text x="48" y="20.5" text-anchor="middle" font-size="11" font-weight="700" fill="#a2973c" font-family="var(--font)">$</text>'
+    +'<path d="M70 12l1.6 3.4L75 17l-3.4 1.6L70 22l-1.6-3.4L65 17l3.4-1.6Z" fill="#e4da82"/></svg>';
 }
 
 /* ── Profile: level, XP-ranked leaderboard, behaviour-driven badges ── */

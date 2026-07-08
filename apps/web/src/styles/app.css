@@ -330,7 +330,8 @@ header.hidden{display:none}
 .ls-course{flex:1 1 230px;background:var(--surface-soft);border-radius:var(--r);padding:18px 20px;display:flex;flex-direction:column;min-width:0}
 .ls-c-k{font-size:13px;color:var(--muted);font-weight:600}
 .ls-c-t{font-size:18px;font-weight:600;margin-top:4px;line-height:1.3}
-.ls-c-art{margin-top:auto;align-self:flex-end;font-size:52px;line-height:1;padding-top:8px}
+.ls-c-art{margin-top:auto;align-self:flex-end;line-height:0;padding-top:8px}
+.ls-c-art svg{display:block}
 #learnAdvisor{display:flex}
 #learnAdvisor .advisor-card{flex:1;margin:0}
 .learn-path{margin:0 0 16px;padding:20px 22px}
@@ -346,6 +347,10 @@ header.hidden{display:none}
 .lp-invest{--pc:var(--invest)}
 .lp-credit{--pc:var(--loan)}
 .lp-home{--pc:var(--save)}
+/* upcoming pathway: honest single banner, no dead-end buttons */
+.lp-soon-pill{font-size:12px;font-weight:600;color:var(--muted);background:var(--surface-soft);padding:5px 12px;border-radius:20px;white-space:nowrap}
+.lp-soon-banner{display:flex;align-items:center;gap:12px;background:var(--pc);border-radius:var(--r);padding:18px 20px;font-size:14px;font-weight:600;color:rgba(0,0,0,.6);min-height:64px}
+.lp-lock{width:22px;height:22px;flex:0 0 auto;stroke:rgba(0,0,0,.55);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:1000px){.learn-top{grid-template-columns:1fr}}
 @media(max-width:760px){.lp-cols{grid-template-columns:1fr}.learn-start{flex-direction:column}}
 

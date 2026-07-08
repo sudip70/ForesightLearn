@@ -807,8 +807,9 @@ function renderHomeInvest(){
    the existing floating Coach Chat — not a second, independent chat engine. ── */
 /* Reusable Financial Advisor card: white card, charcoal header + message bubble,
    soft input pill that forwards into the real Coach Chat. Render into any container
-   by id — currently Home (#homeAdvisor), Budget (#budgetAdvisor), Investing
-   (#journeyAdvisor). One voice (Mia), so every instance shows the same live nudge. */
+   by id — currently Home (#homeAdvisor), Budget (#budgetAdvisor), Spending
+   (#spendAdvisor), Learn (#learnAdvisor). One voice (Mia), so every instance shows
+   the same live nudge. */
 function renderAdvisorCard(targetId){
   var el=document.getElementById(targetId);if(!el)return;
   var n=(typeof homeNudge==='function')?homeNudge():{msg:'Ask me anything about your money.'};
@@ -820,9 +821,7 @@ function renderAdvisorCard(targetId){
     +'<div class="advisor-bubble-row"><div class="advisor-bubble">'+n.msg+'</div>'
     +'<button class="advisor-copy" onclick="copyAdvisorMsg(this)" aria-label="Copy message"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>'
     +'<div class="advisor-input-row"><div class="advisor-inpwrap">'
-    +'<span class="advisor-ic advisor-clip" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></span>'
-    +'<input class="advisor-input" id="'+inId+'" placeholder="Type here…" onkeydown="if(event.key===\'Enter\')advisorAsk(\''+inId+'\')"/>'
-    +'<span class="advisor-ic advisor-mic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></span></div>'
+    +'<input class="advisor-input" id="'+inId+'" placeholder="Ask about your money…" onkeydown="if(event.key===\'Enter\')advisorAsk(\''+inId+'\')"/></div>'
     +'<button class="advisor-send" onclick="advisorAsk(\''+inId+'\')" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>'
     +'</div></div>';
 }
