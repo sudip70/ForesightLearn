@@ -205,6 +205,9 @@ function renderPortfolio(){
     var hc=document.getElementById('homeCash');if(hc)hc.textContent=money(PF.cash);}
   var hs=document.getElementById('homeSpark');
   if(hs){hs.innerHTML=sparkline(portfolioHistory(40).map(function(p){return p.total;}),200,80,'#ffffff');}
+  /* Home Investing panel embeds a portfolio line — re-render it once prices/history load
+     (initial render can run before the series is ready, leaving a 2-point flat line) */
+  if(typeof renderHomeInvest==='function'&&document.getElementById('homeInvest')&&document.getElementById('page-home')&&document.getElementById('page-home').classList.contains('active'))renderHomeInvest();
   renderPortfolioChart();
 }
 /* tiny decorative-but-real sparkline for the Home hero (stretches to fill) */

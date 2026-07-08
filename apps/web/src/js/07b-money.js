@@ -771,7 +771,7 @@ function renderHomeBudgetBig(){
   }).join('')||'<div class="muted-note">No categories yet.</div>';
   el.innerHTML='<div class="card" style="margin:0">'
     +'<div class="hc-head"><span class="hc-title">Your Monthly Budget</span><button class="hc-btn" onclick="goTab(\'budget\')">View Full</button></div>'
-    +'<div class="hb-body"><div class="hb-donut">'+miniDonut(segs,184,pctBudg+'%','budgeted',34)+'</div>'
+    +'<div class="hb-body"><div class="hb-donut">'+miniDonut(segs,220,pctBudg+'%','budgeted',40)+'</div>'
     +'<div class="hb-legend">'+rows+'</div></div></div>';
 }
 /* ── "Investing" summary card (target redesign): left copy + View Investments button,
@@ -785,14 +785,21 @@ function renderHomeInvest(){
   var sub=up
     ? 'Your practice portfolio is <b>up '+signed(gain)+'</b> all-time. Keep learning and practising before you invest for real.'
     : 'Your practice portfolio is <b>down '+signed(gain).replace('-','')+'</b> right now. Dips are normal, this is the safe place to learn.';
+  /* real portfolio-value line for the panel background (falls back to nothing if the
+     series is too short to plot) */
+  var hist=(typeof portfolioHistory==='function')?portfolioHistory(48).map(function(p){return p.total;}):[];
+  var hasMove=hist.length>=8&&Math.max.apply(null,hist)!==Math.min.apply(null,hist);
+  var chart=hasMove?'<div class="hi-chart">'+sparkline(hist,600,150,'#ffffff')+'</div>':'';
   el.innerHTML='<div class="card home-invest">'
     +'<div class="hi-left"><div class="hi-title">Investing</div>'
     +'<div class="hi-sub">'+sub+'</div>'
     +'<button class="btn-taupe hi-btn" onclick="goTab(\'journey\')">View Investments</button></div>'
     +'<div class="hi-panel">'
+    +'<div class="hi-stats">'
     +'<div class="hi-stat"><div class="hi-k">Practice Portfolio</div><div class="hi-v tnum">'+money(T.total)+'</div></div>'
     +'<div class="hi-stat"><div class="hi-k">Total Invested</div><div class="hi-v tnum">'+money0(invested)+'</div></div>'
     +'<div class="hi-stat"><div class="hi-k">Today’s Return</div><div class="hi-v tnum">'+(todayPct>=0?'+':'')+todayPct.toFixed(1)+'%</div></div>'
+    +'</div>'+chart
     +'</div></div>';
 }
 /* ── "Financial Advisor" card (Home + Budget): a preview of Mia's one real thing to

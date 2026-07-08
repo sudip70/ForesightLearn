@@ -1,14 +1,15 @@
 /* ── Navigation ──────────────────────────────── */
-var TAB_OF={home:'home',learn:'learn',tools:'tools',social:'social',journey:'journey',scenario:'journey',risk:'journey',stockfinder:'journey',budget:'budget',goals:'budget',spending:'budget',networth:'accounts',accounts:'accounts',
+var TAB_OF={home:'home',learn:'learn',lessons:'learn',tools:'tools',social:'social',journey:'journey',scenario:'journey',risk:'journey',stockfinder:'journey',budget:'budget',goals:'budget',spending:'budget',networth:'accounts',accounts:'accounts',
   'loan-calc':'tools','mortgage-calc':'tools','compound-calc':'tools','game-swipe':'tools','game-wnb':'tools','game-scam':'tools','game-wordle':'tools','game-xword':'tools','game-quiz':'tools','game-hangman':'tools','game-invest':'tools'};
-var TITLES={home:"Fiscally",learn:'Learn',tools:'Games',social:'Profile',journey:'Investing',scenario:'Scenarios',risk:'Risk Level',stockfinder:'Stock Finder',budget:'Budget',goals:'Savings Goals',spending:'Spending',networth:'Net Worth',accounts:'My Accounts',
+var TITLES={home:"Fiscally",learn:'Learn',lessons:'Learn',tools:'Games',social:'Profile',journey:'Investing',scenario:'Scenarios',risk:'Risk Level',stockfinder:'Stock Finder',budget:'Budget',goals:'Savings Goals',spending:'Spending',networth:'Net Worth',accounts:'My Accounts',
   'loan-calc':'Loan Calculator','mortgage-calc':'Mortgage Calculator','compound-calc':'Compound Calculator','game-swipe':'Budget Swipe','game-wnb':'Wants vs Needs','game-scam':'Scammer Scanner','game-wordle':'Finance Wordle','game-xword':'Finance Crossword','game-quiz':'Quick Count','game-hangman':"Debtor's Tower",'game-invest':'Invest Game'};
 var stack=['home'];
 function show(id){
   closeL();closeTipBtn();/* never leave a lesson/term sheet floating over a new tab */
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page-'+id).classList.add('active');
-  if(id==='learn')renderLearn();
+  if(id==='learn')renderLearnHub();
+  if(id==='lessons')renderLearn();
   if(id==='journey'){applyPracticeLevel();refreshHeldPrices();renderInvestLessons();renderGlossary();}
   if(id==='scenario')renderScenario();
   if(id==='social')renderProfile();
@@ -31,7 +32,7 @@ function show(id){
   if(id==='game-invest')initInvestGame();
   var tab=TAB_OF[id];
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});
-  var isSub=['scenario','risk','stockfinder','goals','spending','networth','loan-calc','mortgage-calc','compound-calc','game-swipe','game-wnb','game-scam','game-wordle','game-xword','game-quiz','game-hangman','game-invest','social'].indexOf(id)>=0;
+  var isSub=['lessons','scenario','risk','stockfinder','goals','spending','networth','loan-calc','mortgage-calc','compound-calc','game-swipe','game-wnb','game-scam','game-wordle','game-xword','game-quiz','game-hangman','game-invest','social'].indexOf(id)>=0;
   document.getElementById('hBack').classList.toggle('show',isSub);
   document.getElementById('hTitle').innerHTML = isSub ? TITLES[id] : (id==='home'?"Home":TITLES[id]);
   document.getElementById('pages').scrollTop=0;

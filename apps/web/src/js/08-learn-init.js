@@ -38,7 +38,7 @@ function touchStreak(){
   syncTopbar();
 }
 function learnXP(n){touchStreak();LEARN.xp+=n;LEARN.dailyXP=Math.min(99,LEARN.dailyXP+n);if(LEARN.xp>=LEARN.xpToNext){LEARN.xp-=LEARN.xpToNext;LEARN.level++;LEARN.xpToNext=Math.round(LEARN.xpToNext*1.25);setTimeout(function(){showToast('🎉 Level up! Level '+LEARN.level);},900);}saveState();}
-function refreshLearn(){checkSkillUnlocks();if(document.getElementById('page-learn').classList.contains('active'))renderLearn();}
+function refreshLearn(){checkSkillUnlocks();if(document.getElementById('page-lessons').classList.contains('active'))renderLearn();}
 function lring(val,max){var r=11,c=2*Math.PI*r,off=c*(1-Math.min(1,val/max));return '<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#edeaf6" stroke-width="4"/><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#e0a92f" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 15 15)"/></svg>';}
 function ldonutSVG(pct){var r=34,c=2*Math.PI*r,off=c*(1-Math.min(1,pct/20));return '<svg width="120" height="120" viewBox="0 0 90 90"><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#efece2" stroke-width="11"/><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#837c74" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 45 45)"/></svg>';}
 function ldonutInner(pct,m){return ldonutSVG(pct)+'<div class="ldonut-c"><div class="ldonut-a">'+money0(m)+'</div><div class="ldonut-k">/month · '+pct+'%</div></div>';}
@@ -430,14 +430,14 @@ function homeNudge(){
       var pc=Math.round(sx.big.pct*100),bn=sx.big.t.replace('-USD','');
       return {msg:'<b>'+pc+'%</b> of your practice money is riding on <b>'+bn+'</b>. Spreading it out means one bad day can\'t take the whole portfolio with it.',
         cta:LEARN.done.risk_div?'Open Practice ›':'Learn: Spread it out ›',
-        go:LEARN.done.risk_div?"goTab('journey')":"goTab('learn');nodeTap('risk_div',false,false)"};
+        go:LEARN.done.risk_div?"goTab('journey')":"goTab('lessons');nodeTap('risk_div',false,false)"};
     }
   }
   /* 2 · been away a few days */
   if(LEARN.lastActive&&act){
     var gap=Math.round((new Date(todayISO())-new Date(LEARN.lastActive))/86400000);
     if(gap>=3)return {msg:'Welcome back! It\'s been '+gap+' days. Five quiet minutes on <b>'+lessonLabel(act)+'</b> gets things moving again.',
-      cta:'Continue learning ›',go:"goTab('learn');nodeTap('"+act+"',false,false)"};
+      cta:'Continue learning ›',go:"goTab('lessons');nodeTap('"+act+"',false,false)"};
   }
   /* 3 · cash drag — only nags once compounding has actually been learned */
   var T=totals();
@@ -450,7 +450,7 @@ function homeNudge(){
       cta:'Open My Accounts ›',go:"goTab('accounts')"};
   /* 5 · fallback: the next real lesson on the trail (live Continue rail) */
   if(act)return {msg:'Next up on your trail: <b>'+lessonLabel(act)+'</b> — about two minutes.',
-    cta:'Start lesson ›',go:"goTab('learn');nodeTap('"+act+"',false,false)"};
+    cta:'Start lesson ›',go:"goTab('lessons');nodeTap('"+act+"',false,false)"};
   return {msg:'You\'ve finished the whole trail 🎉 Keep practising, or revisit any lesson for a refresher.',cta:'Open Practice ›',go:"goTab('journey')"};
 }
 function miaGuide(){
@@ -621,6 +621,51 @@ function renderLearn(){
   h+='</div>';
   LEARN.petJump=false;
   document.getElementById('learnBody').innerHTML=h;
+}
+
+/* ── Learn HUB (the Learn tab landing) ─────────────────────────────
+   Start Learning + Financial Advisor, then pathway cards. "Start Lessons"
+   opens the full trail (page-lessons, renderLearn). Investing is the only
+   real pathway today; credit/home are laid out but marked coming-soon so
+   the hub matches the design without faking content. */
+function nextLesson(){
+  var st=lessonStates(),units=learnUnits(),act=st.activeId;
+  for(var i=0;i<units.length;i++)for(var j=0;j<units[i].lessons.length;j++)
+    if(units[i].lessons[j].id===act)return {ui:i,unit:units[i],lesson:units[i].lessons[j]};
+  return null;
+}
+function learnLessonCount(){return learnUnits().reduce(function(a,u){return a+u.lessons.filter(function(l){return !l.mile;}).length;},0);}
+function renderLearnHub(){
+  var el=document.getElementById('learnHub');if(!el)return;
+  var nl=nextLesson();
+  var courseK=nl?('Course '+(nl.ui+1)+': '+escHtml(nl.unit.t)):'Course 1: Money foundations';
+  var moduleT=nl?escHtml(nl.lesson.label):'You’ve finished every lesson 🎉';
+  var startCta=nl?'Start Lesson':'Review Lessons';
+  var soon="showToast('Coming soon — this learning path is on the way')";
+  function pathway(title,cls,meta,learnGo,practiceGo,productGo,productLbl){
+    return '<div class="card learn-path '+cls+'">'
+      +'<div class="lp-head"><h3 class="lp-title">'+title+'</h3><a class="see-all" onclick="'+learnGo+'">View All ›</a></div>'
+      +'<div class="lp-cols">'
+      +'<div class="lp-col"><div class="lp-col-head"><span class="lp-col-t">Learn</span><span class="lp-col-meta">'+meta+'</span></div><button class="lp-btn" onclick="'+learnGo+'">Start Lessons</button></div>'
+      +'<div class="lp-col"><div class="lp-col-head"><span class="lp-col-t">Practice</span></div><button class="lp-btn" onclick="'+practiceGo+'">Play Simulation</button></div>'
+      +'<div class="lp-col"><div class="lp-col-head"><span class="lp-col-t">Product</span></div><button class="lp-btn" onclick="'+productGo+'">'+productLbl+'</button></div>'
+      +'</div></div>';
+  }
+  el.innerHTML=
+    '<div class="learn-top">'
+    +'<div class="card learn-start">'
+    +'<div class="ls-left"><h2 class="ls-h">Start Learning</h2>'
+    +'<p class="ls-p">Not sure where to start? Let’s cover the money basics first!</p>'
+    +'<button class="btn-taupe ls-btn" onclick="push(\'lessons\')">'+startCta+'</button></div>'
+    +'<div class="ls-course"><div class="ls-c-k">'+courseK+'</div><div class="ls-c-t">'+moduleT+'</div>'
+    +'<div class="ls-c-art" aria-hidden="true">🙋‍♀️</div></div>'
+    +'</div>'
+    +'<div id="learnAdvisor"></div>'
+    +'</div>'
+    +pathway('Grow my money through Investing','lp-invest',learnLessonCount()+' lessons',"push('lessons')","goTab('journey')","goTab('accounts')",'Start Investing')
+    +pathway('Build and improve my credit','lp-credit','Coming soon',soon,soon,soon,'Coming soon')
+    +pathway('Buy or refinance a home','lp-home','Coming soon',soon,soon,soon,'Coming soon');
+  if(typeof renderAdvisorCard==='function')renderAdvisorCard('learnAdvisor');
 }
 
 /* ── Profile: level, XP-ranked leaderboard, behaviour-driven badges ── */
