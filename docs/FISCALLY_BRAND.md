@@ -114,9 +114,33 @@ Two characters, **strictly distinct roles** — this is what keeps them from fee
 
 ## 4. Color system (tokens)
 
-Warm beige is **the** brand (was lavender-purple — same lightness/saturation "shade" per token and the same [gradient recipe](#gradient-recipe-the-level-every-gradient-shares), only the hue rotated warm). Everything else is semantic and used sparingly. Token names below keep the `--purple-*` naming from the lavender era to avoid touching every call site in code — treat the *name* as legacy, the *hex* as current. **Confusingly-but-deliberately**, the original lavender-purple hex didn't disappear — it lives on as its own `--invest` feature color (see Feature colors below), so "purple" now means two different things depending on context: the `--purple-*` *token name* (→ beige hex, generic brand chrome) vs. the *color* purple (→ `--invest` hex, investing only). When in doubt, check which container you're in.
+### Canonical palette — 2026-07 redesign
 
-### Brand (beige)
+> **This table is the palette the app is moving to** (branch `redesign`, from the master design file dated 2026-07-07). Everything *after* it in this section is the previous beige-era system — still what most shipped CSS tokens point at. Migrate screen-by-screen as each redesigned screen lands; when implementing a redesigned screen use this palette, and don't half-migrate a screen the redesign hasn't reached yet.
+
+| Name | Hex | Role |
+|---|---|---|
+| **background & text white** | `#FFFFFF` | Card/surface fills; text on dark surfaces. Page backgrounds are *not* flat white — they sit on the soft 4-corner "mesh" gradient (sage / cream / peach / lavender, see `--mesh-*` in `app.css`). |
+| **button brown** | `#837C74` | **The primary action color** — buttons, selected pills, onboarding nav arrows. In code today as the `--taupe` / `--taupe-deep` family. |
+| **share blue** | `#99CACF` | Share/social feature color. |
+| **spend red** | `#D45C32` | Spending feature color (replaces the old spend orange `#e08a4f`). Feature identity only — loss numbers don't turn this red. |
+| **save yellow** | `#E4DA82` | Saving feature color. |
+| **earn green** | `#619F88` | Growth / gains / earning — the semantic "good" color, and the family the `fiscally` wordmark green comes from. |
+| **invest purple** | `#AEA2D2` | Investing feature color (replaces `--invest #9084b4`). |
+| **neutral grey** | `#EAE7D4` | Soft neutral fills, dividers, muted chips, unselected pills. |
+| **charcoal** | `#242D32` | Dark surfaces — advisor/chat cards, dark check circles on selected pills. |
+| **text black** | `#000000` | Primary text on light. |
+
+Notes:
+- **Loan** has no swatch in the new palette — it keeps its legacy burnt-orange (`--loan`) until the redesign reaches those screens.
+- Onboarding question pills are deliberately **grayscale** (neutral grey unselected → translucent button-brown-gray selected, charcoal check) — no feature color on question screens.
+- Gold (Learn gamification) is unchanged by this palette and stays scoped to Learn.
+
+### Legacy — beige-era system (still in most of the code)
+
+Warm beige was the brand (was lavender-purple — same lightness/saturation "shade" per token and the same [gradient recipe](#gradient-recipe-the-level-every-gradient-shares), only the hue rotated warm). Token names below keep the `--purple-*` naming from the lavender era to avoid touching every call site in code — treat the *name* as legacy, the *hex* as current-in-code. **Confusingly-but-deliberately**, the original lavender-purple hex didn't disappear — it lives on as its own `--invest` feature color (see Feature colors below), so "purple" means two different things depending on context: the `--purple-*` *token name* (→ beige hex, generic brand chrome) vs. the *color* purple (→ `--invest` hex, investing only). When in doubt, check which container you're in.
+
+### Brand (beige) — legacy
 | Token | Hex | Use |
 |---|---|---|
 | `--purple` | `#b4a284` | Brand accent, secondary text emphasis |
@@ -174,19 +198,30 @@ In code: there is no shared "apply this class" utility for this — every gradie
 
 ## 5. Type
 
-- **Family:** system stack (`-apple-system, "Segoe UI", Roboto, …`). Friendly, fast, native-feeling. (If we ever license a face, pick a warm geometric sans — Poppins/Nunito family — for the wordmark + display only.)
-- **Weights:** 600 (body emphasis), 700–800 (labels/titles), 850 (display/numbers).
+- **Family:** **Sophia Pro** (canonical, per the 2026-07 design file). It's a licensed face, so on web we ship **Poppins** (Google Fonts) as the closest freely-available substitute — same geometric-rounded feel — with the system stack as final fallback. The old `Plus Jakarta Sans` is the legacy face still on unmigrated screens.
+- **Body line-height: 120%.**
+- **Weights:** SemiBold (600) is the *heaviest* weight in the system — hierarchy comes from **size, not weight**. (The legacy 700–850 title/number weights read too heavy against Sophia Pro/Poppins geometry; drop them as screens migrate.)
 - **Numbers:** always `font-variant-numeric: tabular-nums` so money columns align.
-- **Scale (mobile):** Display 28–30 · Title 19–21 · Body 14–15 · Caption 11–12 · Big number 24–30.
+- **Scale (from the design file):**
+
+| Style | Size | Weight |
+|---|---|---|
+| H1 | 32pt | SemiBold |
+| H2 | 24pt | SemiBold |
+| Body Lrg Bld | 20pt | SemiBold |
+| Body Lrg | 20pt | Regular |
+| Body Sm Bld | 16pt | SemiBold |
+| Body Small | 16pt | Regular |
+| Description small | 12pt | Regular |
 
 ---
 
 ## 6. Shape, depth, motion
 
-- **Radii:** cards `16` (`--r`), large cards/sheets `22` (`--r-lg`), small `11`, pills `20–30`, avatars/nodes full-circle.
-- **Depth:** one soft shadow, not hard borders. `--shadow: 0 4px 18px -6px rgba(86,80,114,.16)` · `--shadow-lg` for sheets/heroes. Cool neutral-tinted shadow (unchanged by the beige rebrand — it's a neutral, not a brand color), never pure black.
+- **Corner radius intervals: 4, 8, 12** (2026-07 design file). All buttons and interactive chips snap to this scale — `12` for standard buttons/CTAs/option pills (`--r-sm:12px`), `8` for compact chips/tabs (calc chips, range tabs, subtabs, coach chips), `4` reserved for tiny elements. No pill-shaped (`999px`) buttons. Circular *icon* buttons (onboarding arrows, chat send, FAB, avatars/nodes) stay full-circle — they're circles, not rounded rects. Cards currently remain `16` (`--r`) / `24` (`--r-lg`) until the design file says otherwise.
+- **Depth:** one soft shadow, not hard borders. `--shadow: 0 4px 18px -6px rgba(62,57,48,.14)` · `--shadow-lg` for sheets/heroes. Warm neutral-tinted shadow, never pure black.
 - **Motion:** gentle and purposeful. 0.2–0.3s transitions. Progressive reveals (the "See the numbers" expand). Personality motion is **Penny's** (idle bob, completion jump) and lives in Learn. The money screens don't bounce.
-- **Spacing rhythm:** 16px screen gutter, 13px between cards.
+- **Spacing rhythm: 4-based scale — 4 / 8 / 12 / 16 / 20 / 24 (then ×4: 32, 48, 64).** All gaps, margins and paddings snap to it (normalized 2026-07); values 0–3px are allowed for hairlines/dots. 32px screen gutter on desktop pages, 12px between cards (16 on desktop card stacks), 112px page bottom padding so the coach FAB never covers content.
 
 ---
 

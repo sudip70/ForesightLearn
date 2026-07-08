@@ -39,41 +39,33 @@ function touchStreak(){
 }
 function learnXP(n){touchStreak();LEARN.xp+=n;LEARN.dailyXP=Math.min(99,LEARN.dailyXP+n);if(LEARN.xp>=LEARN.xpToNext){LEARN.xp-=LEARN.xpToNext;LEARN.level++;LEARN.xpToNext=Math.round(LEARN.xpToNext*1.25);setTimeout(function(){showToast('🎉 Level up! Level '+LEARN.level);},900);}saveState();}
 function refreshLearn(){checkSkillUnlocks();if(document.getElementById('page-learn').classList.contains('active'))renderLearn();}
-function lring(val,max){var r=11,c=2*Math.PI*r,off=c*(1-Math.min(1,val/max));return '<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#e9e4f3" stroke-width="4"/><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#e0a92f" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 15 15)"/></svg>';}
-function ldonutSVG(pct){var r=34,c=2*Math.PI*r,off=c*(1-Math.min(1,pct/20));return '<svg width="120" height="120" viewBox="0 0 90 90"><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#f4ede1" stroke-width="11"/><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#9a8765" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 45 45)"/></svg>';}
+function lring(val,max){var r=11,c=2*Math.PI*r,off=c*(1-Math.min(1,val/max));return '<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#edeaf6" stroke-width="4"/><circle cx="15" cy="15" r="'+r+'" fill="none" stroke="#e0a92f" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 15 15)"/></svg>';}
+function ldonutSVG(pct){var r=34,c=2*Math.PI*r,off=c*(1-Math.min(1,pct/20));return '<svg width="120" height="120" viewBox="0 0 90 90"><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#efece2" stroke-width="11"/><circle cx="45" cy="45" r="'+r+'" fill="none" stroke="#837c74" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 45 45)"/></svg>';}
 function ldonutInner(pct,m){return ldonutSVG(pct)+'<div class="ldonut-c"><div class="ldonut-a">'+money0(m)+'</div><div class="ldonut-k">/month · '+pct+'%</div></div>';}
 function goalTitle(g){return 'Save '+money0(g.amt)+' for '+escHtml(g.what);}
 /* Home "My Goals" now reflects the unified GOALS list (see 07b-money.js) and opens the Goals page. */
 function renderGoalCard(){
   var el=document.getElementById('homeGoal');if(!el)return;
   var list=(typeof GOALS!=='undefined'&&GOALS)?GOALS:[];
+  var head='<div class="card" style="margin:0"><div class="hc-head"><span class="hc-title">Your Goals</span>'
+    +'<span class="hc-link" onclick="push(\'goals\')">'+(list.length?'View All':'+ Add')+'</span></div>';
   if(!list.length){
-    el.innerHTML='<div class="goal-card" onclick="push(\'goals\')" style="cursor:pointer">'
-      +'<div class="row"><div style="font-size:14px;font-weight:800">🎯 Set a savings goal</div><span class="pill pill-pur">+ Add</span></div>'
-      +'<div class="muted-note" style="text-align:left;margin-top:4px">Tap to create your first goal and track it here.</div></div>';
+    el.innerHTML=head+'<div class="muted-note" style="text-align:left">No goals yet — tap “+ Add” to create your first and track it here.</div></div>';
     return;
   }
-  var saved=0,target=0;list.forEach(function(g){saved+=(+g.saved||0);target+=(+g.target||0);});
-  var pct=target>0?Math.min(100,Math.round(saved/target*100)):0;
-  var h='<div class="goal-card" onclick="push(\'goals\')" style="cursor:pointer">'
-    +'<div class="row"><div style="font-size:14px;font-weight:800">🎯 My Goals</div><span class="pill pill-pur">'+pct+'%</span></div>';
-  list.slice(0,3).forEach(function(g){
-    var gp=(+g.target>0)?Math.min(100,Math.round((+g.saved||0)/(+g.target)*100)):0;
-    h+='<div style="margin-top:9px"><div class="row" style="margin-bottom:4px"><span style="font-size:12px;font-weight:700">'+escHtml(g.what)+'</span>'
-      +'<span style="font-size:11px;color:var(--muted)" class="tnum">'+money0(g.saved)+' / '+money0(g.target)+'</span></div>'
-      +'<div class="bar"><div class="bar-fill" style="width:'+gp+'%"></div></div></div>';
-  });
-  var more=list.length>3?(' · +'+(list.length-3)+' more'):'';
-  h+='<div class="row" style="margin-top:10px"><span style="font-size:11px;color:var(--muted)">'+money0(saved)+' of '+money0(target)+' saved'+more+'</span>'
-    +'<span style="font-size:11px;color:var(--purple-strong);font-weight:700">View all ›</span></div></div>';
-  el.innerHTML=h;
+  var items=list.slice(0,4).map(function(g){
+    return '<div class="hg-item" onclick="push(\'goals\')" style="cursor:pointer"><div style="flex:0 0 auto">'+lring(+g.saved||0,+g.target||1)+'</div>'
+      +'<div style="min-width:0"><div class="hg-n">'+escHtml(g.what)+'</div>'
+      +'<div class="hg-d tnum">'+money0(g.saved)+' of '+money0(g.target)+(g.account?' · '+escHtml(g.account):'')+'</div></div></div>';
+  }).join('');
+  el.innerHTML=head+'<div class="hg-list">'+items+'</div></div>';
 }
 function lrow(n,v,p){return '<div class="lz-row"><div class="row"><span class="lz-n">'+n+'</span><span class="lz-v tnum">'+v+'</span></div><div class="lz-p">'+p+'</div></div>';}
 var LESSONS_L={
   /* ── Unit 1 · Money foundations ── */
   f_budget:{xp:40,celeb:'You\'ve got a plan for every paycheque now.',steps:[
     {say:'Before investing, know where your money goes. One simple split keeps it automatic: <b>50 / 30 / 20</b>. 🧾'},
-    {say:'<b>50%</b> to needs (rent, groceries), <b>30%</b> to wants (fun, takeout), <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#9a8765">50% needs</div><div style="width:30%;background:#6f8fd6">30% wants</div><div style="width:20%;background:#4f9c7e">20% save</div></div>';}},
+    {say:'<b>50%</b> to needs (rent, groceries), <b>30%</b> to wants (fun, takeout), <b>20%</b> to saving &amp; paying off debt.',viz:function(){return '<div class="viz-split"><div style="width:50%;background:#837c74">50% needs</div><div style="width:30%;background:#5b9aa4">30% wants</div><div style="width:20%;background:#619f88">20% save</div></div>';}},
     {q:'You take home $2,000 a month. Using 50/30/20, how much goes to saving &amp; debt?',opts:['$100','$400','$1,000'],correct:1,yes:'Exactly!',why:'20% × $2,000 = $400. Even automating a piece of this changes everything.'},
     {say:'The <b>pay-yourself-first</b> trick: move that 20% on payday — before it can disappear on wants. Future-you always wins this one. 💪'},
     {q:'Which best describes "pay yourself first"?',opts:['Spend freely, save whatever\'s left','Transfer savings the moment you\'re paid','Invest only when you have extra'],correct:1,yes:'Yes!',why:'Moving money before you can spend it is what actually makes saving happen. Willpower alone rarely works.'},
@@ -114,7 +106,7 @@ var LESSONS_L={
   ]},
   v_compound:{xp:50,celeb:'You just met the most powerful force in money.',steps:[
     {say:'The closest thing to magic in money: <b>compounding</b> — when your returns start earning their own returns. The longer you wait to start, the less magic you get. ❄️'},
-    {say:'$200/month invested at 7%/yr grows to about <b>$243,000</b> in 30 years. You only contributed $72,000 — the rest is compounding doing the heavy lifting.',viz:function(){return '<div class="viz-split"><div style="width:30%;background:#9a8765">$72K you put in</div><div style="width:70%;background:#4f9c7e">$171K growth</div></div>';}},
+    {say:'$200/month invested at 7%/yr grows to about <b>$243,000</b> in 30 years. You only contributed $72,000 — the rest is compounding doing the heavy lifting.',viz:function(){return '<div class="viz-split"><div style="width:30%;background:#837c74">$72K you put in</div><div style="width:70%;background:#619f88">$171K growth</div></div>';}},
     {q:'What matters most for compounding to work?',opts:['Picking the perfect stock','Starting early and staying in','Making one huge deposit'],correct:1,yes:'Exactly!',why:'Time is the secret ingredient. Starting 10 years earlier often beats investing twice as much later.'},
     {say:'You invest $1,000 today vs waiting 10 years to invest the same $1,000. At 7%/yr and 30-year horizon, the early start gives you <b>roughly twice the outcome</b>. 😬'},
     {q:'Friend A invests $1,000 today. Friend B waits 10 years, then invests $1,000. At 7%/yr over 30 years, who has more?',opts:['Friend A — started today','Friend B — saved longer before investing','They end up equal'],correct:0,yes:'Right!',why:'Friend A: ~$7,600. Friend B: ~$3,870. One decade of delay costs almost half the final amount.'},
@@ -155,7 +147,7 @@ var LESSONS_L={
   ]},
   p_mix:{xp:45,celeb:'You can design a mix you\'ll actually stick with.',steps:[
     {say:'Your <b>asset mix</b> — how much in stocks vs bonds vs other — shapes most of your long-run results. Get this right and you can sleep through any dip. 🥗'},
-    {say:'A classic start for a 25-year-old: <b>80% stocks / 20% bonds</b> — lean to growth when young, shift toward stability as your goal nears.',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#9084b4">80% stocks</div><div style="width:20%;background:#6f8fd6">20% bonds</div></div>';}},
+    {say:'A classic start for a 25-year-old: <b>80% stocks / 20% bonds</b> — lean to growth when young, shift toward stability as your goal nears.',viz:function(){return '<div class="viz-split"><div style="width:80%;background:#aea2d2">80% stocks</div><div style="width:20%;background:#5b9aa4">20% bonds</div></div>';}},
     {q:'You\'re 25, investing for retirement in 40 years. A reasonable tilt?',opts:['Mostly bonds — safe','Mostly stocks — long horizon','All cash — wait and see'],correct:1,yes:'Yes.',why:'40 years gives you time to ride out every dip stocks throw. Lean into growth when your horizon is long.'},
     {say:'<b>Rebalancing</b>: if stocks boom and grow to 90% of your portfolio, sell a little and buy bonds to drift back to your 80/20 target. Once a year is usually enough.'},
     {q:'Your target is 80% stocks. After a great year it\'s grown to 90% stocks. What do you do?',opts:['Do nothing — let it run','Sell some stocks, buy bonds to get back to 80/20','Sell everything and restart'],correct:1,yes:'Right!',why:'Rebalancing keeps your risk at the level you chose. Let stocks run unchecked and one bad year hits far harder.'},
@@ -278,29 +270,29 @@ var ICN={
 };
 function lic(n){var o=ICN[n]||{};return '<svg viewBox="0 0 24 24" class="duo">'+(o.f?'<g class="duo-f">'+o.f+'</g>':'')+'<g class="duo-s">'+(o.s||'')+'</g></svg>';}
 function learnUnits(){return [
-  {k:'Unit 1',t:'Money foundations',acc:'#7a6ff0',lessons:[
+  {k:'Unit 1',t:'Money foundations',acc:'#8b7cba',lessons:[
     {id:'f_budget',ic:lic('receipt'),label:'Where your money goes'},
     {id:'f_emergency',ic:lic('umbrella'),label:'Your safety net'},
     {id:'f_debt',ic:lic('card'),label:'The cost of debt'},
     {id:'f_inflation',ic:lic('balloon'),label:'Inflation, the silent tax'}]},
-  {k:'Unit 2',t:'Why invest',acc:'#3b8fe0',lessons:[
+  {k:'Unit 2',t:'Why invest',acc:'#5b9aa4',lessons:[
     {id:'v_save',ic:lic('coins'),label:'Saving vs investing'},
     {id:'v_compound',ic:lic('trend'),label:'Compounding'},
     {id:'v_assets',ic:lic('layers'),label:'Stocks, ETFs & bonds'},
     {id:'v_timing',ic:lic('clock'),label:'Time in the market'}]},
-  {k:'Unit 3',t:'Build a smart portfolio',acc:'#14a39b',lessons:[
+  {k:'Unit 3',t:'Build a smart portfolio',acc:'#619f88',lessons:[
     {id:'p_risk',ic:lic('shield'),label:'Why risk matters'},
     {id:'risk_div',ic:lic('pie'),label:'Spread it out'},
     {id:'p_mix',ic:lic('sliders'),label:'Your asset mix'},
     {id:'p_fees',ic:lic('percent'),label:'Index funds & fees'},
     {id:'uncertainty',ic:lic('chart'),label:'Reading forecasts'},
     {id:'MILE',ic:lic('trophy'),label:'Hold 3+ asset types',mile:true}]},
-  {k:'Unit 4',t:'Canadian accounts · TFSA & RRSP',acc:'#db6090',lessons:[
+  {k:'Unit 4',t:'Canadian accounts · TFSA & RRSP',acc:'#c9718f',lessons:[
     {id:'c_tfsa',ic:lic('leaf'),label:'TFSA: tax-free growth'},
     {id:'c_rrsp',ic:lic('bank'),label:'RRSP: retirement'},
     {id:'c_which',ic:lic('scale'),label:'TFSA vs RRSP'},
     {id:'c_order',ic:lic('order'),label:'Which account first'}]},
-  {k:'Unit 5',t:'Plan & reach your goals',acc:'#28a565',lessons:[
+  {k:'Unit 5',t:'Plan & reach your goals',acc:'#a2973c',lessons:[
     {id:'g_smart',ic:lic('target'),label:'Set a SMART goal'},
     {id:'g_buckets',ic:lic('bucket'),label:'Short vs long-term'},
     {id:'g_howmuch',ic:lic('calc'),label:'How much to invest'},
@@ -420,7 +412,7 @@ function nodeTap(id,mile,locked){
   if(mile){openMilestone(pfClasses()>=3);return;}
   if(locked){showToast('Finish the lesson before it first 🙂');return;}
   if(LESSONS_L[id]&&LESSONS_L[id].steps){startLesson(id);return;}
-  openL('<div class="ls-tag">Reviewed ✓</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><div class="lp-bubble" style="margin-top:10px">'+(RECAP[id]||'You\'ve got this one down. ✓')+'</div><button class="btn-ghost-l" onclick="closeL()">Close</button>');
+  openL('<div class="ls-tag">Reviewed ✓</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><div class="lp-bubble" style="margin-top:8px">'+(RECAP[id]||'You\'ve got this one down. ✓')+'</div><button class="btn-ghost-l" onclick="closeL()">Close</button>');
 }
 /* ── Home nudge: Mia's ONE thing for today, drawn from real state ──────
  * Priority-ordered heuristics (concentration → absence → idle cash → empty
@@ -460,13 +452,6 @@ function homeNudge(){
   if(act)return {msg:'Next up on your trail: <b>'+lessonLabel(act)+'</b> — about two minutes.',
     cta:'Start lesson ›',go:"goTab('learn');nodeTap('"+act+"',false,false)"};
   return {msg:'You\'ve finished the whole trail 🎉 Keep practising, or revisit any lesson for a refresher.',cta:'Open Practice ›',go:"goTab('journey')"};
-}
-function renderHomeNudge(){
-  var el=document.getElementById('homeNudge');if(!el)return;
-  var n=homeNudge();
-  el.innerHTML='<div class="mia" style="margin:2px 0 16px"><div class="face">'+avatar()+'</div><div>'
-    +'<div class="bubble">'+n.msg+'</div>'
-    +'<button class="whats" onclick="'+n.go+'">'+n.cta+'</button></div></div>';
 }
 function miaGuide(){
   var st=lessonStates(),act=st.activeId,msg;
@@ -514,12 +499,12 @@ function lpNext(){var L=LESSONS_L[LP.id];if(LP.i<L.steps.length-1){LP.i++;LP.ans
 function finishLesson(){
   var id=LP.id,L=LESSONS_L[id];if(L.onDone)L.onDone();LEARN.done[id]=true;learnXP(L.xp||40);
   var perfect=((LP.wrong||0)===0);
-  document.getElementById('lsheetInner').innerHTML='<div class="cele"><div class="cele-burst">🎉</div><div class="cele-fox">'+petSVG()+'</div><div class="cele-h">Lesson complete!</div><div class="cele-sub">'+(L.celeb||'Nice work, you\'re leveling up.')+'</div><div class="cele-stats"><div class="cstat gold"><div class="cstat-v">+'+(L.xp||40)+'</div><div class="cstat-k">XP earned</div></div><div class="cstat '+(perfect?'green':'pur')+'"><div class="cstat-v">'+(perfect?'💯':'👍')+'</div><div class="cstat-k">'+(perfect?'No mistakes':'Nice effort')+'</div></div><div class="cstat orange"><div class="cstat-v">🔥 '+LEARN.streak+'</div><div class="cstat-k">Day streak</div></div></div><button class="lp-cta" style="margin-top:18px" onclick="closeL();afterLessonDone()">Claim reward</button></div>';
+  document.getElementById('lsheetInner').innerHTML='<div class="cele"><div class="cele-burst">🎉</div><div class="cele-fox">'+petSVG()+'</div><div class="cele-h">Lesson complete!</div><div class="cele-sub">'+(L.celeb||'Nice work, you\'re leveling up.')+'</div><div class="cele-stats"><div class="cstat gold"><div class="cstat-v">+'+(L.xp||40)+'</div><div class="cstat-k">XP earned</div></div><div class="cstat '+(perfect?'green':'pur')+'"><div class="cstat-v">'+(perfect?'💯':'👍')+'</div><div class="cstat-k">'+(perfect?'No mistakes':'Nice effort')+'</div></div><div class="cstat orange"><div class="cstat-v">🔥 '+LEARN.streak+'</div><div class="cstat-k">Day streak</div></div></div><button class="lp-cta" style="margin-top:16px" onclick="closeL();afterLessonDone()">Claim reward</button></div>';
 }
 function afterLessonDone(){checkSkillUnlocks();LEARN.petJump=true;renderLearn();saveState();}
 function openMilestone(done){
-  if(done){openL('<div class="ls-tag">Milestone · done</div><div class="ls-h">🧺 Spread across 3+ types</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><p class="ls-p" style="margin-top:10px">You\'re holding <b>3+ asset types</b> in your practice portfolio, earned by <b>doing</b>. '+PET.name+' is proud of you! 🦊</p><button class="btn-ghost-l" onclick="closeL()">Nice</button>');return;}
-  openL('<div class="ls-tag">Milestone · do it to unlock</div><div class="ls-h">🧺 Hold 3+ asset types</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><p class="ls-p" style="margin-top:10px">This one unlocks by <b>doing</b>: hold at least 3 different asset types (a stock, an ETF, a crypto) at once. You hold <b>'+pfClasses()+'</b> right now.</p><button class="btn btn-pur" style="width:100%;margin-top:6px" onclick="closeL();goTab(\'journey\')">Go to Trade</button><button class="btn-ghost-l" onclick="closeL()">Later</button>');
+  if(done){openL('<div class="ls-tag">Milestone · done</div><div class="ls-h">🧺 Spread across 3+ types</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><p class="ls-p" style="margin-top:8px">You\'re holding <b>3+ asset types</b> in your practice portfolio, earned by <b>doing</b>. '+PET.name+' is proud of you! 🦊</p><button class="btn-ghost-l" onclick="closeL()">Nice</button>');return;}
+  openL('<div class="ls-tag">Milestone · do it to unlock</div><div class="ls-h">🧺 Hold 3+ asset types</div><div class="lp-mia"><div class="lp-face">'+avatar()+'</div></div><p class="ls-p" style="margin-top:8px">This one unlocks by <b>doing</b>: hold at least 3 different asset types (a stock, an ETF, a crypto) at once. You hold <b>'+pfClasses()+'</b> right now.</p><button class="btn btn-pur" style="width:100%;margin-top:8px" onclick="closeL();goTab(\'journey\')">Go to Trade</button><button class="btn-ghost-l" onclick="closeL()">Later</button>');
 }
 /* ── One goal, everywhere ──────────────────────────────────────────────
  * The Learn "Set your goal" sheet and the Practice → Plan tab speak through the
@@ -607,7 +592,7 @@ var UNIT_GUIDES={
 };
 function openUnitGuide(k){
   var g=UNIT_GUIDES[k];if(!g)return;
-  openL('<div class="ls-tag">Quick reference 📖</div><h3 style="margin:4px 0 14px;font-size:16px;color:var(--text)">'+g.t+'</h3>'+g.body+'<button class="btn-sec" onclick="closeL()" style="width:100%;margin-top:18px">Got it ✓</button>');
+  openL('<div class="ls-tag">Quick reference 📖</div><h3 style="margin:4px 0 16px;font-size:16px;color:var(--text)">'+g.t+'</h3>'+g.body+'<button class="btn-sec" onclick="closeL()" style="width:100%;margin-top:16px">Got it ✓</button>');
 }
 function renderLearn(){
   var g=GOAL,gpct=Math.min(100,Math.round(g.saved/g.amt*100)),daily=Math.min(LEARN.dailyXP,50);
@@ -630,7 +615,7 @@ function renderLearn(){
   h+='<div class="learn-rail">';
   h+='<div class="section-t">Skills you\'ve shown</div><div class="ls-sub">These unlock by <b>doing</b> in your practice portfolio, never a quiz.</div>';
   h+='<div class="skills">'+SKILLS.map(function(s){var g2=skillGot(s.id);return '<div class="skill '+(g2?'got':'locked')+'"><div class="skill-ic">'+s.icon+'</div><div class="skill-badge">'+(g2?'✓':'🔒')+'</div><div class="skill-n">'+s.name+'</div><div class="skill-h">'+s.how+'</div></div>';}).join('')+'</div>';
-  h+='<div class="section-t">Glossary</div><div class="card"><div style="display:flex;flex-wrap:wrap;gap:7px">'+['tfsa','rrsp','etf','compound','risk','diversification','bull','bear','inflation','dividend'].map(function(k){return '<span class="whats" style="margin:0" onclick="openTip(\''+k+'\')">'+GLOSS[k].t+'</span>';}).join('')+'</div></div>';
+  h+='<div class="section-t">Glossary</div><div class="card"><div style="display:flex;flex-wrap:wrap;gap:8px">'+['tfsa','rrsp','etf','compound','risk','diversification','bull','bear','inflation','dividend'].map(function(k){return '<span class="whats" style="margin:0" onclick="openTip(\''+k+'\')">'+GLOSS[k].t+'</span>';}).join('')+'</div></div>';
   h+='<div class="card"><div class="row"><span style="font-size:13px;color:var(--muted);font-weight:600">Concepts explored</span><span class="pill pill-pur" id="conceptCount">'+(Object.keys(seen).length)+' explored</span></div></div>';
   h+='</div>';
   h+='</div>';

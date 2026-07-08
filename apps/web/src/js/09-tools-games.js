@@ -68,7 +68,7 @@ function bsRender(){
   var pct=Math.min(100,Math.round(s.kept/s.budget*100));
   var over=s.kept>s.budget;
   el.innerHTML=gameHead('🃏','Budget Swipe','You have <b>$3,000</b> a month. Keep what matters, cut the rest.')
-    +'<div class="bs-meter"><div class="row" style="margin-bottom:6px"><span style="font-size:12px;font-weight:800;color:var(--muted)">KEPT</span>'
+    +'<div class="bs-meter"><div class="row" style="margin-bottom:8px"><span style="font-size:12px;font-weight:800;color:var(--muted)">KEPT</span>'
       +'<span class="tnum" style="font-size:15px;font-weight:800;color:'+(over?'var(--red)':'var(--purple-deep)')+'">'+money0(s.kept)+' / '+money0(s.budget)+'</span></div>'
       +'<div class="bar"><div class="bar-fill" style="width:'+pct+'%;background:'+(over?'var(--red)':'linear-gradient(90deg,var(--grad-a),var(--purple-strong))')+'"></div></div></div>'
     +'<div class="bs-count">Card '+(s.i+1)+' of '+s.deck.length+'</div>'
@@ -916,6 +916,47 @@ function renderMortgageCalc(){
 }
 
 /* ════════════════════════════════════════════════════════════════════════
+ *  COMPOUND CALCULATOR — same layout/pattern as the loan calculator above.
+ *  Investing-themed (#page-compound-calc is in the invest-scoped CSS block),
+ *  math shared with fv() in 07-tools-api.js.
+ * ════════════════════════════════════════════════════════════════════════ */
+var compState={amt:200,rate:7,years:10};
+function compOutHTML(s){
+  var total=fv(s.amt,s.years,s.rate/100),contrib=s.amt*s.years*12,growth=total-contrib;
+  var gPct=total>0?Math.round(growth/total*100):0;
+  return '<div class="co-label">Balance after '+s.years+' years</div><div class="co-big tnum">'+money0(total)+'</div>'
+    +'<div class="co-split"><div class="cs"><label>You put in</label><b class="tnum">'+money0(contrib)+'</b></div>'
+      +'<div class="cs"><label>Growth</label><b class="tnum" style="color:var(--green)">+'+money0(growth)+'</b></div>'
+      +'<div class="cs"><label>Monthly</label><b class="tnum">'+money0(s.amt)+'</b></div></div>'
+    +'<div class="split-bar"><div class="sb-p" style="width:'+(100-gPct)+'%;background:var(--purple-strong)"></div><div class="sb-i" style="width:'+gPct+'%;background:var(--green)"></div></div>'
+    +'<div class="split-key"><span><i class="dot-p" style="background:var(--purple-strong)"></i>Contributions</span><span><i class="dot-i" style="background:var(--green)"></i>Growth '+gPct+'% of balance</span></div>';
+}
+/* Live slider handler: refresh only the output + value labels, leave inputs be. */
+function compInput(){
+  var s=compState;
+  var out=document.getElementById('compOut');if(out)out.innerHTML=compOutHTML(s);
+  var av=document.getElementById('compAVal');if(av)av.textContent=money0(s.amt);
+  var rv=document.getElementById('compRVal');if(rv)rv.textContent=s.rate.toFixed(1)+'%';
+}
+function renderCompoundCalc(){
+  var el=document.getElementById('compBody');if(!el)return;var s=compState;
+  var yrs=[5,10,20,30,40];
+  var h=gameHead('🌱','Compound Calculator','Watch steady monthly contributions snowball over the years.');
+  h+='<div class="card calc-out" id="compOut">'+compOutHTML(s)+'</div>';
+  h+='<div class="card calc-form">'
+    +'<div class="cf-row"><label>Monthly contribution</label><span class="tnum cf-val" id="compAVal">'+money0(s.amt)+'</span></div>'
+    +'<input type="range" min="25" max="1000" step="25" value="'+s.amt+'" oninput="compState.amt=+this.value;compInput()"/>'
+    +'<div class="cf-row"><label>Annual growth</label><span class="tnum cf-val" id="compRVal">'+s.rate.toFixed(1)+'%</span></div>'
+    +'<input type="range" min="1" max="12" step="0.5" value="'+s.rate+'" oninput="compState.rate=+this.value;compInput()"/>'
+    +'<div class="cf-row" style="margin-bottom:8px"><label>Time</label></div>'
+    +'<div class="chip-row">';
+  yrs.forEach(function(y){h+='<div class="calc-chip'+(s.years===y?' on':'')+'" onclick="compState.years='+y+';renderCompoundCalc()">'+y+' yr</div>';});
+  h+='</div></div>';
+  h+=miaSays('Time does the heavy lifting: the longer the money stays in, the more the <b>growth earns growth</b>. This is a range-of-possibilities estimate, not a promise — ~7% is a common long-run stock-market average.');
+  el.innerHTML=h;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
  *  DEBTOR'S TOWER — finance-term Hangman. Each wrong guess collapses a floor
  *  of the tower; five wrong = bankruptcy. Win or lose, Mia explains the word so
  *  every round teaches a term. Reuses gameHead()/miaSays()/gameXP().
@@ -1023,7 +1064,7 @@ var IG_TYPES=[
 ];
 /* bucket colors follow the money-area families (--spend/--save/--blue/--invest);
  * spending is orange like everywhere else — red would read as "loss/alarm" */
-var IG_PAL={spend:'#e08a4f',save:'#e3b23c',share:'#6f8fd6',invest:'#6f659a'};
+var IG_PAL={spend:'#d45c32',save:'#e4da82',share:'#5b9aa4',invest:'#8b7cba'};
 var IG={},igTimer=null;
 
 function initInvestGame(){
@@ -1040,7 +1081,7 @@ function igRender(){
 }
 function igGo(n){if(igTimer){clearInterval(igTimer);igTimer=null;}IG.step=Math.max(0,Math.min(5,IG.step+n));igRender();}
 function igNav(showBack,nextLabel){
-  return '<div class="row" style="gap:10px;margin-top:6px">'
+  return '<div class="row" style="gap:8px;margin-top:8px">'
     +(showBack?'<button class="btn btn-ghost" style="flex:1" onclick="igGo(-1)">Back</button>':'')
     +'<button class="btn btn-pur" style="flex:1.5" onclick="igGo(1)">'+(nextLabel||'Next')+'</button></div>';
 }
@@ -1063,9 +1104,9 @@ function igCharacter(){
     +'<div class="card-t">Choose your character</div><div class="ig-char-grid">'+cards+'</div>'
     +'<div class="row" style="gap:8px;margin-top:4px"><button class="btn btn-soft" onclick="igRandomChar()">🎲 Random</button>'
     +'<button class="btn '+(IG.custom?'btn-pur':'btn-soft')+'" onclick="igCustom()">Custom (You)</button></div>'
-    +(IG.custom?'<div class="card" style="margin-top:11px"><label class="f-label">Your income per month</label>'
+    +(IG.custom?'<div class="card" style="margin-top:12px"><label class="f-label">Your income per month</label>'
       +'<input class="f-in" inputmode="decimal" value="'+IG.earn+'" oninput="IG.earn=numVal(this.value)"/></div>':'')
-    +'<button class="btn btn-pur" style="margin-top:14px" onclick="igGo(1)">Next</button>';
+    +'<button class="btn btn-pur" style="margin-top:16px" onclick="igGo(1)">Next</button>';
 }
 function igPickChar(k){IG.custom=false;IG.charKey=k;IG.earn=igChar().earn;igRender();}
 function igRandomChar(){IG.custom=false;IG.charKey=IG_CHARS[Math.floor(Math.random()*IG_CHARS.length)].key;IG.earn=igChar().earn;igRender();}
@@ -1091,14 +1132,14 @@ function igDonut(segs,size,top,sub){
   size=size||150;var cx=65,cy=65,r=49,sw=17,gap=0.07,ang=-Math.PI/2;
   var tot=0;segs.forEach(function(g){tot+=Math.max(0,g.v);});if(tot<=0)tot=1;
   var vis=segs.filter(function(g){return g.v>0;});
-  var s='<circle cx="65" cy="65" r="'+r+'" fill="none" stroke="#f0edfa" stroke-width="'+sw+'"/>';
+  var s='<circle cx="65" cy="65" r="'+r+'" fill="none" stroke="#f2efe4" stroke-width="'+sw+'"/>';
   vis.forEach(function(g){
     var a0=ang,a1=ang+(g.v/tot)*2*Math.PI;ang=a1;var pad=vis.length>1?gap/2:0;
     if(vis.length===1)s+='<circle cx="65" cy="65" r="'+r+'" fill="none" stroke="'+g.c+'" stroke-width="'+sw+'"/>';
     else s+='<path d="'+arcPath(cx,cy,r,a0+pad,a1-pad)+'" fill="none" stroke="'+g.c+'" stroke-width="'+sw+'" stroke-linecap="round"/>';
   });
-  s+='<text x="65" y="62" text-anchor="middle" font-size="21" font-weight="800" fill="#322e44" font-family="\'Plus Jakarta Sans\',sans-serif">'+top+'</text>'
-    +'<text x="65" y="80" text-anchor="middle" font-size="9.5" font-weight="700" fill="#9a93b3" font-family="\'Plus Jakarta Sans\',sans-serif">'+(sub||'')+'</text>';
+  s+='<text x="65" y="62" text-anchor="middle" font-size="21" font-weight="800" fill="#000000" font-family="\'Poppins\',sans-serif">'+top+'</text>'
+    +'<text x="65" y="80" text-anchor="middle" font-size="9.5" font-weight="700" fill="#a19b91" font-family="\'Poppins\',sans-serif">'+(sub||'')+'</text>';
   return '<svg viewBox="0 0 130 130" width="'+size+'" height="'+size+'" style="display:block;flex:0 0 auto">'+s+'</svg>';
 }
 function igBudgetWheel(){
@@ -1135,7 +1176,7 @@ function igType(){
     +'<div class="muted-note" style="text-align:left" id="igBlurb">'+t.blurb+'</div></div>'
     +'<div class="card"><div class="card-t">Risk · how bouncy the ride</div>'
     +'<div id="igGauge" style="display:flex;justify-content:center"></div>'
-    +'<div class="row" style="font-size:11px;font-weight:700;color:var(--muted);padding:0 6px;margin-top:-6px"><span>Low</span><span>High</span></div>'
+    +'<div class="row" style="font-size:11px;font-weight:700;color:var(--muted);padding:0 8px;margin-top:-8px"><span>Low</span><span>High</span></div>'
     +'<input type="range" min="0" max="100" value="'+IG.risk+'" oninput="igSetRisk(this.value)"/>'
     +'<div class="row" style="margin-top:8px"><div><div class="muted-note" style="margin:0;text-align:left">Typical return</div><div class="tnum" id="igRet" style="font-size:21px;font-weight:800;color:var(--purple-deep)">'+Math.round(igExpReturn()*100)+'%/yr</div></div>'
     +'<div style="text-align:right"><div class="muted-note" style="margin:0">Yearly swing</div><div class="tnum" id="igVol" style="font-size:21px;font-weight:800;color:var(--ink)">±'+Math.round(igVolPct()*100)+'%</div></div></div></div>'
@@ -1157,10 +1198,10 @@ function igSetRisk(v){
 function igSimulate(){
   return igHeader()
     +'<div class="card"><div class="row"><div class="card-t" style="margin:0">Your money over '+IG.years+' years</div><span class="pill pill-pur" id="igYear">Year 0</span></div>'
-    +'<div id="igChart" style="margin-top:10px"></div>'
-    +'<div class="row" style="margin-top:10px"><div><div class="muted-note" style="margin:0;text-align:left">Portfolio</div><div class="tnum" id="igBal" style="font-size:25px;font-weight:800;color:var(--purple-deep)">'+money0(0)+'</div></div>'
+    +'<div id="igChart" style="margin-top:8px"></div>'
+    +'<div class="row" style="margin-top:8px"><div><div class="muted-note" style="margin:0;text-align:left">Portfolio</div><div class="tnum" id="igBal" style="font-size:25px;font-weight:800;color:var(--purple-deep)">'+money0(0)+'</div></div>'
     +'<div style="text-align:right"><div class="muted-note" style="margin:0">Invested so far</div><div class="tnum" id="igInv" style="font-size:15px;font-weight:800">'+money0(0)+'</div></div></div>'
-    +'<div id="igTick" class="muted-note" style="text-align:left;min-height:20px;margin-top:6px"></div></div>'
+    +'<div id="igTick" class="muted-note" style="text-align:left;min-height:20px;margin-top:8px"></div></div>'
     +'<button class="btn btn-soft" id="igSkip" onclick="igSkip()">Skip to the end ▶▶</button>';
 }
 /* Honest, geometric per-year return: the MEDIAN sits at exp − vol²/2, so a higher
@@ -1190,7 +1231,7 @@ function igApplyYear(y){
 }
 function igDrawChart(shown){
   var el=document.getElementById('igChart');if(!el)return;
-  el.innerHTML=equityChart(shown.map(function(p){return {total:p.total,year:p.year};}),360,150,IG.mode==='cash'?'#a59c92':'#6f659a',function(p){return 'Yr '+p.year;});
+  el.innerHTML=equityChart(shown.map(function(p){return {total:p.total,year:p.year};}),360,150,IG.mode==='cash'?'#a49d94':'#8b7cba',function(p){return 'Yr '+p.year;});
   var last=shown[shown.length-1];
   var b=document.getElementById('igBal');if(b)b.textContent=money0(last.total);
   var iv=document.getElementById('igInv');if(iv)iv.textContent=money0(IG.contributed);
@@ -1223,7 +1264,7 @@ function igStep(){
 function igShowDecision(y,r){
   var t=document.getElementById('igTick');if(!t)return;
   t.innerHTML='<div class="ig-decide"><div class="ig-decide-q">📉 The market just fell '+Math.round(-r*100)+'% in year '+y+'. What do you do?</div>'
-    +'<div class="row" style="gap:7px;margin-top:9px">'
+    +'<div class="row" style="gap:8px;margin-top:8px">'
     +'<button class="btn btn-soft" style="flex:1" onclick="igDecide(\'sell\')">Sell to cash</button>'
     +'<button class="btn btn-ghost" style="flex:1" onclick="igDecide(\'hold\')">Hold</button>'
     +'<button class="btn btn-pur" style="flex:1" onclick="igDecide(\'buy\')">Buy more</button></div></div>';
@@ -1289,11 +1330,11 @@ function igConeChart(bands,your){
   var med=bands.map(function(b,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(b.p50).toFixed(1);}).join(' ');
   var yr=your.map(function(v,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1);}).join(' ');
   return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" style="display:block">'
-    +'<path d="'+up+dn+'Z" fill="#9084b4" opacity="0.16"/>'
-    +'<path d="'+med+'" fill="none" stroke="#9084b4" stroke-width="1.6" stroke-dasharray="3 3"/>'
-    +'<path d="'+yr+'" fill="none" stroke="#6f659a" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>'
-    +'<text x="'+padL+'" y="'+(h-6)+'" font-size="9" fill="#aaa4c0" font-weight="700">Yr 0</text>'
-    +'<text x="'+(w-padR)+'" y="'+(h-6)+'" font-size="9" fill="#aaa4c0" font-weight="700" text-anchor="end">Yr '+(n-1)+'</text></svg>';
+    +'<path d="'+up+dn+'Z" fill="#aea2d2" opacity="0.16"/>'
+    +'<path d="'+med+'" fill="none" stroke="#aea2d2" stroke-width="1.6" stroke-dasharray="3 3"/>'
+    +'<path d="'+yr+'" fill="none" stroke="#8b7cba" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>'
+    +'<text x="'+padL+'" y="'+(h-6)+'" font-size="9" fill="#a19b91" font-weight="700">Yr 0</text>'
+    +'<text x="'+(w-padR)+'" y="'+(h-6)+'" font-size="9" fill="#a19b91" font-weight="700" text-anchor="end">Yr '+(n-1)+'</text></svg>';
 }
 function igLesson(){
   var r=IG.result;
@@ -1309,18 +1350,18 @@ function igResult(){
     : (r.boughtDip ? 'Buying the dip helped you finish above the typical outcome.'
     : 'Replay the same plan and it can land very differently — the shaded band shows how wide that range is.');
   return igHeader()
-    +'<div class="hero" style="background:linear-gradient(140deg,#6f659a,#9084b4)"><div class="ig-grade">'+r.grade+'</div>'
+    +'<div class="hero" style="background:linear-gradient(140deg,#8b7cba,#aea2d2)"><div class="ig-grade">'+r.grade+'</div>'
     +'<div class="hero-l">After '+IG.years+' years</div><div class="hero-v tnum">'+money0(r.end)+'</div>'
     +'<div class="hero-c">from '+money0(r.contributed)+' invested · '+r.pct+'th percentile outcome</div></div>'
     +'<div class="card"><div class="card-t">Your run vs the range of outcomes</div><div id="igCmp"></div>'
-    +'<div class="row" style="margin-top:10px"><span class="dleg" style="padding:0"><span class="dl-dot" style="background:#6f659a"></span><span class="dl-n">Your run</span></span><span class="tnum" style="font-weight:800">'+money0(r.end)+'</span></div>'
-    +'<div class="row"><span class="dleg" style="padding:0"><span class="dl-dot" style="background:#9084b4"></span><span class="dl-n">Typical (median)</span></span><span class="tnum" style="font-weight:800;color:var(--purple-strong)">'+money0(r.med)+'</span></div>'
+    +'<div class="row" style="margin-top:8px"><span class="dleg" style="padding:0"><span class="dl-dot" style="background:#8b7cba"></span><span class="dl-n">Your run</span></span><span class="tnum" style="font-weight:800">'+money0(r.end)+'</span></div>'
+    +'<div class="row"><span class="dleg" style="padding:0"><span class="dl-dot" style="background:#aea2d2"></span><span class="dl-n">Typical (median)</span></span><span class="tnum" style="font-weight:800;color:var(--purple-strong)">'+money0(r.med)+'</span></div>'
     +'<div class="row"><span class="dleg" style="padding:0"><span class="dl-n" style="color:var(--muted)">Likely range (10–90%)</span></span><span class="tnum" style="font-weight:700;color:var(--muted)">'+money0(r.p10)+' – '+money0(r.p90)+'</span></div>'
-    +'<div class="row"><span class="dleg" style="padding:0"><span class="dl-dot" style="background:#a59c92"></span><span class="dl-n">All savings (2%)</span></span><span class="tnum" style="font-weight:700;color:var(--muted)">'+money0(r.savings)+'</span></div>'
+    +'<div class="row"><span class="dleg" style="padding:0"><span class="dl-dot" style="background:#a49d94"></span><span class="dl-n">All savings (2%)</span></span><span class="tnum" style="font-weight:700;color:var(--muted)">'+money0(r.savings)+'</span></div>'
     +'<div class="muted-note" style="text-align:left;margin-top:8px">'+debrief+'</div></div>'
-    +(r.donated>0?'<div class="card" style="display:flex;align-items:center;gap:11px"><div style="font-size:24px">💛</div><div><div class="ac-name" style="margin:0;font-size:14px">You gave '+money0(igShareMonthly())+' a month</div><div class="ac-note">to causes you care about, from your Share bucket — investing and giving aren\'t either/or.</div></div></div>':'')
+    +(r.donated>0?'<div class="card" style="display:flex;align-items:center;gap:12px"><div style="font-size:24px">💛</div><div><div class="ac-name" style="margin:0;font-size:14px">You gave '+money0(igShareMonthly())+' a month</div><div class="ac-note">to causes you care about, from your Share bucket — investing and giving aren\'t either/or.</div></div></div>':'')
     +miaSays(igLesson())
-    +'<div class="row" style="gap:10px"><button class="btn btn-ghost" style="flex:1" onclick="initInvestGame()">New game</button><button class="btn btn-pur" style="flex:1.4" onclick="igAgain()">Play again ↻</button></div>';
+    +'<div class="row" style="gap:8px"><button class="btn btn-ghost" style="flex:1" onclick="initInvestGame()">New game</button><button class="btn btn-pur" style="flex:1.4" onclick="igAgain()">Play again ↻</button></div>';
 }
 function igDrawResult(){
   var el=document.getElementById('igCmp');if(!el)return;

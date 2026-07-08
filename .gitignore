@@ -38,3 +38,6 @@ _site/
 .DS_Store
 .claude/
 .vscode/
+
+# Impeccable skill working output (critique snapshots)
+.impeccable/

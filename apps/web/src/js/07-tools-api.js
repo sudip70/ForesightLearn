@@ -81,22 +81,16 @@ function loadForecast(t){
      function money(v){return v>=1000?'$'+(v/1000).toFixed(1)+'K':'$'+v.toFixed(0);}
      function pc(v){return (v>=0?'+':'')+(v*100).toFixed(0)+'%';}
      document.getElementById('fcScen').innerHTML=scenGrid([money(tp.bear),pc(rt.bear)],[money(tp.base),pc(rt.base)],[money(tp.bull),pc(rt.bull)])
-       +'<div class="row" style="margin-top:11px"><span style="font-size:11px;color:var(--muted);font-weight:700">Bounciness: '+d.risk_label+' · a range, not a promise</span><span class="pill pill-grn">● Live</span></div>';
+       +'<div class="row" style="margin-top:12px"><span style="font-size:11px;color:var(--muted);font-weight:700">Bounciness: '+d.risk_label+' · a range, not a promise</span><span class="pill pill-grn">● Live</span></div>';
      if(d.plain_language)document.getElementById('fcTip').innerHTML=d.plain_language;
    }).catch(function(){
      if(fcCurrent!==t)return;
-     var s=st();if(s)s.innerHTML='Showing sample numbers, <a href="#" onclick="renderFc(\''+t+'\');return false;" style="color:#7d72a8;font-weight:800;text-decoration:none">retry</a>';
+     var s=st();if(s)s.innerHTML='Showing sample numbers, <a href="#" onclick="renderFc(\''+t+'\');return false;" style="color:#8b7cba;font-weight:800;text-decoration:none">retry</a>';
    });
 }
 
-/* ── Compound calculator ─────────────────────── */
+/* ── Compound calculator math (page + renderer live in 09-tools-games.js) ── */
 function fv(m,yrs,annual){var r=(annual==null?0.07:annual)/12,n=yrs*12;return r===0?m*n:m*((Math.pow(1+r,n)-1)/r);}
-function onCalc(){
-  var m=+document.getElementById('ccSlider').value;
-  document.getElementById('ccAmt').textContent='$'+m;
-  document.getElementById('cc10').textContent='$'+(fv(m,10)/1000).toFixed(1)+'K';
-  document.getElementById('cc30').textContent='$'+(fv(m,30)/1000).toFixed(0)+'K';
-}
 
 /* ── Risk gauge ──────────────────────────────── */
 function onRisk(v){
@@ -130,6 +124,4 @@ function closeTipBtn(){document.getElementById('sheetOv').classList.remove('open
 /* ── Toast ───────────────────────────────────── */
 var tt;
 function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},2600);}
-
-onCalc();
 

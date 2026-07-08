@@ -74,12 +74,16 @@ function monthTotal(){var m=thisMonth(),t=0;SPENDING.forEach(function(s){if((s.d
 
 /* ── Budget ──────────────────────────────────── */
 function renderBudget(){
+  if(typeof renderBudgetDonutCard==='function')renderBudgetDonutCard();
+  if(typeof renderBudgetRecent==='function')renderBudgetRecent();
+  if(typeof renderBudgetGoalsCard==='function')renderBudgetGoalsCard();
+  if(typeof renderAdvisorCard==='function')renderAdvisorCard('budgetAdvisor');
   var el=document.getElementById('budgetBody');if(!el)return;
   var planned=BUDGET.categories.reduce(function(a,c){return a+numVal(c.limit);},0);
   var leftToBudget=BUDGET.income-planned;
   var spent=monthTotal(),leftToSpend=BUDGET.income-spent;
-  var h='<div class="hero"><div class="hero-l">Money left to spend this month</div>'
-    +'<div class="hero-v tnum">'+money(leftToSpend)+'</div>'
+  var h='<div class="hero budget-hero"><div class="hero-main"><div class="hero-l">Money left to spend this month</div>'
+    +'<div class="hero-v tnum">'+money(leftToSpend)+'</div></div>'
     +'<div class="hero-row"><div class="s"><label>Income</label><span class="tnum">'+money0(BUDGET.income)+'</span></div>'
     +'<div class="s"><label>Spent</label><span class="tnum">'+money0(spent)+'</span></div>'
     +'<div class="s"><label>Budgeted</label><span class="tnum">'+money0(planned)+'</span></div></div></div>';
@@ -87,22 +91,22 @@ function renderBudget(){
   h+='<div class="card"><div class="card-t">Monthly income</div>'
     +'<label class="f-label">After-tax income you expect each month</label>'
     +'<input class="f-in" inputmode="decimal" value="'+BUDGET.income+'" onchange="setBudgetIncome(this.value)"/>'
-    +'<div class="muted-note" style="text-align:left">'+(leftToBudget>=0?money0(leftToBudget)+' is still unbudgeted — give every dollar a job.':'You\'ve budgeted '+money0(-leftToBudget)+' more than you earn.')+'</div></div>';
+    +'<div class="muted-note" style="text-align:left">'+(leftToBudget>=0?money0(leftToBudget)+' is still unbudgeted: give every dollar a job.':'You\'ve budgeted '+money0(-leftToBudget)+' more than you earn.')+'</div></div>';
 
-  h+='<div class="card"><div class="row" style="margin-bottom:11px"><div class="card-t" style="margin-bottom:0">Categories</div><span class="pill pill-pur">'+BUDGET.categories.length+'</span></div>';
+  h+='<div class="card"><div class="row" style="margin-bottom:12px"><div class="card-t" style="margin-bottom:0">Categories</div><span class="pill pill-pur">'+BUDGET.categories.length+'</span></div>';
   if(!BUDGET.categories.length)h+='<div class="muted-note" style="text-align:left">No categories yet. Add one below.</div>';
   BUDGET.categories.forEach(function(c,i){
     var sp=monthSpent(c.name),lim=numVal(c.limit),pct=lim>0?Math.min(100,Math.round(sp/lim*100)):0,over=sp>lim&&lim>0;
-    h+='<div style="margin-bottom:13px"><div class="row" style="margin-bottom:5px">'
+    h+='<div style="margin-bottom:14px"><div class="row" style="margin-bottom:7px">'
       +'<span style="font-weight:700;font-size:13px">'+escHtml(c.name)+'</span>'
       +'<span style="display:flex;align-items:center;gap:8px"><span class="tnum '+(over?'down':'')+'" style="font-size:12px;font-weight:700">'+money0(sp)+' / '+money0(lim)+'</span>'
       +'<button class="adjust" title="Remove" style="padding:4px 8px" onclick="delBudgetCat('+i+')">✕</button></span></div>'
-      +'<div class="bar"><div class="bar-fill" style="width:'+pct+'%'+(over?';background:var(--red)':'')+'"></div></div></div>';
+      +'<div class="bar" style="margin:0"><div class="bar-fill" style="width:'+pct+'%'+(over?';background:var(--red)':'')+'"></div></div></div>';
   });
-  h+='<div class="row" style="gap:8px;margin-top:6px;align-items:flex-end">'
+  h+='<div class="row" style="gap:8px;margin-top:8px;align-items:flex-end">'
     +'<div style="flex:2"><label class="f-label">Category</label>'+'<input class="f-in" id="bcName" placeholder="e.g. Eating out"/></div>'
     +'<div style="flex:1"><label class="f-label">Limit</label>'+moneyInput('bcLimit',null,'0')+'</div>'
-    +'<button class="btn btn-soft" style="flex:0 0 auto;width:auto;padding:11px 16px" onclick="addBudgetCat()">Add</button></div>';
+    +'<button class="btn btn-soft" style="flex:0 0 auto;width:auto;padding:12px 16px" onclick="addBudgetCat()">Add</button></div>';
   h+='</div>';
   el.innerHTML=h;
 }
@@ -114,6 +118,62 @@ function addBudgetCat(){
   BUDGET.categories.push({name:n,limit:numVal(l)});saveState();renderBudget();showToast('✓ Added '+n);
 }
 function delBudgetCat(i){BUDGET.categories.splice(i,1);saveState();renderBudget();}
+/* ── Budget tab: donut summary card. "This month" is the only real tab — Today/Last
+   month have no matching breakdown in SPENDING, so they're labeled coming-soon
+   instead of faking data that doesn't exist. Presentation-only (no hover/click),
+   unlike My Accounts' acctDonut() which stays the one interactive/click-to-log donut. ── */
+function budgetTab(t){if(t!=='month'){showToast('Coming soon');return;}}
+function renderBudgetDonutCard(){
+  var el=document.getElementById('budgetDonutCard');if(!el)return;
+  var income=numVal(BUDGET.income),planned=BUDGET.categories.reduce(function(a,c){return a+numVal(c.limit);},0);
+  var spent=monthTotal(),left=income-spent;
+  var pctBudg=income>0?Math.round(planned/income*100):0;
+  var cats=BUDGET.categories.slice().sort(function(a,b){return numVal(b.limit)-numVal(a.limit);});
+  var segs=cats.slice(0,6).map(function(c,i){return {v:planned>0?numVal(c.limit)/planned:0,c:MONEY_PALETTE[i%MONEY_PALETTE.length]};});
+  var rows=cats.slice(0,6).map(function(c,i){
+    var pct=planned>0?Math.min(100,Math.round(numVal(c.limit)/planned*100)):0;
+    return '<div style="margin-bottom:8px"><div class="row" style="margin-bottom:3px"><span style="font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:'+MONEY_PALETTE[i%MONEY_PALETTE.length]+'"></span>'+escHtml(c.name)+'</span><span class="tnum" style="font-size:12px;color:var(--muted)">'+money0(c.limit)+'</span></div>'
+      +'<div class="bar" style="margin:0"><div class="bar-fill" style="width:'+pct+'%;background:'+MONEY_PALETTE[i%MONEY_PALETTE.length]+'"></div></div></div>';
+  }).join('')||'<div class="muted-note">No categories yet.</div>';
+  el.innerHTML='<div class="card" style="margin:0">'
+    +'<div class="row" style="margin-bottom:12px">'
+    +'<div class="subtabs" style="margin:0"><div class="subtab active" onclick="budgetTab(\'month\')">This month</div><div class="subtab" onclick="budgetTab(\'today\')">Today</div><div class="subtab" onclick="budgetTab(\'last\')">Last month</div></div>'
+    +'</div>'
+    +'<div class="row" style="margin-bottom:12px"><span class="pill '+(left>=0?'pill-grn':'pill-red')+'">'+money0(left)+' left</span><span class="tnum" style="font-size:12px;color:var(--muted)">'+money0(spent)+' spent of '+money0(income)+'</span></div>'
+    +'<div style="display:flex;gap:16px;align-items:flex-start"><div style="flex:0 0 auto">'+miniDonut(segs,110,pctBudg+'%','budgeted')+'</div>'
+    +'<div style="flex:1;min-width:0">'+rows+'</div></div></div>';
+}
+/* ── Budget tab: read-only preview of the 5 most recent expenses (full editing
+   stays on the dedicated Spending page — this is a summary, not a second editor) ── */
+function renderBudgetRecent(){
+  var el=document.getElementById('budgetRecentCard');if(!el)return;
+  var recent=SPENDING.slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');}).slice(0,5);
+  var rows=recent.map(function(s){
+    return '<div class="lrow"><div style="min-width:0"><div class="l-n">'+escHtml(s.note||s.category)+'</div><div class="l-s">'+escHtml(s.category)+'</div></div>'
+      +'<div class="l-v"><div class="l-p tnum down">-'+money0(s.amount)+'</div></div></div>';
+  }).join('')||'<div class="muted-note" style="text-align:left">No expenses logged yet.</div>';
+  el.innerHTML='<div class="card">'
+    +'<div class="row" style="margin-bottom:8px"><div class="card-t" style="margin-bottom:0;color:var(--spend-deep)">Recent Expenses</div>'
+    +'<button class="btn-taupe" style="width:auto;padding:8px 12px;font-size:12px" onclick="push(\'spending\')">View All</button></div>'
+    +rows+'</div>';
+}
+/* ── Budget tab: goals-reached summary — a generic target icon, never Penny
+   (the fox mascot is Learn-tab-only per brand rules, never appears elsewhere) ── */
+function renderBudgetGoalsCard(){
+  var el=document.getElementById('budgetGoalsCard');if(!el)return;
+  var list=(typeof GOALS!=='undefined'?GOALS:[]),reached=list.filter(function(g){return numVal(g.saved)>=numVal(g.target)&&numVal(g.target)>0;}).length;
+  var saved=list.reduce(function(a,g){return a+numVal(g.saved);},0);
+  var rows=list.slice(0,4).map(function(g){
+    var done=numVal(g.saved)>=numVal(g.target)&&numVal(g.target)>0;
+    return '<div class="row" style="margin-top:12px"><span style="display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700">'
+      +'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="'+(done?'#619f88':'rgba(255,255,255,.45)')+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(done?'<circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/>':'<circle cx="12" cy="12" r="9"/>')+'</svg>'
+      +escHtml(g.what)+'</span><span style="font-size:11px;color:rgba(255,255,255,.6)">'+(done?'Reached':money0(g.saved)+' / '+money0(g.target))+'</span></div>';
+  }).join('')||'<div style="font-size:12.5px;color:rgba(255,255,255,.65);margin-top:8px">No goals yet.</div>';
+  el.innerHTML='<div class="darkcard">'
+    +'<div class="row"><div class="dc-t">'+reached+'/'+list.length+' Goals Reached</div><span class="see-all" style="color:#fff" onclick="push(\'goals\')">View All</span></div>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:3px">'+money0(saved)+' saved</div>'
+    +rows+'</div>';
+}
 
 /* ── Savings Goals (multi-goal list) ─────────── */
 function renderGoals(){
@@ -126,7 +186,7 @@ function renderGoals(){
   h+='<div class="card"><div class="row" style="gap:8px;align-items:flex-end">'
     +'<div style="flex:2"><label class="f-label">New goal</label><input class="f-in" id="goName" placeholder="e.g. Trip to Japan"/></div>'
     +'<div style="flex:1"><label class="f-label">Target</label>'+moneyInput('goTarget',null,'0')+'</div>'
-    +'<button class="btn btn-soft" style="flex:0 0 auto;width:auto;padding:11px 16px" onclick="addGoal()">Add</button></div></div>';
+    +'<button class="btn btn-soft" style="flex:0 0 auto;width:auto;padding:12px 16px" onclick="addGoal()">Add</button></div></div>';
   if(!GOALS.length)h+='<div class="card"><div class="muted-note" style="text-align:left">No goals yet — add your first above.</div></div>';
   GOALS.forEach(function(g){
     var gp=numVal(g.target)>0?Math.min(100,Math.round(numVal(g.saved)/numVal(g.target)*100)):0,done=gp>=100;
@@ -134,8 +194,8 @@ function renderGoals(){
       +'<span class="pill '+(done?'pill-grn':'pill-pur')+'">'+gp+'%</span></div>'
       +'<div class="bar"><div class="bar-fill" style="width:'+gp+'%"></div></div>'
       +'<div class="row"><span style="font-size:11px;color:var(--muted)">'+money0(g.saved)+' of '+money0(g.target)+(g.account?' · '+g.account:'')+'</span></div>'
-      +'<div class="row" style="gap:8px;margin-top:9px">'+moneyInput('gc_'+g.id,null,'Add amount')
-      +'<button class="btn btn-pur" style="width:auto;padding:9px 14px" onclick="goalContribute(\''+g.id+'\')">Add to savings</button>'
+      +'<div class="row" style="gap:8px;margin-top:8px;align-items:stretch">'+moneyInput('gc_'+g.id,null,'Add amount','margin-bottom:0')
+      +'<button class="btn btn-pur" style="width:auto;padding:8px 16px;white-space:nowrap" onclick="goalContribute(\''+g.id+'\')">Add to savings</button>'
       +'<button class="adjust" title="Delete goal" onclick="delGoal(\''+g.id+'\')">✕</button></div></div>';
   });
   el.innerHTML=h;
@@ -168,7 +228,7 @@ function renderSpending(){
       +cats.map(function(c){return '<option>'+escHtml(c)+'</option>';}).join('')+'</select></div></div>'
     +'<label class="f-label">Note (optional)</label><input class="f-in" id="exNote" placeholder="What was it for?"/>'
     +'<label class="f-label">Date</label><input class="f-in" id="exDate" type="date" value="'+todayISO()+'"/>'
-    +'<button class="btn btn-pur" style="margin-top:11px" onclick="addExpense()">Add expense</button></div>';
+    +'<button class="btn btn-pur" style="margin-top:12px" onclick="addExpense()">Add expense</button></div>';
   // by-category this month
   var byCat={};SPENDING.forEach(function(s){if((s.date||'').slice(0,7)===thisMonth())byCat[s.category]=(byCat[s.category]||0)+numVal(s.amount);});
   var catKeys=Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a];});
@@ -183,11 +243,14 @@ function renderSpending(){
   if(!recent.length)h+='<div class="muted-note" style="text-align:left">No expenses logged yet.</div>';
   recent.forEach(function(s){
     h+='<div class="lrow"><div style="min-width:0"><div class="l-n">'+escHtml(s.note||s.category)+'</div><div class="l-s">'+escHtml(s.category)+' · '+(s.date||'')+'</div></div>'
-      +'<div style="display:flex;align-items:center;gap:10px"><div class="l-v"><div class="l-p tnum down">-'+money0(s.amount)+'</div></div>'
+      +'<div style="display:flex;align-items:center;gap:8px"><div class="l-v"><div class="l-p tnum down">-'+money0(s.amount)+'</div></div>'
       +'<button class="adjust" title="Delete" style="padding:4px 8px" onclick="delExpense(\''+s.id+'\')">✕</button></div></div>';
   });
   h+='</div>';
+  // reusable Financial Advisor card — Mia's live nudge + a shortcut into Coach Chat
+  h+='<div id="spendAdvisor"></div>';
   el.innerHTML=h;
+  if(typeof renderAdvisorCard==='function')renderAdvisorCard('spendAdvisor');
 }
 function addExpense(){
   var amt=numVal((document.getElementById('exAmt')||{}).value);if(amt<=0){showToast('Enter an amount');return;}
@@ -220,16 +283,16 @@ function renderNetworth(){
   h+='<div class="card"><div class="card-t">Assets</div>';
   h+='<div class="lrow"><div class="l-n">Practice portfolio <span class="pill pill-grn" style="font-size:10px">live</span></div><div class="l-v"><div class="l-p tnum">'+money0(t.live)+'</div></div></div>';
   NETWORTH.assets.forEach(function(a,i){
-    h+='<div class="lrow"><div class="l-n">'+escHtml(a.name)+'</div><div style="display:flex;align-items:center;gap:10px"><div class="l-v"><div class="l-p tnum">'+money0(a.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'assets\','+i+')">✕</button></div></div>';
+    h+='<div class="lrow"><div class="l-n">'+escHtml(a.name)+'</div><div style="display:flex;align-items:center;gap:8px"><div class="l-v"><div class="l-p tnum">'+money0(a.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'assets\','+i+')">✕</button></div></div>';
   });
-  h+='<div class="row" style="gap:8px;margin-top:9px;align-items:flex-end"><div style="flex:2"><input class="f-in" id="naName" placeholder="Asset (e.g. Car)"/></div><div style="flex:1">'+moneyInput('naVal',null,'0')+'</div><button class="btn btn-soft" style="width:auto;padding:11px 16px" onclick="addNW(\'assets\')">Add</button></div></div>';
+  h+='<div class="row" style="gap:8px;margin-top:8px;align-items:flex-end"><div style="flex:2"><input class="f-in" id="naName" placeholder="Asset (e.g. Car)"/></div><div style="flex:1">'+moneyInput('naVal',null,'0')+'</div><button class="btn btn-soft" style="width:auto;padding:12px 16px" onclick="addNW(\'assets\')">Add</button></div></div>';
   // debts
   h+='<div class="card"><div class="card-t">Debts</div>';
   if(!NETWORTH.debts.length)h+='<div class="muted-note" style="text-align:left">No debts — nice.</div>';
   NETWORTH.debts.forEach(function(d,i){
-    h+='<div class="lrow"><div class="l-n">'+escHtml(d.name)+'</div><div style="display:flex;align-items:center;gap:10px"><div class="l-v"><div class="l-p tnum down">-'+money0(d.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'debts\','+i+')">✕</button></div></div>';
+    h+='<div class="lrow"><div class="l-n">'+escHtml(d.name)+'</div><div style="display:flex;align-items:center;gap:8px"><div class="l-v"><div class="l-p tnum down">-'+money0(d.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'debts\','+i+')">✕</button></div></div>';
   });
-  h+='<div class="row" style="gap:8px;margin-top:9px;align-items:flex-end"><div style="flex:2"><input class="f-in" id="ndName" placeholder="Debt (e.g. Credit card)"/></div><div style="flex:1">'+moneyInput('ndVal',null,'0')+'</div><button class="btn btn-soft" style="width:auto;padding:11px 16px" onclick="addNW(\'debts\')">Add</button></div></div>';
+  h+='<div class="row" style="gap:8px;margin-top:8px;align-items:flex-end"><div style="flex:2"><input class="f-in" id="ndName" placeholder="Debt (e.g. Credit card)"/></div><div style="flex:1">'+moneyInput('ndVal',null,'0')+'</div><button class="btn btn-soft" style="width:auto;padding:12px 16px" onclick="addNW(\'debts\')">Add</button></div></div>';
   el.innerHTML=h;
 }
 function addNW(kind){
@@ -256,7 +319,7 @@ function acctChat(text,onclick){
 }
 /* ── inline graphics ── */
 function bankCardSVG(kind){
-  var c=kind==='debit'?{a:'#4f9c7e',chip:'#dbeee6',t:'DEBIT'}:{a:'#726650',chip:'#f4ede1',t:'CREDIT'};
+  var c=kind==='debit'?{a:'#619f88',chip:'#e2efe9',t:'DEBIT'}:{a:'#55504a',chip:'#efece2',t:'CREDIT'};
   var gid='cardSheen_'+kind;
   return '<svg viewBox="0 0 80 52" width="62" height="40" style="display:block;border-radius:8px;box-shadow:var(--shadow);flex-shrink:0">'
     +'<rect width="80" height="52" rx="8" fill="'+c.a+'"/>'
@@ -264,14 +327,14 @@ function bankCardSVG(kind){
     +'<rect x="9" y="20" width="15" height="12" rx="2.5" fill="'+c.chip+'"/>'
     +'<path d="M9 26h15M16.5 20v12" stroke="'+c.a+'" stroke-width="1" opacity=".55"/>'
     +'<circle cx="62" cy="40" r="8" fill="rgba(255,255,255,.32)"/><circle cx="53" cy="40" r="8" fill="rgba(255,255,255,.2)"/>'
-    +'<text x="9" y="46" font-size="6.5" font-weight="800" fill="rgba(255,255,255,.92)" font-family="\'Plus Jakarta Sans\',sans-serif" letter-spacing=".5">'+c.t+'</text>'
+    +'<text x="9" y="46" font-size="6.5" font-weight="800" fill="rgba(255,255,255,.92)" font-family="\'Poppins\',sans-serif" letter-spacing=".5">'+c.t+'</text>'
     +'<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs></svg>';
 }
 function loanSVG(){
   return '<svg viewBox="0 0 48 48" width="48" height="48" style="flex-shrink:0"><rect x="3" y="3" width="42" height="42" rx="12" fill="#f5ddc9"/>'
     +'<path d="M13 30c3-2 6-2 9 0 3 2 7 1 9-2" stroke="#c96a2e" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
     +'<circle cx="31" cy="18" r="6.5" fill="#fff" stroke="#c96a2e" stroke-width="2.4"/>'
-    +'<text x="31" y="21.5" font-size="9" font-weight="800" fill="#c96a2e" text-anchor="middle" font-family="\'Plus Jakarta Sans\',sans-serif">$</text></svg>';
+    +'<text x="31" y="21.5" font-size="9" font-weight="800" fill="#c96a2e" text-anchor="middle" font-family="\'Poppins\',sans-serif">$</text></svg>';
 }
 function piggySVG(){
   return '<svg viewBox="0 0 48 48" width="48" height="48" style="flex-shrink:0"><rect x="2" y="2" width="44" height="44" rx="13" fill="#f4eccf"/>'
@@ -284,10 +347,10 @@ function piggySVG(){
     +'<rect x="16" y="35" width="3" height="4.5" rx="1.4" fill="#c97ba1"/><rect x="27" y="35" width="3" height="4.5" rx="1.4" fill="#c97ba1"/></svg>';
 }
 function investSVG(){
-  return '<svg viewBox="0 0 48 48" width="48" height="48" style="flex-shrink:0"><rect x="2" y="2" width="44" height="44" rx="13" fill="#e7e1f4"/>'
-    +'<rect x="12" y="28" width="5" height="8" rx="1.5" fill="#9084b4"/><rect x="21" y="23" width="5" height="13" rx="1.5" fill="#7a6ea8"/><rect x="30" y="18" width="5" height="18" rx="1.5" fill="#6f659a"/>'
-    +'<path d="M12 24l8-6 5 4 9-9" stroke="#4f9c7e" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
-    +'<path d="M31 13h4v4" stroke="#4f9c7e" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  return '<svg viewBox="0 0 48 48" width="48" height="48" style="flex-shrink:0"><rect x="2" y="2" width="44" height="44" rx="13" fill="#edeaf6"/>'
+    +'<rect x="12" y="28" width="5" height="8" rx="1.5" fill="#aea2d2"/><rect x="21" y="23" width="5" height="13" rx="1.5" fill="#8b7cba"/><rect x="30" y="18" width="5" height="18" rx="1.5" fill="#8b7cba"/>'
+    +'<path d="M12 24l8-6 5 4 9-9" stroke="#619f88" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+    +'<path d="M31 13h4v4" stroke="#619f88" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
 
 /* My Accounts is a tracker first: each account section owns its own container and
@@ -315,7 +378,7 @@ function acctDonut(){
   data.forEach(function(d,i){d.pct=Math.round(d.val/total*100);d.color=MONEY_PALETTE[i%MONEY_PALETTE.length];});
   var cx=65,cy=65,r=48,sw=18,gap=data.length>1?0.05:0,ang=-Math.PI/2;
   var svg='<svg viewBox="0 0 130 130" width="122" height="122" style="display:block;flex:0 0 auto">'
-    +'<circle cx="65" cy="65" r="48" fill="none" stroke="#f0edfa" stroke-width="'+sw+'"/>';
+    +'<circle cx="65" cy="65" r="48" fill="none" stroke="#f2efe4" stroke-width="'+sw+'"/>';
   data.forEach(function(d,i){
     var a0=ang,a1=ang+(d.val/total)*2*Math.PI;ang=a1;
     var common='id="dnArc'+i+'" fill="none" stroke="'+d.color+'" stroke-width="'+sw+'" stroke-linecap="round" style="cursor:pointer;transition:opacity .15s" '
@@ -323,8 +386,8 @@ function acctDonut(){
     if(data.length===1)svg+='<circle cx="65" cy="65" r="48" '+common+'/>';
     else svg+='<path d="'+arcPath(cx,cy,r,a0+gap/2,a1-gap/2)+'" '+common+'/>';
   });
-  svg+='<text id="dnTop" x="65" y="63" text-anchor="middle" font-size="21" font-weight="800" fill="#322e44" font-family="\'Plus Jakarta Sans\',sans-serif">'+money0(total)+'</text>'
-    +'<text id="dnSub" x="65" y="80" text-anchor="middle" font-size="9.5" font-weight="700" fill="#847f9c" font-family="\'Plus Jakarta Sans\',sans-serif">spent this month</text></svg>';
+  svg+='<text id="dnTop" x="65" y="63" text-anchor="middle" font-size="21" font-weight="800" fill="#000000" font-family="\'Poppins\',sans-serif">'+money0(total)+'</text>'
+    +'<text id="dnSub" x="65" y="80" text-anchor="middle" font-size="9.5" font-weight="700" fill="#6f6b64" font-family="\'Poppins\',sans-serif">spent this month</text></svg>';
   var leg='<div class="donut-legend">';
   data.forEach(function(d,i){
     leg+='<div class="dleg" id="dnLeg'+i+'" onmouseover="donutHover('+i+')" onmouseout="donutHover(-1)" onclick="donutPick('+i+')">'
@@ -376,15 +439,15 @@ function renderAcctDebit(){
     .map(function(s){return {date:s.date,label:escHtml(s.note||s.category),amount:s.amount,cls:'down',sign:'-'};});
   var txns=deps.concat(purchases).sort(function(a,b){return (b.date||'').localeCompare(a.date||'');}).slice(0,3);
   var h='<div class="acct-card" style="display:block">'
-    +'<div class="row" style="margin-bottom:11px"><div style="display:flex;align-items:center;gap:12px">'+bankCardSVG('debit')
+    +'<div class="row" style="margin-bottom:12px"><div style="display:flex;align-items:center;gap:12px">'+bankCardSVG('debit')
     +'<div><div class="ac-name" style="margin:0">Debit Card</div><div class="ac-note" style="margin-top:2px">Balance</div></div></div>'
-    +'<div style="display:flex;align-items:center;gap:9px"><span class="tnum" style="font-size:19px;font-weight:800;color:'+(bal<0?'var(--red)':'var(--green)')+'">'+money0(bal)+'</span>'+helpDot('debit_card')+'</div></div>';
+    +'<div style="display:flex;align-items:center;gap:8px"><span class="tnum" style="font-size:19px;font-weight:800;color:'+(bal<0?'var(--red)':'var(--green)')+'">'+money0(bal)+'</span>'+helpDot('debit_card')+'</div></div>';
   if(txns.length){
     txns.forEach(function(x){h+='<div class="txn"><span>'+x.label+'</span><span class="'+x.cls+'">'+x.sign+money0(x.amount)+'</span></div>';});
   }else{
     h+='<div class="ac-note" style="margin-bottom:2px">No debit activity logged yet</div>';
   }
-  h+='<div class="cat-add" style="margin-top:10px"><input class="f-in" id="chAmt" inputmode="decimal" placeholder="Amount" style="margin:0" onkeydown="if(event.key===\'Enter\')addChequing()"/>'
+  h+='<div class="cat-add" style="margin-top:8px"><input class="f-in" id="chAmt" inputmode="decimal" placeholder="Amount" style="margin:0" onkeydown="if(event.key===\'Enter\')addChequing()"/>'
     +'<input class="f-in" id="chSrc" placeholder="Source (e.g. Paycheck)" style="margin:0" onkeydown="if(event.key===\'Enter\')addChequing()"/>'
     +'<button class="btn btn-soft" onclick="addChequing()">Add money</button></div>';
   box.innerHTML=h+'</div>';
@@ -430,16 +493,16 @@ function renderAcctSpend(){
     +'<input class="f-in" id="axAmt" inputmode="decimal" placeholder="Amount" style="margin:0" onkeydown="if(event.key===\'Enter\')addAcctExpense()"/>'
     +'<select class="f-in" id="axCat" style="margin:0" onchange="acctCat=this.value">'+cats.map(function(c){return '<option'+(c===acctCat?' selected':'')+'>'+escHtml(c)+'</option>';}).join('')+'</select>'
     +'<select class="f-in" id="axPay" style="margin:0" onchange="acctPay=this.value">'+['Debit card','Credit card','Cash'].map(function(p){return '<option'+(p===acctPay?' selected':'')+'>'+p+'</option>';}).join('')+'</select>'
-    +'<button class="btn btn-pur" style="width:auto;flex:0 0 auto;padding:10px 18px" onclick="addAcctExpense()">Add</button></div>';
+    +'<button class="btn btn-pur" style="width:auto;flex:0 0 auto;padding:8px 16px" onclick="addAcctExpense()">Add</button></div>';
   /* live breakdown: interactive donut of this month's spending */
   h+=acctDonut();
   var recent=SPENDING.slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');}).slice(0,3);
   if(recent.length){
-    h+='<div style="margin-top:15px"><div class="card-t" style="margin-bottom:9px">Recent</div>';
+    h+='<div style="margin-top:16px"><div class="card-t" style="margin-bottom:8px">Recent</div>';
     recent.forEach(function(s){
       h+='<div class="lrow"><div style="min-width:0"><div class="l-n">'+escHtml(s.note||s.category)+'</div>'
         +'<div class="l-s">'+escHtml(s.category)+(s.acct?' · '+escHtml(s.acct):'')+' · '+(s.date||'')+'</div></div>'
-        +'<div style="display:flex;align-items:center;gap:10px"><div class="l-p tnum down">-'+money0(s.amount)+'</div>'
+        +'<div style="display:flex;align-items:center;gap:8px"><div class="l-p tnum down">-'+money0(s.amount)+'</div>'
         +'<button class="acct-q" style="width:28px;height:28px;font-size:14px;border-color:var(--line)" title="Delete" onclick="delAcctExpense(\''+s.id+'\')">✕</button></div></div>';
     });
     h+='</div>';
@@ -473,9 +536,9 @@ function renderAcctLoans(){
   var mo=LOANS.reduce(function(a,l){return a+numVal(l.monthly);},0);
   var sub=LOANS.length?(mo>0?money0(mo)+'/mo total':LOANS.length+' loan'+(LOANS.length===1?'':'s')):'No loans added yet';
   var h='<div class="acct-card" style="display:block">'
-    +'<div class="row" style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:11px">'+loanSVG()
+    +'<div class="row" style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:12px">'+loanSVG()
     +'<div><div class="ac-name" style="margin:0">Loan Accounts</div><div class="ac-note" style="margin-top:2px">'+sub+'</div></div></div>'
-    +(LOANS.length?'<div style="display:flex;align-items:center;gap:9px"><span class="pill pill-loan">owe '+money0(owe)+'</span>'+helpDot('loan_acct')+'</div>':helpDot('loan_acct'))+'</div>';
+    +(LOANS.length?'<div style="display:flex;align-items:center;gap:8px"><span class="pill pill-loan">owe '+money0(owe)+'</span>'+helpDot('loan_acct')+'</div>':helpDot('loan_acct'))+'</div>';
   LOANS.forEach(function(l,i){
     h+='<div class="loan-row">'
       +'<div class="loan-row-head"><span class="loan-row-name">'+escHtml(l.name)+'</span><span class="loan-row-bal">'+money0(l.balance)+'</span></div>'
@@ -522,12 +585,12 @@ function delLoan(i){
 function renderAcctSave(){
   var box=document.getElementById('acctSaveBox');if(!box)return;
   box.innerHTML='<div class="acct-card" style="display:block">'
-    +'<div class="row" style="margin-bottom:11px"><div style="display:flex;align-items:center;gap:12px">'+piggySVG()
+    +'<div class="row" style="margin-bottom:12px"><div style="display:flex;align-items:center;gap:12px">'+piggySVG()
     +'<div><div class="ac-name" style="margin:0">Savings Account</div><div class="ac-note" style="margin-top:2px">Balance</div></div></div>'
-    +'<div style="display:flex;align-items:center;gap:9px"><span class="tnum" style="font-size:19px;font-weight:800;color:var(--green)">'+money0(SAVINGS.balance)+'</span>'+helpDot('savings_acct')+'</div></div>'
+    +'<div style="display:flex;align-items:center;gap:8px"><span class="tnum" style="font-size:19px;font-weight:800;color:var(--green)">'+money0(SAVINGS.balance)+'</span>'+helpDot('savings_acct')+'</div></div>'
     +'<div class="cat-add"><input class="f-in" id="svAmt" inputmode="decimal" placeholder="Amount" style="margin:0" onkeydown="if(event.key===\'Enter\')addSavings()"/>'
     +'<button class="btn btn-soft" onclick="addSavings()">Deposit</button>'
-    +'<button class="btn btn-ghost" style="width:auto;flex:0 0 auto;padding:8px 13px;font-size:12px" onclick="withdrawSavings()">Withdraw</button></div></div>';
+    +'<button class="btn btn-ghost" style="width:auto;flex:0 0 auto;padding:8px 12px;font-size:12px" onclick="withdrawSavings()">Withdraw</button></div></div>';
 }
 function addSavings(){
   var f=document.getElementById('svAmt'),amt=numVal(f&&f.value);if(amt<=0){showToast('Enter an amount');return;}
@@ -547,10 +610,10 @@ function renderAcctInvest(){
   var bp=(typeof PF!=='undefined')?numVal(PF.cash):0;
   var live=(typeof totals==='function')?totals().total:0;
   box.innerHTML='<div class="acct-card" style="display:block">'
-    +'<div class="row" style="margin-bottom:11px"><div style="display:flex;align-items:center;gap:12px">'+investSVG()
+    +'<div class="row" style="margin-bottom:12px"><div style="display:flex;align-items:center;gap:12px">'+investSVG()
     +'<div><div class="ac-name" style="margin:0">Investing Account</div><div class="ac-note" style="margin-top:2px">TFSA · practice portfolio</div></div></div>'
-    +'<div style="display:flex;align-items:center;gap:9px"><span class="tnum" style="font-size:19px;font-weight:800;color:var(--purple-deep)">'+money0(live)+'</span>'+helpDot('investing_acct')+'</div></div>'
-    +'<div class="row" style="margin:0 0 10px;padding:9px 11px;background:var(--purple-soft);border-radius:11px"><span style="font-size:12.5px;font-weight:800;color:var(--purple-deep)">⚡ Buying power</span><span class="tnum" style="font-weight:800;color:var(--purple-deep)">'+money(bp)+'</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px"><span class="tnum" style="font-size:19px;font-weight:800;color:var(--purple-deep)">'+money0(live)+'</span>'+helpDot('investing_acct')+'</div></div>'
+    +'<div class="row" style="margin:0 0 8px;padding:8px 12px;background:var(--purple-soft);border-radius:12px"><span style="font-size:12.5px;font-weight:800;color:var(--purple-deep)">⚡ Buying power</span><span class="tnum" style="font-weight:800;color:var(--purple-deep)">'+money(bp)+'</span></div>'
     +'<div class="cat-add"><input class="f-in" id="ivAmt" inputmode="decimal" placeholder="Add cash" style="margin:0" onkeydown="if(event.key===\'Enter\')addInvestCash()"/>'
     +'<button class="btn btn-soft" onclick="addInvestCash()">Add to investment account</button></div>'
     +'<div class="ac-note" style="margin-top:8px">Deposits become virtual cash you can invest over in <b>Practice</b>.</div></div>';
@@ -594,21 +657,21 @@ function renderAccounts(){
   h+='<div class="stack">'
     +'<div class="acct-sec save"><div class="acct-sec-t">🐷 Savings Accounts</div>'
     +'<div id="acctSaveBox"></div>'
-    +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 10px">'
+    +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 8px">'
     +'<button class="lpa-btn" style="flex:1" onclick="goTab(\'learn\')"><span class="lpa-e">💡</span>Learn</button>'
     +'<div style="flex:0 0 auto;display:flex">'+acctChat('Help me set up a savings account',acctHelp('Open a savings account','Almost every bank offers a free high-interest savings account, open one online in minutes. Then automate it: set a small auto-transfer (even $25) from chequing each payday. Aim to build a starter emergency fund of about one month of expenses first.'))+'</div>'
     +'</div>'
     +'</div>'
     +'<div class="acct-sec invest"><div class="acct-sec-t">📈 Investing Accounts</div>'
     +'<div id="acctInvestBox"></div>'
-    +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 10px">'
+    +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 8px">'
     +'<button class="lpa-btn" style="flex:1" onclick="openTip(\'tfsa\')"><span class="lpa-e">💡</span>Learn</button>'
     +'<div style="flex:0 0 auto;display:flex">'+acctChat('Help me set up an investing account',acctHelp('Open a real investing account','When you\'re ready, most banks and brokerages let you open a TFSA online for free. Start with a TFSA (growth is tax-free), pick a low-cost broad ETF, and contribute a small amount regularly. Everything you practise here, buying, holding, diversifying, applies the same way with real money.'))+'</div>'
     +'</div>'
     +'</div>'
     +'<div class="acct-sec loan"><div class="acct-sec-t">🏦 Loan Accounts</div>'
     +'<div id="acctLoansBox"></div>'
-    +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 10px">'
+    +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 8px">'
     +'<button class="lpa-btn" style="flex:1" onclick="push(\'loan-calc\')"><span class="lpa-e">💡</span>Learn</button>'
     +'<div style="flex:0 0 auto;display:flex">'+acctChat('Help me pay off debt faster',acctHelp('Paying off debt faster','List your debts by interest rate. Send any extra money to the highest-rate debt first (the "avalanche" method) — it saves the most interest overall. Prefer quick wins to stay motivated? Pay off the smallest balance first (the "snowball" method) instead. Either way, keep paying at least the minimum on everything else.'))+'</div>'
     +'</div>'
@@ -624,64 +687,35 @@ function renderAccounts(){
  * (brand beige, --save gold, --spend orange, --blue, --loan burnt, taupe).
  * Semantic green/red are deliberately absent: green means gains and red means
  * loss app-wide, so neither may color an arbitrary "Transport" slice. */
-var MONEY_PALETTE=['#9a8765','#e3b23c','#e08a4f','#6f8fd6','#c96a2e','#a59c92'];
-function miniDonut(segs,size,centerTop,centerSub){
-  size=size||92;var r=size/2-8,C=2*Math.PI*r,cx=size/2,cy=size/2,off=0;
-  var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#f0edfa" stroke-width="13"/>';
+var MONEY_PALETTE=['#837c74','#e4da82','#d45c32','#5b9aa4','#c96a2e','#a49d94'];
+function miniDonut(segs,size,centerTop,centerSub,sw){
+  size=size||92;sw=sw||13;var r=size/2-sw/2-1,C=2*Math.PI*r,cx=size/2,cy=size/2,off=0;
+  var ftop=Math.max(14,Math.round(size*0.145)),fsub=Math.max(8,Math.round(size*0.068));
+  var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#f2efe4" stroke-width="'+sw+'"/>';
   segs.forEach(function(g){var len=C*Math.max(0,Math.min(1,g.v));if(len<=0)return;
-    s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+g.c+'" stroke-width="13" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
+    s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+g.c+'" stroke-width="'+sw+'" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
     off+=len;});
   return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" style="display:block">'+s
-    +'<text x="'+cx+'" y="'+(cy-1)+'" text-anchor="middle" font-size="16" font-weight="800" fill="#4b4470">'+centerTop+'</text>'
-    +'<text x="'+cx+'" y="'+(cy+12)+'" text-anchor="middle" font-size="8" font-weight="700" fill="#9a93b3">'+(centerSub||'')+'</text></svg>';
+    +'<text x="'+cx+'" y="'+(cy-1)+'" text-anchor="middle" font-size="'+ftop+'" font-weight="800" fill="#665b93">'+centerTop+'</text>'
+    +'<text x="'+cx+'" y="'+(cy+ftop*0.82)+'" text-anchor="middle" font-size="'+fsub+'" font-weight="700" fill="#a19b91">'+(centerSub||'')+'</text></svg>';
 }
 /* Home greeting reflects the real streak + live portfolio, so the top of Home
  * always matches the topbar and the Practice numbers (no more hardcoded copy). */
 function renderHomeGreet(){
+  var t=document.getElementById('homeTitle');
+  var name=(typeof USER!=='undefined'&&USER.name)?(', '+USER.name):'';
+  if(t)t.textContent='Welcome Back'+name;
   var el=document.getElementById('homeGreet');if(!el)return;
-  var days=(typeof LEARN!=='undefined'&&LEARN.streak)?LEARN.streak:1;
-  var dayWord='<b>'+days+' day'+(days===1?'':'s')+'</b> in';
-  var T=totals(),invested=START_CAPITAL+(PF.deposits||0),gain=T.unreal+PF.realized;
-  var line;
-  if(gain>0.5)line="You're "+dayWord+", and your portfolio's <b>up "+signed(gain)+"</b>. Here's where things stand.";
-  else if(gain<-0.5)line="You're "+dayWord+". Your portfolio's <b>down "+signed(gain).replace('-','')+"</b> right now — markets wobble, that's normal.";
-  else line="You're "+dayWord+", and your portfolio's right where you started. Ready when you are.";
-  el.innerHTML=line;
+  var goal=(typeof USER!=='undefined'&&USER.topGoal)?USER.topGoal:'';
+  if(goal)el.innerHTML='Continue your progress, you’re on your way to <b>'+escHtml(goal.charAt(0).toLowerCase()+goal.slice(1))+'</b>.';
+  else el.innerHTML='Here’s where things stand today, one small step at a time.';
 }
 function renderMoneyHome(){
   renderHomeGreet();
-  if(typeof renderHomeNudge==='function')renderHomeNudge();/* Mia's one thing for today (08-learn-init.js) */
-  /* ── Budget tile: donut of how income is allocated across categories ── */
-  var bt=document.getElementById('tileBudget');
-  if(bt){
-    var income=numVal(BUDGET.income),planned=BUDGET.categories.reduce(function(a,c){return a+numVal(c.limit);},0);
-    var spent=monthTotal(),left=income-spent;
-    var pctBudg=income>0?Math.round(planned/income*100):0;
-    var cats=BUDGET.categories.slice().sort(function(a,b){return numVal(b.limit)-numVal(a.limit);});
-    var segs=cats.slice(0,6).map(function(c,i){return {v:planned>0?numVal(c.limit)/planned:0,c:MONEY_PALETTE[i%MONEY_PALETTE.length]};});
-    var legend=cats.slice(0,3).map(function(c,i){
-      return '<div class="row" style="margin:0 0 3px"><span style="font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:'+MONEY_PALETTE[i%MONEY_PALETTE.length]+'"></span>'+escHtml(c.name)+'</span><span class="tnum" style="font-size:11px;color:var(--muted)">'+money0(c.limit)+'</span></div>';
-    }).join('')||'<div class="muted-note" style="text-align:left">No categories yet.</div>';
-    bt.innerHTML='<div class="card" style="cursor:pointer;margin:0;height:100%" onclick="push(\'budget\')">'
-      +'<div class="row" style="margin-bottom:9px"><div class="card-t" style="margin-bottom:0">💰 Budget</div><span class="pill '+(left>=0?'pill-grn':'pill-red')+'">'+money0(left)+' left</span></div>'
-      +'<div style="display:flex;gap:13px;align-items:center"><div style="flex:0 0 auto">'+miniDonut(segs,92,pctBudg+'%','budgeted')+'</div>'
-      +'<div style="flex:1;min-width:0">'+legend+'<div class="muted-note" style="text-align:left;margin:6px 0 0">'+money0(spent)+' spent of '+money0(income)+'</div></div></div></div>';
-  }
-  /* ── Spending tile ── */
-  var st=document.getElementById('tileSpending');
-  if(st){
-    var inc=numVal(BUDGET.income),tot=monthTotal(),m=thisMonth();
-    var rows=SPENDING.filter(function(x){return (x.date||'').slice(0,7)===m;});
-    var byCat={};rows.forEach(function(x){byCat[x.category]=(byCat[x.category]||0)+numVal(x.amount);});
-    var top=Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a];})[0];
-    var sp=inc>0?Math.min(100,Math.round(tot/inc*100)):0;
-    st.innerHTML='<div class="card" style="cursor:pointer;margin:0;height:100%" onclick="push(\'spending\')">'
-      +'<div class="row" style="margin-bottom:8px"><div class="card-t" style="margin-bottom:0">🧾 Spending</div><span class="pill pill-pur">this month</span></div>'
-      +'<div class="tnum" style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--ink)">'+money(tot)+'</div>'
-      +'<div class="muted-note" style="text-align:left;margin-top:2px">'+rows.length+' transaction'+(rows.length===1?'':'s')+(top?' · top: '+escHtml(top):'')+'</div>'
-      +'<div class="bar" style="margin-top:10px"><div class="bar-fill" style="width:'+sp+'%"></div></div>'
-      +'<div class="muted-note" style="text-align:left;margin-top:4px">'+sp+'% of '+money0(inc)+' income</div></div>';
-  }
+  if(typeof renderHomeQuickActions==='function')renderHomeQuickActions();
+  if(typeof renderHomeBudgetBig==='function')renderHomeBudgetBig();
+  if(typeof renderHomeInvest==='function')renderHomeInvest();
+  if(typeof renderAdvisorCard==='function')renderAdvisorCard('homeAdvisor');
   /* ── Net Worth tile ── */
   var nt=document.getElementById('tileNetworth');
   if(nt){
@@ -689,10 +723,112 @@ function renderMoneyHome(){
     nt.innerHTML='<div class="card" style="cursor:pointer;margin:0;height:100%" onclick="push(\'networth\')">'
       +'<div class="row" style="margin-bottom:8px"><div class="card-t" style="margin-bottom:0">📊 Net Worth</div></div>'
       +'<div class="tnum" style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--ink)">'+money(t.net)+'</div>'
-      +'<div style="display:flex;gap:16px;margin-top:7px">'
+      +'<div style="display:flex;gap:16px;margin-top:8px">'
       +'<div><div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.4px">ASSETS</div><div class="tnum" style="font-weight:800;font-size:13px">'+money0(t.assets)+'</div></div>'
       +'<div><div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.4px">DEBTS</div><div class="tnum down" style="font-weight:800;font-size:13px">'+money0(t.debts)+'</div></div></div>'
-      +'<div style="display:flex;height:7px;border-radius:4px;overflow:hidden;margin-top:10px;background:#f0edfa">'
+      +'<div style="display:flex;height:7px;border-radius:4px;overflow:hidden;margin-top:8px;background:#f2efe4">'
       +'<div style="width:'+aw+'%;background:var(--green)"></div><div style="width:'+dw+'%;background:var(--red)"></div></div></div>';
+  }
+}
+/* ── Home quick-action tiles: the app's 3 real feature-colored areas (not the
+   credit/mortgage copy from the reference design, which has no backing feature here) ── */
+function renderHomeQuickActions(){
+  var el=document.getElementById('homeQuick');if(!el)return;
+  /* invest: how much of your practice money is actually deployed (cash put to work) */
+  var T=totals(),investPct=T.total>0?Math.round((T.total-PF.cash)/T.total*100):0;
+  /* savings: dollars saved toward your goals, as a share of their combined target */
+  var gSaved=0,gTarget=0;(typeof GOALS!=='undefined'?GOALS:[]).forEach(function(g){gSaved+=(+g.saved||0);gTarget+=(+g.target||0);});
+  var goalsPct=gTarget>0?Math.min(100,Math.round(gSaved/gTarget*100)):0;
+  /* budget: share of this month's planned budget used so far */
+  var budgPlanned=(BUDGET&&BUDGET.categories?BUDGET.categories:[]).reduce(function(a,c){return a+numVal(c.limit);},0);
+  var budgPct=budgPlanned>0?Math.min(100,Math.round(monthTotal()/budgPlanned*100)):0;
+  /* colors ordered purple → red → yellow to match the reference; each still points at a
+     real feature area (investing / budget / savings) with real progress. */
+  function tile(cls,title,pct,go){
+    return '<div class="qa-tile '+cls+'" onclick="'+go+'"><div class="qa-t">'+title+'</div>'
+      +'<div class="qa-prog"><span class="qa-lbl">Progress</span><span class="qa-pct tnum">'+pct+'%</span></div>'
+      +'<div class="qa-bar"><div class="qa-bar-fill" style="width:'+pct+'%"></div></div>'
+      +'<button class="qa-btn" onclick="event.stopPropagation();'+go+'">Continue</button></div>';
+  }
+  el.innerHTML=tile('qa-invest','Grow my money through investing',investPct,"goTab('journey')")
+    +tile('qa-spend','Stay on top of my budget',budgPct,"goTab('budget')")
+    +tile('qa-save','Reach my savings goals',goalsPct,"push('goals')");
+}
+/* ── "Your Monthly Budget" card (target redesign): donut + right-side legend where each
+   row is Label / progress-bar / $spent-of-$limit, from real BUDGET categories ── */
+function renderHomeBudgetBig(){
+  var el=document.getElementById('homeBudgetBig');if(!el)return;
+  var income=numVal(BUDGET.income),planned=BUDGET.categories.reduce(function(a,c){return a+numVal(c.limit);},0);
+  var pctBudg=income>0?Math.round(planned/income*100):0;
+  var m=thisMonth(),byCat={};SPENDING.forEach(function(s){if((s.date||'').slice(0,7)===m)byCat[s.category]=(byCat[s.category]||0)+numVal(s.amount);});
+  var cats=BUDGET.categories.slice().sort(function(a,b){return numVal(b.limit)-numVal(a.limit);});
+  var segs=cats.slice(0,6).map(function(c,i){return {v:planned>0?numVal(c.limit)/planned:0,c:MONEY_PALETTE[i%MONEY_PALETTE.length]};});
+  var rows=cats.slice(0,5).map(function(c,i){
+    var lim=numVal(c.limit),spent=byCat[c.name]||0,pct=lim>0?Math.min(100,Math.round(spent/lim*100)):0,col=MONEY_PALETTE[i%MONEY_PALETTE.length];
+    return '<div class="hb-row"><div class="hb-row-head"><span class="hb-lbl">'+escHtml(c.name)+'</span>'
+      +'<span class="hb-amt tnum">'+money0(spent)+'<span class="hb-tot">/'+money0(lim)+'</span></span></div>'
+      +'<div class="bar" style="margin:0"><div class="bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';
+  }).join('')||'<div class="muted-note">No categories yet.</div>';
+  el.innerHTML='<div class="card" style="margin:0">'
+    +'<div class="hc-head"><span class="hc-title">Your Monthly Budget</span><button class="hc-btn" onclick="goTab(\'budget\')">View Full</button></div>'
+    +'<div class="hb-body"><div class="hb-donut">'+miniDonut(segs,184,pctBudg+'%','budgeted',34)+'</div>'
+    +'<div class="hb-legend">'+rows+'</div></div></div>';
+}
+/* ── "Investing" summary card (target redesign): left copy + View Investments button,
+   right purple stat panel (Practice Portfolio / Total Invested / all-time Return) ── */
+function renderHomeInvest(){
+  var el=document.getElementById('homeInvest');if(!el)return;
+  var T=totals(),invested=START_CAPITAL+(PF.deposits||0),gain=T.unreal+PF.realized;
+  var up=gain>=0;
+  /* third stat is today's move (falls back to 0.0% when no live day-basis yet) */
+  var dm=(typeof acctDayMove==='function')?acctDayMove():null,todayPct=dm?dm.pct:0;
+  var sub=up
+    ? 'Your practice portfolio is <b>up '+signed(gain)+'</b> all-time. Keep learning and practising before you invest for real.'
+    : 'Your practice portfolio is <b>down '+signed(gain).replace('-','')+'</b> right now. Dips are normal, this is the safe place to learn.';
+  el.innerHTML='<div class="card home-invest">'
+    +'<div class="hi-left"><div class="hi-title">Investing</div>'
+    +'<div class="hi-sub">'+sub+'</div>'
+    +'<button class="btn-taupe hi-btn" onclick="goTab(\'journey\')">View Investments</button></div>'
+    +'<div class="hi-panel">'
+    +'<div class="hi-stat"><div class="hi-k">Practice Portfolio</div><div class="hi-v tnum">'+money(T.total)+'</div></div>'
+    +'<div class="hi-stat"><div class="hi-k">Total Invested</div><div class="hi-v tnum">'+money0(invested)+'</div></div>'
+    +'<div class="hi-stat"><div class="hi-k">Today’s Return</div><div class="hi-v tnum">'+(todayPct>=0?'+':'')+todayPct.toFixed(1)+'%</div></div>'
+    +'</div></div>';
+}
+/* ── "Financial Advisor" card (Home + Budget): a preview of Mia's one real thing to
+   say today (homeNudge(), 08-learn-init.js) plus an input that forwards straight into
+   the existing floating Coach Chat — not a second, independent chat engine. ── */
+/* Reusable Financial Advisor card: white card, charcoal header + message bubble,
+   soft input pill that forwards into the real Coach Chat. Render into any container
+   by id — currently Home (#homeAdvisor), Budget (#budgetAdvisor), Investing
+   (#journeyAdvisor). One voice (Mia), so every instance shows the same live nudge. */
+function renderAdvisorCard(targetId){
+  var el=document.getElementById(targetId);if(!el)return;
+  var n=(typeof homeNudge==='function')?homeNudge():{msg:'Ask me anything about your money.'};
+  var inId=targetId+'Input';
+  el.innerHTML='<div class="advisor-card">'
+    +'<div class="advisor-head"><div class="advisor-t">Financial Advisor</div>'
+    +'<button class="advisor-expand" onclick="openCoach()" aria-label="Open full chat"><svg viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4l-8 8"/><path d="M10 20H4v-6"/><path d="M4 20l8-8"/></svg></button></div>'
+    +'<div class="advisor-body">'
+    +'<div class="advisor-bubble-row"><div class="advisor-bubble">'+n.msg+'</div>'
+    +'<button class="advisor-copy" onclick="copyAdvisorMsg(this)" aria-label="Copy message"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>'
+    +'<div class="advisor-input-row"><div class="advisor-inpwrap">'
+    +'<span class="advisor-ic advisor-clip" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></span>'
+    +'<input class="advisor-input" id="'+inId+'" placeholder="Type here…" onkeydown="if(event.key===\'Enter\')advisorAsk(\''+inId+'\')"/>'
+    +'<span class="advisor-ic advisor-mic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></span></div>'
+    +'<button class="advisor-send" onclick="advisorAsk(\''+inId+'\')" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>'
+    +'</div></div>';
+}
+function advisorAsk(inputId){
+  var inp=document.getElementById(inputId),text=((inp&&inp.value)||'').trim();
+  openCoach();
+  if(text){document.getElementById('coachInput').value=text;coachSend();}
+  if(inp)inp.value='';
+}
+function copyAdvisorMsg(btn){
+  var bub=btn.parentElement&&btn.parentElement.querySelector('.advisor-bubble');
+  var txt=bub?(bub.innerText||bub.textContent||''):'';
+  if(txt&&navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){if(typeof showToast==='function')showToast('Copied');}).catch(function(){});
   }
 }

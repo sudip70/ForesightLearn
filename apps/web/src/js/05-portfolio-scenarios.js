@@ -65,12 +65,12 @@ function compareChart(a,b,w,h,labelFn){
   var sx=(w-pad*2)/Math.max(1,n-1),lf=labelFn||function(p){return 'Day '+p.i;};
   function X(i){return pad+i*sx;}function Y(v){return padT+(h-padT-padB)*(1-(v-mn)/rg);}
   function path(arr){return arr.map(function(p,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(p.total).toFixed(1);}).join(' ');}
-  var lab='';[0,Math.floor((n-1)/2),n-1].forEach(function(i,k){var gx=X(i).toFixed(1);lab+='<text x="'+gx+'" y="'+(h-6)+'" font-size="9" fill="#aaa4c0" font-weight="700" text-anchor="'+(k===0?'start':(k===2?'end':'middle'))+'">'+lf((a[i]||a[a.length-1]))+'</text>';});
+  var lab='';[0,Math.floor((n-1)/2),n-1].forEach(function(i,k){var gx=X(i).toFixed(1);lab+='<text x="'+gx+'" y="'+(h-6)+'" font-size="9" fill="#a19b91" font-weight="700" text-anchor="'+(k===0?'start':(k===2?'end':'middle'))+'">'+lf((a[i]||a[a.length-1]))+'</text>';});
   function dot(arr,col){var e=arr[arr.length-1];return '<circle cx="'+X(arr.length-1).toFixed(1)+'" cy="'+Y(e.total).toFixed(1)+'" r="3.2" fill="'+col+'" stroke="#fff" stroke-width="1.5"/>';}
   return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" style="display:block">'
-    +'<path d="'+path(a)+'" fill="none" stroke="#9084b4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
-    +'<path d="'+path(b)+'" fill="none" stroke="#4f9c7e" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'
-    +lab+dot(a,'#9084b4')+dot(b,'#4f9c7e')+'</svg>';
+    +'<path d="'+path(a)+'" fill="none" stroke="#aea2d2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+    +'<path d="'+path(b)+'" fill="none" stroke="#619f88" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'
+    +lab+dot(a,'#aea2d2')+dot(b,'#619f88')+'</svg>';
 }
 var scnCur='gfc2008',scnData=null,scnTerm='bear',scnAnim=null;
 function scnLabelFn(spec,d){
@@ -80,13 +80,13 @@ function scnLabelFn(spec,d){
 function drawScenarioChart(spec,d,upto){
   var c=document.getElementById('scenarioChart');if(!c)return;var lf=scnLabelFn(spec,d);
   if(spec.compare){c.innerHTML=compareChart(d.curveA.slice(0,upto),d.curveB.slice(0,upto),300,150,lf);}
-  else{c.innerHTML=equityChart(d.curveA.slice(0,upto),300,150,'#6f659a',lf);}
+  else{c.innerHTML=equityChart(d.curveA.slice(0,upto),300,150,'#8b7cba',lf);}
 }
 function scnStatBox(label,val,cls){return '<div class="scn-stat"><label>'+label+'</label><div class="v '+(cls||'')+'">'+val+'</div></div>';}
 function renderScnSummary(spec,d){
   var el=document.getElementById('scnResult');if(!el)return;var h='';
   if(spec.compare){
-    h='<div class="scn-result"><div class="scn-legend"><span><i style="background:#9084b4"></i>Your mix</span><span><i style="background:#4f9c7e"></i>Spread out</span></div></div>'
+    h='<div class="scn-result"><div class="scn-legend"><span><i style="background:#aea2d2"></i>Your mix</span><span><i style="background:#619f88"></i>Spread out</span></div></div>'
       +'<div class="scn-result">'+scnStatBox('Your mix · worst drop',d.worstA.toFixed(0)+'%','dn')+scnStatBox('Spread out · worst drop',d.worstB.toFixed(0)+'%','up')+'</div>';
   }else{
     var up=d.gainA>=0;
@@ -223,16 +223,16 @@ function renderHoldings(){
   var html='';
   var mix=pfMix();
   if(mix.inv&&pfLevel>=2){
-    var COLW={stock:'#9084b4',etf:'#6f8fd6',crypto:'#c19a34'};/* --invest / --blue / --amber — gold stays Learn-only */
-    var seg=Object.keys(mix.by).map(function(c){return '<div style="width:'+(mix.by[c]/mix.inv*100)+'%;background:'+(COLW[c]||'#9084b4')+'"></div>';}).join('');
+    var COLW={stock:'#aea2d2',etf:'#5b9aa4',crypto:'#c19a34'};/* --invest / --blue / --amber — gold stays Learn-only */
+    var seg=Object.keys(mix.by).map(function(c){return '<div style="width:'+(mix.by[c]/mix.inv*100)+'%;background:'+(COLW[c]||'#aea2d2')+'"></div>';}).join('');
     var labels=Object.keys(mix.by).map(function(c){return Math.round(mix.by[c]/mix.inv*100)+'% '+c;}).join(' · ');
     var read=mix.classes>=3?'Nicely spread across '+mix.classes+' asset types 🧺':'Mostly in '+mix.classes+' type'+(mix.classes>1?'s':'')+', spreading out lowers risk';
-    html+='<div class="card"><div class="card-t" style="margin-bottom:10px">Portfolio analytics</div><div class="mixbar">'+seg+'</div><div class="mininote" style="margin-top:9px"><b style="color:var(--ink)">'+read+'</b><br>'+labels+'</div></div>';
+    html+='<div class="card"><div class="card-t" style="margin-bottom:8px">Portfolio analytics</div><div class="mixbar">'+seg+'</div><div class="mininote" style="margin-top:8px"><b style="color:var(--ink)">'+read+'</b><br>'+labels+'</div></div>';
   }
   if(!PF.pos.length){html='<div class="card"><div class="muted-note" style="text-align:left">No holdings yet. Tap <b>Trade</b> to make your first paper investment, virtual cash, zero risk.</div></div>';}
   else{
     var posHelp=pfLevel>=2?'<button type="button" class="qd" onclick="event.stopPropagation();openTip(\'pnl\')" aria-label="What is profit and loss?">?</button>':'';
-    html+='<div class="card"><div class="row" style="margin-bottom:13px"><div class="card-t" style="margin-bottom:0">Positions'+posHelp+'</div><span class="pill pill-pur">'+PF.pos.length+' holdings</span></div>';
+    html+='<div class="card"><div class="row" style="margin-bottom:12px"><div class="card-t" style="margin-bottom:0">Positions'+posHelp+'</div><span class="pill pill-pur">'+PF.pos.length+' holdings</span></div>';
     PF.pos.forEach(function(p){
       var cur=curPx(p.t),val=p.sh*cur,pl=(cur-p.avg)*p.sh,plp=(cur/p.avg-1)*100,cls=pl>=0?'up':'down',sg=pl>=0?'+':'-';
       var dm=posDayMove(p),today=(pfLevel>=2&&dm)?' · <span class="'+(dm.pct>=0?'up':'down')+'" style="font-weight:700">'+(dm.pct>=0?'+':'')+dm.pct.toFixed(2)+'% today</span>':'';
@@ -240,14 +240,14 @@ function renderHoldings(){
         ?'<div class="l-c '+cls+'">'+sg+'$'+Math.abs(pl).toFixed(2)+' ('+sg+Math.abs(plp).toFixed(1)+'%)</div>'
         :'<div class="l-c '+cls+'" style="font-size:13px">'+(pl>=0?'▲':'▼')+'</div>';
       html+='<div class="lrow" style="cursor:pointer" onclick="openTradeFor(\''+p.t+'\')">'
-        +'<div style="display:flex;align-items:center;gap:11px"><div class="tkr-ic">'+p.t+'</div><div><div class="l-n">'+p.t+' <span style="font-size:10px;color:var(--faint);font-weight:700">'+p.acct+'</span></div><div class="l-s">'+fmtSh(p.sh)+' sh · avg '+money(p.avg)+today+'</div></div></div>'
+        +'<div style="display:flex;align-items:center;gap:12px"><div class="tkr-ic">'+p.t+'</div><div><div class="l-n">'+p.t+' <span style="font-size:10px;color:var(--faint);font-weight:700">'+p.acct+'</span></div><div class="l-s">'+fmtSh(p.sh)+' sh · avg '+money(p.avg)+today+'</div></div></div>'
         +'<div class="l-v"><div class="l-p tnum">'+money(val)+'</div>'+plHtml+'</div></div>';
     });
     html+='</div>';
   }
   var byAcct={};PF.pos.forEach(function(p){(byAcct[p.acct]=byAcct[p.acct]||[]).push(p);});
   if(pfLevel>=3&&Object.keys(byAcct).length){
-    html+='<div class="card-t" style="margin:4px 2px 10px">Accounts · risk plans</div>';
+    html+='<div class="card-t" style="margin:4px 2px 8px">Accounts · risk plans</div>';
     Object.keys(byAcct).forEach(function(ac){
       var v=0;byAcct[ac].forEach(function(p){v+=p.sh*curPx(p.t);});
       var c=ac==='TFSA'?'tfsa':(ac==='RRSP'?'rrsp':'etf');
@@ -261,7 +261,7 @@ function renderTrade(){
     '<div class="card"><div class="card-t">Trade</div>'
     +'<input class="f-in" id="tradeSearch" placeholder="🔍 Search any of 56 assets…" autocomplete="off" oninput="tradeFilter()"/>'
     +'<div id="tradeResults" class="sf-results" style="display:none;margin-top:8px"></div>'
-    +'<div id="tradePanel" style="margin-top:13px"></div></div>';
+    +'<div id="tradePanel" style="margin-top:12px"></div></div>';
   if(tradeTicker)selectTradeAsset(tradeTicker);
 }
 function tradeFilter(){
@@ -284,9 +284,9 @@ function renderTradePanel(){
   var have=PF.pos.filter(function(x){return x.t===t;})[0];
   var sh=parseFloat((document.getElementById('tradeSh')||{}).value)||pendingSh||0;
   var h='<div class="trade-asset"><div><div class="ta-t">'+bn+' <span class="sf-cls '+a.c+'">'+a.c+'</span></div><div class="ta-n">'+a.n+(have?' · you hold '+fmtSh(have.sh):'')+'</div></div><div class="ta-px"><div class="tnum">'+money(px)+'</div><span class="pill '+(live?'pill-grn':'pill-gry')+'" style="font-size:10px">'+(live?'● Live':'~ est.')+'</span></div></div>';
-  h+='<div class="toggle" style="margin-top:13px"><button class="tg buy'+(tradeAction==='buy'?' on':'')+'" onclick="setTrade(\'buy\')">Buy</button><button class="tg sell'+(tradeAction==='sell'?' on':'')+'" onclick="setTrade(\'sell\')">Sell</button></div>';
+  h+='<div class="toggle" style="margin-top:12px"><button class="tg buy'+(tradeAction==='buy'?' on':'')+'" onclick="setTrade(\'buy\')">Buy</button><button class="tg sell'+(tradeAction==='sell'?' on':'')+'" onclick="setTrade(\'sell\')">Sell</button></div>';
   h+='<label class="f-label">Shares<button type="button" class="qd" onclick="openTip(\'avg_cost\')" aria-label="What does shares and average cost mean?">?</button></label><input class="f-in" type="number" id="tradeSh" min="0" step="0.0001" placeholder="0" value="'+(sh||'')+'" oninput="updateCost()"/>';
-  h+='<div class="row" style="margin:10px 0 13px"><span style="font-size:13px;color:var(--muted);font-weight:600" id="costLbl">'+(tradeAction==='buy'?'Estimated cost':'Estimated proceeds')+'</span><span style="font-size:17px;font-weight:800;color:var(--purple-deep)" class="tnum" id="tradeCost">'+money(sh*px)+'</span></div>';
+  h+='<div class="row" style="margin:8px 0 12px"><span style="font-size:13px;color:var(--muted);font-weight:600" id="costLbl">'+(tradeAction==='buy'?'Estimated cost':'Estimated proceeds')+'</span><span style="font-size:17px;font-weight:800;color:var(--purple-deep)" class="tnum" id="tradeCost">'+money(sh*px)+'</span></div>';
   if(tradeAction==='buy'&&pfLevel===1){
     h+='<div class="muted-note" style="text-align:left">Buying is practice with virtual cash, so there\'s zero risk. Pick how many shares and review your order.</div>';
   }else if(tradeAction==='buy'){
@@ -335,7 +335,7 @@ function execTrade(){
 function renderActivity(){
   if(!ACTIVITY.length){document.getElementById('jAct').innerHTML='<div class="card"><div class="card-t">Activity</div><div class="muted-note" style="text-align:left">No trades yet. Head to <b>Trade</b> to make your first paper investment, it all shows up here.</div></div>';return;}
   document.getElementById('jAct').innerHTML='<div class="card"><div class="card-t">Activity</div>'+ACTIVITY.map(function(a){
-    return '<div class="lrow"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:17px">'+a.ic+'</div><div><div class="l-n">'+a.main+'</div><div class="l-s">'+a.sub+'</div></div></div><div class="l-v"><div class="l-p tnum '+a.cls+'">'+a.amt+'</div></div></div>';
+    return '<div class="lrow"><div style="display:flex;align-items:center;gap:8px"><div style="font-size:17px">'+a.ic+'</div><div><div class="l-n">'+a.main+'</div><div class="l-s">'+a.sub+'</div></div></div><div class="l-v"><div class="l-p tnum '+a.cls+'">'+a.amt+'</div></div></div>';
   }).join('')+'</div>';
 }
 function renderJourneyPlan(){
@@ -350,7 +350,7 @@ function renderJourneyPlan(){
     +'<div class="toggle"><button class="tg buy'+(contrib.freq==='Weekly'?' on':'')+'" onclick="setFreq(\'Weekly\')">Weekly</button><button class="tg buy'+(contrib.freq==='Monthly'?' on':'')+'" onclick="setFreq(\'Monthly\')">Monthly</button></div>'
     +'<div class="muted-note" style="text-align:left" id="contribNote">'+planNote()+'</div></div>'
     +'<div class="goal-card" onclick="openGoalSetup()" style="cursor:pointer"><div class="row"><div style="font-size:14px;font-weight:800">🎯 '+goalTitle(g)+'</div><span class="pill pill-pur">'+gpct+'%</span></div><div class="bar"><div class="bar-fill" style="width:'+gpct+'%"></div></div><div class="row"><span style="font-size:11px;color:var(--muted)">'+money0(g.saved)+' of '+money0(g.amt)+'</span><span style="font-size:11px;color:var(--purple-strong);font-weight:700">'+g.years+'-yr plan · ✏️ adjust</span></div></div>'
-    +'<div class="card-t" style="margin:4px 2px 10px">Milestones</div>'
+    +'<div class="card-t" style="margin:4px 2px 8px">Milestones</div>'
     +goalMs(g).map(function(m,i){return '<div class="milestone"><div class="ms-n"'+(i===0?' style="background:var(--green-soft);color:var(--green)"':'')+'>'+(i===0?'✓':(i+1))+'</div><div class="ms-t">'+m+'</div></div>';}).join('');
 }
 function planNote(){var yr=contrib.amt*(contrib.freq==='Weekly'?52:12);return 'Fiscally will remind you to invest $'+contrib.amt+' '+contrib.freq.toLowerCase()+', about '+('$'+yr.toLocaleString())+'/yr toward your goal.';}

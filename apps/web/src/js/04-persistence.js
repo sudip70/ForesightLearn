@@ -6,7 +6,7 @@ var STORE_KEY='fiscally.web.v1',onboarded=false;
 var DEMO=/[?&]demo\b/.test(location.search),demoActive=false;
 function saveState(){
   if(demoActive)return;
-  try{localStorage.setItem(STORE_KEY,JSON.stringify({v:1,onboarded:onboarded,PF:PF,ACTIVITY:ACTIVITY,GOAL:GOAL,LEARN:LEARN,contrib:contrib,seen:seen,initDone:initDone,BUDGET:BUDGET,GOALS:GOALS,SPENDING:SPENDING,NETWORTH:NETWORTH,LOANS:LOANS,SAVINGS:SAVINGS,CHEQUING:CHEQUING,CREDIT_CARD:CREDIT_CARD,pfLevel:pfLevel}));}catch(e){}
+  try{localStorage.setItem(STORE_KEY,JSON.stringify({v:1,onboarded:onboarded,PF:PF,ACTIVITY:ACTIVITY,GOAL:GOAL,LEARN:LEARN,contrib:contrib,seen:seen,initDone:initDone,BUDGET:BUDGET,GOALS:GOALS,SPENDING:SPENDING,NETWORTH:NETWORTH,LOANS:LOANS,SAVINGS:SAVINGS,CHEQUING:CHEQUING,CREDIT_CARD:CREDIT_CARD,pfLevel:pfLevel,USER:USER}));}catch(e){}
 }
 /* A brand-new user starts with a genuinely blank slate — no pre-done lessons, no
    seeded positions or ledgers. The literals declared in 03/07b/08 are the DEMO
@@ -19,6 +19,7 @@ function freshStart(){
   GOAL.saved=0;GOALS=[];SPENDING=[];LOANS=[];
   SAVINGS={balance:0};CHEQUING={balance:0,deposits:[]};CREDIT_CARD=null;
   NETWORTH={assets:[{name:'Savings account',value:0},{name:'Chequing',value:0}],debts:[]};
+  USER={name:'',age:null};
 }
 function loadState(){
   try{
@@ -34,6 +35,7 @@ function loadState(){
     if(d.CHEQUING)CHEQUING=d.CHEQUING;if(!Array.isArray(CHEQUING.deposits))CHEQUING.deposits=[];
     if(d.CREDIT_CARD)CREDIT_CARD=d.CREDIT_CARD;
     if(d.pfLevel)pfLevel=Math.max(1,Math.min(3,d.pfLevel|0))||1;
+    if(d.USER)USER=d.USER;
     onboarded=!!d.onboarded;return true;
   }catch(e){return false;}
 }

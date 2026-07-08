@@ -1,6 +1,6 @@
 /* ── Mia avatar (inline SVG) ─────────────────── */
 function avatar(){return '<svg viewBox="0 0 48 48" width="100%" height="100%">'
-+'<rect width="48" height="48" fill="#f4ede1"/>'
++'<rect width="48" height="48" fill="#efece2"/>'
 +'<path d="M9 27 Q9 7 24 7 Q39 7 39 27 L39 40 Q33 44 24 44 Q15 44 9 40 Z" fill="#43301f"/>'
 +'<circle cx="24" cy="27" r="13" fill="#f0b896"/>'
 +'<path d="M11 24 Q12 9 24 9 Q36 9 37 24 Q34 16 24 16 Q14 16 11 24 Z" fill="#43301f"/>'
@@ -78,7 +78,7 @@ function candleChart(data,w,h){
   function Y(v){return pad+(h-pad*2)*(1-(v-mn)/rg);}
   var s='';
   data.forEach(function(d,i){
-    var x=pad+i*slot+slot/2,up=d.c>=d.o,col=up?'#7d72a8':'#c0b4d8';
+    var x=pad+i*slot+slot/2,up=d.c>=d.o,col=up?'#8b7cba':'#c8c0e2';
     s+='<line x1="'+x+'" y1="'+Y(d.hi)+'" x2="'+x+'" y2="'+Y(d.lo)+'" stroke="'+col+'" stroke-width="1.3"/>';
     var yt=Y(Math.max(d.o,d.c)),yb=Y(Math.min(d.o,d.c));
     s+='<rect x="'+(x-cw/2)+'" y="'+yt+'" width="'+cw+'" height="'+Math.max(1.5,yb-yt)+'" rx="1.5" fill="'+col+'"/>';
@@ -87,7 +87,7 @@ function candleChart(data,w,h){
 }
 function donutChart(segs,size,centerPct){
   var r=size/2-16,C=2*Math.PI*r,cx=size/2,cy=size/2,off=0,s='';
-  s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#f0edfa" stroke-width="26"/>';
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#f2efe4" stroke-width="26"/>';
   segs.forEach(function(seg){
     var len=C*seg.v;
     s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+seg.c+'" stroke-width="26" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" stroke-linecap="butt" transform="rotate(-90 '+cx+' '+cy+')"/>';
@@ -105,11 +105,11 @@ function gaugeChart(pct){
   var id='gg'+Math.floor(Math.random()*1e6);
   var nd=[cx+(r-6)*Math.cos(va),cy+(r-6)*Math.sin(va)];
   return '<svg viewBox="0 0 '+w+' '+h+'" width="220" height="128">'
-    +'<defs><linearGradient id="'+id+'" x1="0" x2="1"><stop offset="0" stop-color="#c0b4d8"/><stop offset="1" stop-color="#6f659a"/></linearGradient></defs>'
-    +arc(a0,a1,'#f0edfa',16)
+    +'<defs><linearGradient id="'+id+'" x1="0" x2="1"><stop offset="0" stop-color="#c8c0e2"/><stop offset="1" stop-color="#8b7cba"/></linearGradient></defs>'
+    +arc(a0,a1,'#f2efe4',16)
     +arc(a0,va,'url(#'+id+')',16)
-    +'<line x1="'+cx+'" y1="'+cy+'" x2="'+nd[0].toFixed(1)+'" y2="'+nd[1].toFixed(1)+'" stroke="#565072" stroke-width="4" stroke-linecap="round"/>'
-    +'<circle cx="'+cx+'" cy="'+cy+'" r="8" fill="#fff" stroke="#565072" stroke-width="3"/></svg>';
+    +'<line x1="'+cx+'" y1="'+cy+'" x2="'+nd[0].toFixed(1)+'" y2="'+nd[1].toFixed(1)+'" stroke="#665b93" stroke-width="4" stroke-linecap="round"/>'
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="8" fill="#fff" stroke="#665b93" stroke-width="3"/></svg>';
 }
 function genCandles(n,start){
   var d=[],p=start;
@@ -145,9 +145,9 @@ function interactiveChart(id,cfg){
   var clip='clip_'+id;
   var content=cfg.draw(X,Y,v,baseY);
   var labs=cfg.xLabels?cfg.xLabels(v):[];
-  var labSvg=labs.map(function(L){return '<text x="'+X(L.i).toFixed(1)+'" y="'+(h-6)+'" font-size="9" fill="#aaa4c0" font-weight="700" text-anchor="'+L.a+'">'+L.t+'</text>';}).join('');
+  var labSvg=labs.map(function(L){return '<text x="'+X(L.i).toFixed(1)+'" y="'+(h-6)+'" font-size="9" fill="#a19b91" font-weight="700" text-anchor="'+L.a+'">'+L.t+'</text>';}).join('');
   var maxM=cfg.maxMarkers||3,dots='';
-  for(var k=0;k<maxM;k++)dots+='<circle id="'+id+'_hd'+k+'" r="3.4" fill="#6f659a" stroke="#fff" stroke-width="1.5" style="display:none"/>';
+  for(var k=0;k<maxM;k++)dots+='<circle id="'+id+'_hd'+k+'" r="3.4" fill="#8b7cba" stroke="#fff" stroke-width="1.5" style="display:none"/>';
   var svg='<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" style="display:block;touch-action:none">'
     +'<defs><clipPath id="'+clip+'"><rect x="'+pad+'" y="0" width="'+plotW+'" height="'+h+'"/></clipPath></defs>'
     +'<g clip-path="url(#'+clip+')">'+content+'</g>'
@@ -236,13 +236,9 @@ function chartHoverOff(id){var g=document.getElementById(id+'_hl');if(g)g.style.
 /* journeyChart is rendered by renderPortfolioChart() inside renderPortfolio (needs PF/totals) */
 /* scenarioChart is rendered lazily by renderScenario() when the Scenarios page opens */
 /* Stock Finder now renders a live forecast fan chart (see sfSelect) */
-renderGauge(20);renderDonut(10);
+renderGauge(20);
 /* NOTE: live-data init (renderFc/loadIndices) runs at the very end of the script;
    it depends on `var API` which is assigned further down. */
 
-function renderDonut(pct){
-  var segs=[{v:pct/100,c:'#b4a284'},{v:0.30,c:'#609c84'},{v:0.22,c:'#d9b84e'},{v:0.18,c:'#cc5a3c'},{v:1-pct/100-0.70,c:'#d8cbb4'}];
-  document.getElementById('obDonut').innerHTML=donutChart(segs,190,pct);
-}
 function renderGauge(v){document.getElementById('gaugeWrap').innerHTML=gaugeChart(v/100);}
 

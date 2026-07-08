@@ -1,15 +1,15 @@
 /* ── Navigation ──────────────────────────────── */
-var TAB_OF={home:'home',learn:'learn',tools:'tools',social:'social',journey:'journey',scenario:'journey',risk:'journey',stockfinder:'tools',budget:'home',goals:'home',spending:'home',networth:'accounts',accounts:'accounts',
-  'loan-calc':'tools','mortgage-calc':'tools','game-swipe':'tools','game-wnb':'tools','game-scam':'tools','game-wordle':'tools','game-xword':'tools','game-quiz':'tools','game-hangman':'tools','game-invest':'tools'};
-var TITLES={home:"Fiscally",learn:'Learn',tools:'Explore',social:'Profile',journey:'Practice',scenario:'Scenarios',risk:'Risk Level',stockfinder:'Stock Finder',budget:'Budget',goals:'Savings Goals',spending:'Spending',networth:'Net Worth',accounts:'My Accounts',
-  'loan-calc':'Loan Calculator','mortgage-calc':'Mortgage Calculator','game-swipe':'Budget Swipe','game-wnb':'Wants vs Needs','game-scam':'Scammer Scanner','game-wordle':'Finance Wordle','game-xword':'Finance Crossword','game-quiz':'Quick Count','game-hangman':"Debtor's Tower",'game-invest':'Invest Game'};
+var TAB_OF={home:'home',learn:'learn',tools:'tools',social:'social',journey:'journey',scenario:'journey',risk:'journey',stockfinder:'journey',budget:'budget',goals:'budget',spending:'budget',networth:'accounts',accounts:'accounts',
+  'loan-calc':'tools','mortgage-calc':'tools','compound-calc':'tools','game-swipe':'tools','game-wnb':'tools','game-scam':'tools','game-wordle':'tools','game-xword':'tools','game-quiz':'tools','game-hangman':'tools','game-invest':'tools'};
+var TITLES={home:"Fiscally",learn:'Learn',tools:'Games',social:'Profile',journey:'Investing',scenario:'Scenarios',risk:'Risk Level',stockfinder:'Stock Finder',budget:'Budget',goals:'Savings Goals',spending:'Spending',networth:'Net Worth',accounts:'My Accounts',
+  'loan-calc':'Loan Calculator','mortgage-calc':'Mortgage Calculator','compound-calc':'Compound Calculator','game-swipe':'Budget Swipe','game-wnb':'Wants vs Needs','game-scam':'Scammer Scanner','game-wordle':'Finance Wordle','game-xword':'Finance Crossword','game-quiz':'Quick Count','game-hangman':"Debtor's Tower",'game-invest':'Invest Game'};
 var stack=['home'];
 function show(id){
   closeL();closeTipBtn();/* never leave a lesson/term sheet floating over a new tab */
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page-'+id).classList.add('active');
   if(id==='learn')renderLearn();
-  if(id==='journey'){applyPracticeLevel();refreshHeldPrices();}
+  if(id==='journey'){applyPracticeLevel();refreshHeldPrices();renderInvestLessons();renderGlossary();}
   if(id==='scenario')renderScenario();
   if(id==='social')renderProfile();
   if(id==='home'){renderMoneyHome();renderGoalCard();}
@@ -20,6 +20,7 @@ function show(id){
   if(id==='accounts'){renderAccounts();renderMoneyHome();}
   if(id==='loan-calc')renderLoanCalc();
   if(id==='mortgage-calc')renderMortgageCalc();
+  if(id==='compound-calc')renderCompoundCalc();
   if(id==='game-swipe')initBudgetSwipe();
   if(id==='game-wnb')initWantsNeeds();
   if(id==='game-scam')initScammerScanner();
@@ -30,7 +31,7 @@ function show(id){
   if(id==='game-invest')initInvestGame();
   var tab=TAB_OF[id];
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});
-  var isSub=['scenario','risk','stockfinder','budget','goals','spending','networth','loan-calc','mortgage-calc','game-swipe','game-wnb','game-scam','game-wordle','game-xword','game-quiz','game-hangman','game-invest'].indexOf(id)>=0;
+  var isSub=['scenario','risk','stockfinder','goals','spending','networth','loan-calc','mortgage-calc','compound-calc','game-swipe','game-wnb','game-scam','game-wordle','game-xword','game-quiz','game-hangman','game-invest','social'].indexOf(id)>=0;
   document.getElementById('hBack').classList.toggle('show',isSub);
   document.getElementById('hTitle').innerHTML = isSub ? TITLES[id] : (id==='home'?"Home":TITLES[id]);
   document.getElementById('pages').scrollTop=0;
@@ -43,45 +44,106 @@ function push(id){stack.push(id);show(id);}
 function back(){stack.pop();show(stack[stack.length-1]||'home');}
 
 /* ── Onboarding ──────────────────────────────── */
-var obStep=1,OB_MAX=6;
+var obStep=1,OB_MAX=3;
+var USER={name:'',age:null};/* filled from OB1 (name+age+confidence), persisted via saveState */
+var OB_ARROW_NEXT='<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
 (function initDots(){var h='';for(var i=1;i<=OB_MAX;i++)h+='<div class="ob-dot'+(i===1?' on':'')+'"></div>';document.getElementById('obDots').innerHTML=h;})();
 function renderOB(){
   document.querySelectorAll('.ob-screen').forEach(function(s){s.classList.toggle('active',+s.dataset.ob===obStep);});
   document.querySelectorAll('.ob-dot').forEach(function(d,i){d.classList.toggle('on',i===obStep-1);});
-  document.getElementById('obNextBtn').textContent=obStep===OB_MAX?"Let's Start! 🚀":'Next';
-  if(obStep===OB_MAX)renderOBSummary();
+  var nb=document.getElementById('obNextBtn'),bb=document.getElementById('obBackBtn');
+  nb.classList.toggle('wide',obStep===OB_MAX);
+  nb.innerHTML=obStep===OB_MAX?"Let's Start! 🚀":OB_ARROW_NEXT;
+  if(bb)bb.style.visibility=obStep===1?'hidden':'visible';
+  document.getElementById('onboarding').classList.toggle('ob-wide',obStep===3);/* budget screen is a 2-card spread */
+  if(obStep===3)initOBBudget();
   document.querySelector('.ob-body').scrollTop=0;
 }
 function obNext(){if(obStep<OB_MAX){obStep++;renderOB();}else finishOB();}
-/* what the user actually typed on the goal screen (falling back to the placeholders) */
-function obGoalDraft(){
-  function txt(id){return ((document.getElementById(id)||{}).value||'').trim();}
-  function num(id,dflt){var n=Math.round(parseFloat(txt(id).replace(/[^0-9.]/g,'')));return n>0?n:dflt;}
-  return {what:txt('goalWhat')||'A car',amt:num('goalAmt',10000),years:num('goalTime',5)};
+function obBack(){if(obStep>1){obStep--;renderOB();}}
+/* OB1 name+age → USER (used by the Home greeting; persisted with everything else) */
+function applyOBUser(){
+  USER.name=((document.getElementById('obName')||{}).value||'').trim().slice(0,24);
+  var a=parseInt((document.getElementById('obAge')||{}).value,10);
+  USER.age=(a>0&&a<120)?a:null;
+  USER.confidence=obConf;USER.topGoal=obWhy;
 }
-function renderOBSummary(){
-  var g=obGoalDraft(),el=document.getElementById('obGoalSum');
-  if(el)el.innerHTML='<b style="color:var(--purple-strong);font-size:18px">Save $'+g.amt.toLocaleString()+'</b><br/>for '+escHtml(g.what.charAt(0).toLowerCase()+g.what.slice(1))+', over '+g.years+' year'+(g.years===1?'':'s');
-  var m=document.getElementById('obMs3');
-  if(m)m.textContent='Contribute '+obPct+'% of your earnings monthly';
-}
-/* write the shaped goal into the unified GOALS list (GOALS[0] = primary, same slot
-   the Learn goal sheet edits) so Home/Goals/Plan all reflect what was typed here */
+/* OB3 no longer shapes a dollar goal \u2014 it records the top financial goal (obWhy).
+   Annotate the primary goal if one exists; never fabricate a placeholder goal. */
 function applyOBGoal(){
-  if(obStep<3)return;/* skipped before the goal screen — keep the defaults */
-  var g=obGoalDraft();
-  if(typeof GOALS!=='undefined'){
-    if(!GOALS.length)GOALS.unshift({id:moneyUid(),saved:0,account:'TFSA'});
-    var g0=GOALS[0];
-    /* a different goal than what sat in the slot — don't inherit the old one's progress */
-    if(g0.what!==g.what||g0.target!==g.amt||g0.saved==null)g0.saved=0;
-    g0.what=g.what;g0.target=g.amt;
-    g0.years=g.years;g0.why=obWhy;g0.pct=obPct;
-  }
+  if(obStep<2)return;/* skipped before the goal screen \u2014 keep the defaults */
+  if(typeof GOALS!=='undefined'&&GOALS.length){GOALS[0].why=obWhy;GOALS[0].pct=obPct;}
   if(typeof syncPrimaryGoal==='function')syncPrimaryGoal();
 }
+/* budget-setup onboarding screen (OB3, 2026-07 redesign): income slider + donut on the
+   left, Current/Goal dollar sliders per money area (save/spend/invest) on the right. */
+var obIncome=2500;
+var obCur={save:300,spend:1500,invest:200},obGoal={save:450,spend:1300,invest:300};
+/* literal hex (not var()) to match how every other inline-SVG donut in this app colors
+   its segments — save/spend/invest feature colors + earn green for what's left over */
+var OBB_C={save:'#e4da82',spend:'#d45c32',invest:'#aea2d2',left:'#619f88'};
+function obbPaint(id,color,v,max){
+  var el=document.getElementById(id);if(!el)return;
+  var p=max>0?Math.min(100,v/max*100):0;
+  el.style.background='linear-gradient(90deg,'+color+' '+p+'%,#ececec '+p+'%)';
+}
+function obbSync(area,which){
+  var v=(which==='Cur'?obCur:obGoal)[area];
+  var id='ob'+area.charAt(0).toUpperCase()+area.slice(1)+which;
+  obbPaint(id,OBB_C[area],v,obIncome);
+  var lb=document.getElementById(id+'Val');if(lb)lb.textContent='$'+(+v).toLocaleString();
+}
+function obBudget(key,v){
+  var m=key.match(/^(save|spend|invest)(Cur|Goal)$/);if(!m)return;
+  (m[2]==='Cur'?obCur:obGoal)[m[1]]=+v;
+  obbSync(m[1],m[2]);
+  if(key==='investGoal')obPct=Math.max(1,Math.round(+v/Math.max(1,obIncome)*100));
+  renderObSplitDonut();
+}
+function onObIncome(v){
+  obIncome=+v;
+  var lb=document.getElementById('obIncomeVal');if(lb)lb.textContent='$'+obIncome.toLocaleString();
+  obbPaint('obIncomeSlider',OBB_C.left,obIncome,10000);
+  ['save','spend','invest'].forEach(function(a){['Cur','Goal'].forEach(function(w){
+    var el=document.getElementById('ob'+a.charAt(0).toUpperCase()+a.slice(1)+w);
+    if(el){el.max=obIncome;}
+    var st=(w==='Cur'?obCur:obGoal);if(st[a]>obIncome){st[a]=obIncome;if(el)el.value=obIncome;}
+    obbSync(a,w);
+  });});
+  renderObSplitDonut();
+}
+/* paint every slider + the donut from state — called when the step opens */
+function initOBBudget(){
+  onObIncome(obIncome);
+}
+function renderObSplitDonut(){
+  var total=Math.max(obIncome,obGoal.save+obGoal.spend+obGoal.invest,1);
+  var left=Math.max(0,obIncome-obGoal.save-obGoal.spend-obGoal.invest);
+  var pc=function(v){return Math.round(v/total*100);};
+  var segs=[{v:obGoal.spend/total,c:OBB_C.spend},{v:obGoal.save/total,c:OBB_C.save},{v:obGoal.invest/total,c:OBB_C.invest},{v:left/total,c:OBB_C.left}];
+  var el=document.getElementById('obSplitDonut');if(el)el.innerHTML=donutChart(segs,150,'');
+  var leg=document.getElementById('obSplitLegend');
+  if(leg)leg.innerHTML='<span class="ob-split-dot" style="background:'+OBB_C.spend+'"></span>'+pc(obGoal.spend)+'%'
+    +'<span class="ob-split-dot" style="background:'+OBB_C.save+'"></span>'+pc(obGoal.save)+'%'
+    +'<span class="ob-split-dot" style="background:'+OBB_C.invest+'"></span>'+pc(obGoal.invest)+'%'
+    +'<span class="ob-split-dot" style="background:'+OBB_C.left+'"></span>'+pc(left)+'%';
+}
+/* write the GOAL sliders into the real BUDGET (income + Savings category + scaled remaining
+   categories) so Home/Budget reflect what was set here, same pattern as applyOBGoal above */
+function applyOBBudget(){
+  if(obStep<3||typeof BUDGET==='undefined')return;
+  BUDGET.income=obIncome;
+  var savings=BUDGET.categories.filter(function(c){return c.name==='Savings';})[0];
+  if(savings)savings.limit=obGoal.save;else BUDGET.categories.push({name:'Savings',limit:obGoal.save});
+  var others=BUDGET.categories.filter(function(c){return c.name!=='Savings';});
+  var curTotal=others.reduce(function(s,c){return s+c.limit;},0)||1;
+  others.forEach(function(c){c.limit=Math.round(c.limit/curTotal*obGoal.spend);});
+  obPct=Math.max(1,Math.round(obGoal.invest/Math.max(1,obIncome)*100));
+}
 function finishOB(){
+  applyOBUser();
   applyOBGoal();
+  applyOBBudget();
   onboarded=true;saveState();
   enterApp();
   setTimeout(function(){showToast('🎉 Your journey has begun!');},400);
@@ -92,15 +154,10 @@ function startWelcome(){
   setTimeout(function(){w.classList.add('hidden');w.style.opacity='';w.style.transition='';},400);
 }
 function restartOnboarding(){obStep=1;renderOB();document.getElementById('welcome').classList.remove('hidden');document.getElementById('onboarding').classList.remove('hidden');document.getElementById('appHeader').classList.add('hidden');document.getElementById('appNav').classList.add('hidden');document.getElementById('coachFab').classList.add('hidden');closeCoachBtn();}
-var obWhy='So my money can grow safely',obPct=10;
-function pickExp(el,v){document.querySelectorAll('.exp-card').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');}
-function pickWhy(el){document.querySelectorAll('.why').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');obWhy=el.textContent;}
-function onPct(v){
-  obPct=+v;
-  renderDonut(+v);
-  document.getElementById('donutHi').textContent='$'+(v*300).toLocaleString();
-  document.getElementById('donutLo').textContent='$'+(v*30).toLocaleString();
-}
+var obWhy='Grow my money through investing',obConf='New to personal finance',obPct=10;
+/* OB2 + OB3 share the .why pill class, so selection is scoped to each screen's own grid */
+function pickWhy(el){el.parentElement.querySelectorAll('.why').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');obWhy=el.textContent;}
+function pickConf(el){el.parentElement.querySelectorAll('.why').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');obConf=el.textContent;}
 
 /* ── In-screen tabs ──────────────────────────── */
 var jCur='hold';
