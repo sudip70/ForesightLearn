@@ -79,14 +79,14 @@ function renderForecastChart(id,hist,bear,base,bull,histDates,fcDates){
     },
     xLabels:function(v){
       var lo=Math.max(0,Math.ceil(v.lo)),hi=Math.min(n-1,Math.floor(v.hi)),mid=Math.round((lo+hi)/2);
-      return [{i:lo,a:'start',t:dateAt(lo)},{i:mid,a:'middle',t:dateAt(mid)},{i:hi,a:'end',t:dateAt(hi)}];
+      return [{i:lo,a:'start',t:fmtDate(dateAt(lo))},{i:mid,a:'middle',t:fmtDate(dateAt(mid))},{i:hi,a:'end',t:fmtDate(dateAt(hi))}];
     },
     pointAt:function(idx){
-      if(idx>=s){var fi=idx-s;return {date:dateAt(idx),anchorVal:base[fi],rows:[
+      if(idx>=s){var fi=idx-s;return {date:fmtDate(dateAt(idx)),anchorVal:base[fi],rows:[
         {color:'#619f88',label:'Bull',value:bull[fi],disp:sfMoney(bull[fi])},
         {color:'#8b7cba',label:'Base',value:base[fi],disp:sfMoney(base[fi])},
         {color:'#cf5a40',label:'Bear',value:bear[fi],disp:sfMoney(bear[fi])}]};}
-      return {date:dateAt(idx),anchorVal:hist[idx],rows:[{color:'#8b7cba',label:'Price',value:hist[idx],disp:sfMoney(hist[idx])}]};
+      return {date:fmtDate(dateAt(idx)),anchorVal:hist[idx],rows:[{color:'#8b7cba',label:'Price',value:hist[idx],disp:sfMoney(hist[idx])}]};
     }
   };
   interactiveChart(id,cfg);
@@ -141,8 +141,8 @@ function paintSF(a,d,p){
     +mrow('Data quality',conf+'% · '+d.confidence_label,'How clean and steady the recent data is. Even with great data, nobody can predict the exact price, only a likely range.')
     +mrow('Risk level',d.risk_label,'A plain rating of how much this could swing, currently '+(d.risk_label||'').toLowerCase()+'.')
     +'</div>';
-  var since=(fc&&fc.available&&fc.previous_as_of)?('Barely moved since '+fc.previous_as_of+' (base '+(fc.base_return_delta>=0?'+':'')+(fc.base_return_delta*100).toFixed(2)+'%).'):'';
-  html+='<div class="card"><div class="card-t">Where this data comes from</div><div style="display:flex;gap:8px;flex-wrap:wrap'+(since?';margin-bottom:8px':'')+'"><span class="pill pill-grn">'+(dq.freshness_label||'Fresh')+'</span><span class="pill pill-pur">Daily snapshot</span><span class="pill pill-gry">'+(d.data_as_of||dq.as_of_date||'')+'</span></div>'+(since?'<div class="mrow-s" style="margin:0">'+since+'</div>':'')+'</div>';
+  var since=(fc&&fc.available&&fc.previous_as_of)?('Barely moved since '+fmtDate(fc.previous_as_of)+' (base '+(fc.base_return_delta>=0?'+':'')+(fc.base_return_delta*100).toFixed(2)+'%).'):'';
+  html+='<div class="card"><div class="card-t">Where this data comes from</div><div style="display:flex;gap:8px;flex-wrap:wrap'+(since?';margin-bottom:8px':'')+'"><span class="pill pill-grn">'+(dq.freshness_label||'Fresh')+'</span><span class="pill pill-pur">Daily snapshot</span><span class="pill pill-gry">'+fmtDate(d.data_as_of||dq.as_of_date||'')+'</span></div>'+(since?'<div class="mrow-s" style="margin:0">'+since+'</div>':'')+'</div>';
   if(pf.last_sale||pf.market_cap){
     function r(l,v){return '<div class="lrow"><span class="l-s">'+l+'</span><span style="font-weight:800;font-size:13px" class="tnum">'+v+'</span></div>';}
     html+='<div class="card"><div class="card-t">Company snapshot</div>'
@@ -155,7 +155,7 @@ function paintSF(a,d,p){
   html+='</div>';
   // about (brief)
   var about=(pf.sector?bn+' is a '+a.c+' in the '+pf.sector+' sector'+(pf.industry?' ('+pf.industry+')':'')+'. ':'')+(d.plain_language||'');
-  html+='<div class="card"><div class="card-t">About '+bn+'</div><div style="font-size:13px;color:var(--muted);line-height:1.6">'+about+' <span style="font-size:11px">These are model estimates for learning, not advice. Data as of '+(d.data_as_of||dq.as_of_date||'')+'.</span></div></div>';
+  html+='<div class="card"><div class="card-t">About '+bn+'</div><div style="font-size:13px;color:var(--muted);line-height:1.6">'+about+' <span style="font-size:11px">These are model estimates for learning, not advice. Data as of '+fmtDate(d.data_as_of||dq.as_of_date||'')+'.</span></div></div>';
   html+=watchBtnHtml(a.t);
   html+='</div></div>';
   document.getElementById('sfDetail').innerHTML=html;

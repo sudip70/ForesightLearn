@@ -47,6 +47,21 @@ function syncNetworthMirror(){
 }
 
 function moneyUid(){return 'm'+Math.random().toString(36).slice(2,9);}
+/* ── tiny inline stroke icons (same visual system as the sidebar nav SVGs) —
+   structural UI (section headers, stat tiles, list prefixes) uses these, never
+   emoji; emoji stay only in playful microcopy like toasts ── */
+var MICONS={
+  card:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+  sprout:'<path d="M12 20v-7"/><path d="M12 13c0-3.5 2.6-6 6.5-6 0 3.5-2.6 6-6.5 6z"/><path d="M12 13c0-3.5-2.6-6-6.5-6 0 3.5 2.6 6 6.5 6z"/>',
+  trendUp:'<polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/>',
+  trendDown:'<polyline points="3 7 9 13 13 9 21 17"/><polyline points="15 17 21 17 21 11"/>',
+  bank:'<path d="M3 9.5 12 4l9 5.5"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/>',
+  bolt:'<path d="M13 2 4 14h6l-1 8 9-12h-6z"/>',
+  receipt:'<path d="M6 2h12v20l-2-1.5L14 22l-2-1.5L10 22l-2-1.5L6 22z"/><path d="M9.5 7.5h5M9.5 11.5h5"/>',
+  bars:'<line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="10"/><path d="M3 20h18"/>',
+  target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/>',
+  checkRing:'<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9.5"/>'};
+function mIcon(name,size){return '<svg class="ic" viewBox="0 0 24 24" style="width:'+(size||16)+'px;height:'+(size||16)+'px">'+(MICONS[name]||'')+'</svg>';}
 /* Escape user-entered text before interpolating it into HTML (category, loan, note names). */
 function escHtml(s){return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function todayISO(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
@@ -140,7 +155,7 @@ function renderBudgetDonutCard(){
     +'<div class="subtabs" style="margin:0"><div class="subtab active" onclick="budgetTab(\'month\')">This month</div><div class="subtab" onclick="budgetTab(\'today\')">Today</div><div class="subtab" onclick="budgetTab(\'last\')">Last month</div></div>'
     +'</div>'
     +'<div class="row" style="margin-bottom:12px"><span class="pill '+(left>=0?'pill-grn':'pill-red')+'">'+money0(left)+' left</span><span class="tnum" style="font-size:12px;color:var(--muted)">'+money0(spent)+' spent of '+money0(income)+'</span></div>'
-    +'<div style="display:flex;gap:16px;align-items:flex-start"><div style="flex:0 0 auto">'+miniDonut(segs,110,pctBudg+'%','budgeted')+'</div>'
+    +'<div style="display:flex;gap:24px;align-items:center"><div style="flex:0 0 auto">'+miniDonut(segs,168,pctBudg+'%','budgeted',20)+'</div>'
     +'<div style="flex:1;min-width:0">'+rows+'</div></div></div>';
 }
 /* ── Budget tab: read-only preview of the 5 most recent expenses (full editing
@@ -190,7 +205,7 @@ function renderGoals(){
   if(!GOALS.length)h+='<div class="card"><div class="muted-note" style="text-align:left">No goals yet — add your first above.</div></div>';
   GOALS.forEach(function(g){
     var gp=numVal(g.target)>0?Math.min(100,Math.round(numVal(g.saved)/numVal(g.target)*100)):0,done=gp>=100;
-    h+='<div class="goal-card"><div class="row"><div style="font-size:14px;font-weight:800">'+(done?'🏆 ':'🎯 ')+escHtml(g.what)+'</div>'
+    h+='<div class="goal-card"><div class="row"><div style="font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px;color:'+(done?'var(--green)':'inherit')+'">'+mIcon(done?'checkRing':'target',15)+'<span style="color:var(--ink)">'+escHtml(g.what)+'</span></div>'
       +'<span class="pill '+(done?'pill-grn':'pill-pur')+'">'+gp+'%</span></div>'
       +'<div class="bar"><div class="bar-fill" style="width:'+gp+'%"></div></div>'
       +'<div class="row"><span style="font-size:11px;color:var(--muted)">'+money0(g.saved)+' of '+money0(g.target)+(g.account?' · '+g.account:'')+'</span></div>'
@@ -242,7 +257,7 @@ function renderSpending(){
   h+='<div class="card"><div class="card-t">Recent</div>';
   if(!recent.length)h+='<div class="muted-note" style="text-align:left">No expenses logged yet.</div>';
   recent.forEach(function(s){
-    h+='<div class="lrow"><div style="min-width:0"><div class="l-n">'+escHtml(s.note||s.category)+'</div><div class="l-s">'+escHtml(s.category)+' · '+(s.date||'')+'</div></div>'
+    h+='<div class="lrow"><div style="min-width:0"><div class="l-n">'+escHtml(s.note||s.category)+'</div><div class="l-s">'+escHtml(s.category)+' · '+fmtDate(s.date)+'</div></div>'
       +'<div style="display:flex;align-items:center;gap:8px"><div class="l-v"><div class="l-p tnum down">-'+money0(s.amount)+'</div></div>'
       +'<button class="adjust" title="Delete" style="padding:4px 8px" onclick="delExpense(\''+s.id+'\')">✕</button></div></div>';
   });
@@ -290,7 +305,7 @@ function renderNetworth(){
   h+='<div class="card"><div class="card-t">Debts</div>';
   if(!NETWORTH.debts.length)h+='<div class="muted-note" style="text-align:left">No debts — nice.</div>';
   NETWORTH.debts.forEach(function(d,i){
-    h+='<div class="lrow"><div class="l-n">'+escHtml(d.name)+'</div><div style="display:flex;align-items:center;gap:8px"><div class="l-v"><div class="l-p tnum down">-'+money0(d.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'debts\','+i+')">✕</button></div></div>';
+    h+='<div class="lrow"><div class="l-n">'+escHtml(d.name)+'</div><div style="display:flex;align-items:center;gap:8px"><div class="l-v"><div class="l-p tnum down-soft">-'+money0(d.value)+'</div></div><button class="adjust" style="padding:4px 8px" onclick="delNW(\'debts\','+i+')">✕</button></div></div>';
   });
   h+='<div class="row" style="gap:8px;margin-top:8px;align-items:flex-end"><div style="flex:2"><input class="f-in" id="ndName" placeholder="Debt (e.g. Credit card)"/></div><div style="flex:1">'+moneyInput('ndVal',null,'0')+'</div><button class="btn btn-soft" style="width:auto;padding:12px 16px" onclick="addNW(\'debts\')">Add</button></div></div>';
   el.innerHTML=h;
@@ -417,14 +432,16 @@ function donutPick(i){
 function renderAcctSummary(){
   var box=document.getElementById('acctSummary');if(!box)return;
   var bp=(typeof PF!=='undefined')?numVal(PF.cash):0;
-  var owe=LOANS.reduce(function(a,l){return a+numVal(l.balance);},0);
+  /* "Owed" = every debt on the Net Worth ledger (loans + credit card…), not just
+     LOANS — must match the Debts figure in the net-worth hero directly above */
+  var owe=NETWORTH.debts.reduce(function(a,d){return a+numVal(d.value);},0);
   function tile(ic,label,val,cls){return '<div class="sum-tile"><div class="st-l">'+ic+' '+label+'</div><div class="st-v tnum '+(cls||'')+'">'+val+'</div></div>';}
   box.innerHTML='<div class="acct-sum">'
-    +tile('💳','Chequing',money0(CHEQUING.balance),numVal(CHEQUING.balance)<0?'down':'')
-    +tile('🐷','Savings',money0(SAVINGS.balance),'up')
-    +tile('⚡','Buying power',money0(bp),'')
-    +tile('📉','Owed',money0(owe),'down')
-    +tile('🧾','Spent this month',money0(monthTotal()),'')
+    +tile(mIcon('card',14),'Chequing',money0(CHEQUING.balance),numVal(CHEQUING.balance)<0?'down':'')
+    +tile(mIcon('sprout',14),'Savings',money0(SAVINGS.balance),'up')
+    +tile(mIcon('bolt',14),'Buying power',money0(bp),'')
+    +tile(mIcon('trendDown',14),'Owed',money0(owe),'down-soft')
+    +tile(mIcon('receipt',14),'Spent this month',money0(monthTotal()),'')
     +'</div>';
 }
 
@@ -488,7 +505,7 @@ function renderAcctSpend(){
   if(cats.indexOf('Other')<0)cats.push('Other');
   if(cats.indexOf(acctCat)<0)acctCat=cats[0];
   var h='<div class="acct-card" style="display:block">'
-    +'<div class="row" style="margin-bottom:12px"><div class="ac-name" style="margin:0">🧾 Log spending</div><span class="pill pill-pur">'+money0(monthTotal())+' this month</span></div>'
+    +'<div class="row" style="margin-bottom:12px"><div class="ac-name" style="margin:0">'+mIcon('receipt',15)+' Log spending</div><span class="pill pill-pur">'+money0(monthTotal())+' this month</span></div>'
     +'<div class="logrow">'
     +'<input class="f-in" id="axAmt" inputmode="decimal" placeholder="Amount" style="margin:0" onkeydown="if(event.key===\'Enter\')addAcctExpense()"/>'
     +'<select class="f-in" id="axCat" style="margin:0" onchange="acctCat=this.value">'+cats.map(function(c){return '<option'+(c===acctCat?' selected':'')+'>'+escHtml(c)+'</option>';}).join('')+'</select>'
@@ -501,7 +518,7 @@ function renderAcctSpend(){
     h+='<div style="margin-top:16px"><div class="card-t" style="margin-bottom:8px">Recent</div>';
     recent.forEach(function(s){
       h+='<div class="lrow"><div style="min-width:0"><div class="l-n">'+escHtml(s.note||s.category)+'</div>'
-        +'<div class="l-s">'+escHtml(s.category)+(s.acct?' · '+escHtml(s.acct):'')+' · '+(s.date||'')+'</div></div>'
+        +'<div class="l-s">'+escHtml(s.category)+(s.acct?' · '+escHtml(s.acct):'')+' · '+fmtDate(s.date)+'</div></div>'
         +'<div style="display:flex;align-items:center;gap:8px"><div class="l-p tnum down">-'+money0(s.amount)+'</div>'
         +'<button class="acct-q" style="width:28px;height:28px;font-size:14px;border-color:var(--line)" title="Delete" onclick="delAcctExpense(\''+s.id+'\')">✕</button></div></div>';
     });
@@ -613,7 +630,7 @@ function renderAcctInvest(){
     +'<div class="row" style="margin-bottom:12px"><div style="display:flex;align-items:center;gap:12px">'+investSVG()
     +'<div><div class="ac-name" style="margin:0">Investing Account</div><div class="ac-note" style="margin-top:2px">TFSA · practice portfolio</div></div></div>'
     +'<div style="display:flex;align-items:center;gap:8px"><span class="tnum" style="font-size:19px;font-weight:800;color:var(--purple-deep)">'+money0(live)+'</span>'+helpDot('investing_acct')+'</div></div>'
-    +'<div class="row" style="margin:0 0 8px;padding:8px 12px;background:var(--purple-soft);border-radius:12px"><span style="font-size:12.5px;font-weight:800;color:var(--purple-deep)">⚡ Buying power</span><span class="tnum" style="font-weight:800;color:var(--purple-deep)">'+money(bp)+'</span></div>'
+    +'<div class="row" style="margin:0 0 8px;padding:8px 12px;background:var(--purple-soft);border-radius:12px"><span style="font-size:12.5px;font-weight:800;color:var(--purple-deep)">'+mIcon('bolt',13)+' Buying power</span><span class="tnum" style="font-weight:800;color:var(--purple-deep)">'+money(bp)+'</span></div>'
     +'<div class="cat-add"><input class="f-in" id="ivAmt" inputmode="decimal" placeholder="Add cash" style="margin:0" onkeydown="if(event.key===\'Enter\')addInvestCash()"/>'
     +'<button class="btn btn-soft" onclick="addInvestCash()">Add to investment account</button></div>'
     +'<div class="ac-note" style="margin-top:8px">Deposits become virtual cash you can invest over in <b>Practice</b>.</div></div>';
@@ -644,7 +661,7 @@ function renderAccounts(){
 
   h+='<div class="grid-2"><div class="stack">';
   /* ── Spending ── */
-  h+='<div class="acct-sec spend"><div class="acct-sec-t">🪙 Spending Accounts</div>'
+  h+='<div class="acct-sec spend"><div class="acct-sec-t">'+mIcon('card',17)+' Spending Accounts</div>'
     +'<div id="acctDebitBox"></div>'
     +'<div class="acct-card">'+bankCardSVG('credit')
       +'<div class="ac-mid"><div class="ac-name">Credit Card</div><div id="acctCreditBox"></div></div>'
@@ -655,21 +672,21 @@ function renderAccounts(){
 
   /* ── Saving + Investing ── */
   h+='<div class="stack">'
-    +'<div class="acct-sec save"><div class="acct-sec-t">🐷 Savings Accounts</div>'
+    +'<div class="acct-sec save"><div class="acct-sec-t">'+mIcon('sprout',17)+' Savings Accounts</div>'
     +'<div id="acctSaveBox"></div>'
     +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 8px">'
     +'<button class="lpa-btn" style="flex:1" onclick="goTab(\'learn\')"><span class="lpa-e">💡</span>Learn</button>'
     +'<div style="flex:0 0 auto;display:flex">'+acctChat('Help me set up a savings account',acctHelp('Open a savings account','Almost every bank offers a free high-interest savings account, open one online in minutes. Then automate it: set a small auto-transfer (even $25) from chequing each payday. Aim to build a starter emergency fund of about one month of expenses first.'))+'</div>'
     +'</div>'
     +'</div>'
-    +'<div class="acct-sec invest"><div class="acct-sec-t">📈 Investing Accounts</div>'
+    +'<div class="acct-sec invest"><div class="acct-sec-t">'+mIcon('trendUp',17)+' Investing Accounts</div>'
     +'<div id="acctInvestBox"></div>'
     +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 8px">'
     +'<button class="lpa-btn" style="flex:1" onclick="openTip(\'tfsa\')"><span class="lpa-e">💡</span>Learn</button>'
     +'<div style="flex:0 0 auto;display:flex">'+acctChat('Help me set up an investing account',acctHelp('Open a real investing account','When you\'re ready, most banks and brokerages let you open a TFSA online for free. Start with a TFSA (growth is tax-free), pick a low-cost broad ETF, and contribute a small amount regularly. Everything you practise here, buying, holding, diversifying, applies the same way with real money.'))+'</div>'
     +'</div>'
     +'</div>'
-    +'<div class="acct-sec loan"><div class="acct-sec-t">🏦 Loan Accounts</div>'
+    +'<div class="acct-sec loan"><div class="acct-sec-t">'+mIcon('bank',17)+' Loan Accounts</div>'
     +'<div id="acctLoansBox"></div>'
     +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 8px">'
     +'<button class="lpa-btn" style="flex:1" onclick="push(\'loan-calc\')"><span class="lpa-e">💡</span>Learn</button>'
@@ -721,13 +738,13 @@ function renderMoneyHome(){
   if(nt){
     var t=networthRows(),tot2=t.assets+t.debts,aw=tot2>0?Math.round(t.assets/tot2*100):0,dw=100-aw;
     nt.innerHTML='<div class="card" style="cursor:pointer;margin:0;height:100%" onclick="push(\'networth\')">'
-      +'<div class="row" style="margin-bottom:8px"><div class="card-t" style="margin-bottom:0">📊 Net Worth</div></div>'
+      +'<div class="row" style="margin-bottom:8px"><div class="card-t" style="margin-bottom:0">'+mIcon('bars',15)+' Net Worth</div></div>'
       +'<div class="tnum" style="font-size:26px;font-weight:800;letter-spacing:-.5px;color:var(--ink)">'+money(t.net)+'</div>'
       +'<div style="display:flex;gap:16px;margin-top:8px">'
       +'<div><div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.4px">ASSETS</div><div class="tnum" style="font-weight:800;font-size:13px">'+money0(t.assets)+'</div></div>'
-      +'<div><div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.4px">DEBTS</div><div class="tnum down" style="font-weight:800;font-size:13px">'+money0(t.debts)+'</div></div></div>'
+      +'<div><div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.4px">DEBTS</div><div class="tnum down-soft" style="font-weight:800;font-size:13px">'+money0(t.debts)+'</div></div></div>'
       +'<div style="display:flex;height:7px;border-radius:4px;overflow:hidden;margin-top:8px;background:#f2efe4">'
-      +'<div style="width:'+aw+'%;background:var(--green)"></div><div style="width:'+dw+'%;background:var(--red)"></div></div></div>';
+      +'<div style="width:'+aw+'%;background:var(--green)"></div><div style="width:'+dw+'%;background:#e2a68f"></div></div></div>';
   }
 }
 /* ── Home quick-action tiles: the app's 3 real feature-colored areas (not the

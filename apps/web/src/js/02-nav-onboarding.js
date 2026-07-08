@@ -32,6 +32,8 @@ function show(id){
   if(id==='game-invest')initInvestGame();
   var tab=TAB_OF[id];
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});
+  /* gamification chips (streak/level) only surface on the Learn tab per brand */
+  document.getElementById('appHeader').classList.toggle('gami',tab==='learn');
   var isSub=['lessons','scenario','risk','stockfinder','goals','spending','networth','loan-calc','mortgage-calc','compound-calc','game-swipe','game-wnb','game-scam','game-wordle','game-xword','game-quiz','game-hangman','game-invest','social'].indexOf(id)>=0;
   document.getElementById('hBack').classList.toggle('show',isSub);
   document.getElementById('hTitle').innerHTML = isSub ? TITLES[id] : (id==='home'?"Home":TITLES[id]);

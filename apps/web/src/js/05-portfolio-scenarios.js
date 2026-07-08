@@ -98,13 +98,13 @@ function renderScnSummary(spec,d){
 function animateScenario(){
   if(scnAnim){clearInterval(scnAnim);scnAnim=null;}
   var spec=scnSpec(scnCur),d=scnData;if(!d)return;
-  var btn=document.getElementById('scnRunBtn');if(btn)btn.textContent='Running… ▶';
+  var btn=document.getElementById('scnRunBtn');if(btn){btn.textContent='Running…';btn.disabled=true;}
   var res=document.getElementById('scnResult');if(res)res.innerHTML='';
   var n=d.curveA.length,k=1;drawScenarioChart(spec,d,1);
   scnAnim=setInterval(function(){
     k+=Math.max(1,Math.round(n/45));if(k>=n)k=n;
     drawScenarioChart(spec,d,k);
-    if(k>=n){clearInterval(scnAnim);scnAnim=null;renderScnSummary(spec,d);if(btn)btn.textContent='Replay ▶';}
+    if(k>=n){clearInterval(scnAnim);scnAnim=null;renderScnSummary(spec,d);if(btn){btn.textContent='Replay ▶';btn.disabled=false;}}
   },45);
 }
 function renderScenario(){

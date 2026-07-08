@@ -284,7 +284,7 @@
             <div class="dh-top"><div class="dh-k">Practice portfolio</div><span class="pill pill-grn min-int" id="pfAllPct">+1.0%</span></div>
             <div class="dh-val tnum" id="pfValue">$10,101.29</div>
             <div class="dh-chg"><span id="scStatVal" class="tnum">+$101.29</span><span class="min-int"> · all time</span><button type="button" class="qd on-dark min-int" onclick="openTip('all_time_return')" aria-label="What is all-time return?">?</button><span id="pfToday" class="min-int"></span></div>
-            <div class="dh-bp"><div class="dh-bp-l">⚡ Buying power<button type="button" class="qd" onclick="openTip('buying_power')" aria-label="What is buying power?">?</button></div><div class="dh-bp-v tnum" id="pfCash">$3,346.81</div></div>
+            <div class="dh-bp"><div class="dh-bp-l"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg> Buying power<button type="button" class="qd" onclick="openTip('buying_power')" aria-label="What is buying power?">?</button></div><div class="dh-bp-v tnum" id="pfCash">$3,346.81</div></div>
           </div>
 
           <div class="card">
@@ -403,6 +403,8 @@
 
     <!-- ─── RISK (sub) ─── -->
     <div class="page" id="page-risk">
+      <div class="page-title" style="margin-top:2px">Risk Level</div>
+      <div class="page-sub">Pick how bouncy your plan should be. More bounce can mean more growth, and bigger dips along the way.</div>
       <div class="style-chip">
         <div class="sc-av">__AV__</div>
         <div class="sc-mid"><div class="sc-label">Investment Style</div><div class="sc-name">Future Planner</div></div>
@@ -554,7 +556,7 @@
 
           <button class="btn" style="margin-top:16px;background:linear-gradient(135deg,#a6d2d6,var(--share));color:#14282b;box-shadow:0 8px 20px -6px rgba(79,132,137,.35)" onclick="showToast('Shared your journey 🎉')">Share My Journey</button>
           <button class="btn btn-ghost" style="margin-top:8px" onclick="restartOnboarding()">↺ Replay Onboarding</button>
-          <button class="btn btn-ghost" style="margin-top:8px;color:var(--red)" onclick="resetProgress()">↺ Reset all progress</button>
+          <button class="btn btn-ghost" style="margin-top:8px;color:var(--muted)" onclick="resetProgress()">↺ Reset all progress</button>
         </div>
       </div>
     </div>

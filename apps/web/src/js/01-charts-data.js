@@ -1,3 +1,14 @@
+/* ── Friendly date: every user-facing date reads "Jul 8" (or "Feb 27, 2025" when
+   not this year) — raw ISO strings never reach the UI (brand: plain language) ── */
+var FMTD_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtDate(iso){
+  var p=(''+(iso||'')).slice(0,10).split('-');
+  if(p.length<3||!+p[0])return iso||'';
+  var s=FMTD_MONTHS[(+p[1])-1]+' '+(+p[2]);
+  if(+p[0]!==new Date().getFullYear())s+=', '+p[0];
+  return s;
+}
+
 /* ── Mia avatar (inline SVG) ─────────────────── */
 function avatar(){return '<svg viewBox="0 0 48 48" width="100%" height="100%">'
 +'<rect width="48" height="48" fill="#efece2"/>'
@@ -96,7 +107,7 @@ function donutChart(segs,size,centerPct){
   s+='<text x="'+cx+'" y="'+(cy+2)+'" text-anchor="middle" dominant-baseline="middle" class="donut-val">'+centerPct+'%</text>';
   return '<svg viewBox="0 0 '+size+' '+size+'" width="190" height="190">'+s+'</svg>';
 }
-function gaugeChart(pct){
+function gaugeChart(pct,label){
   var w=220,h=128,cx=110,cy=112,r=88;
   function P(a){return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
   function arc(f,t,col,wd){var a=P(f),b=P(t),lg=(t-f)>Math.PI?1:0;return '<path d="M '+a[0].toFixed(1)+' '+a[1].toFixed(1)+' A '+r+' '+r+' 0 '+lg+' 1 '+b[0].toFixed(1)+' '+b[1].toFixed(1)+'" stroke="'+col+'" stroke-width="'+wd+'" fill="none" stroke-linecap="round"/>';}
@@ -104,10 +115,15 @@ function gaugeChart(pct){
   var va=a0+(a1-a0)*pct;
   var id='gg'+Math.floor(Math.random()*1e6);
   var nd=[cx+(r-6)*Math.cos(va),cy+(r-6)*Math.sin(va)];
+  /* live level word inside the arc — without it the static "Medium" tick sitting
+     under the needle hub reads as the current state even when the needle points Low */
+  var lbl=label?'<text x="'+cx+'" y="'+(cy-28)+'" text-anchor="middle" font-size="21" font-weight="800" fill="#665b93">'+label+'</text>'
+    +'<text x="'+cx+'" y="'+(cy-12)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#a19b91">risk</text>':'';
   return '<svg viewBox="0 0 '+w+' '+h+'" width="220" height="128">'
     +'<defs><linearGradient id="'+id+'" x1="0" x2="1"><stop offset="0" stop-color="#c8c0e2"/><stop offset="1" stop-color="#8b7cba"/></linearGradient></defs>'
-    +arc(a0,a1,'#f2efe4',16)
+    +arc(a0,a1,'#e5e1d0',16)
     +arc(a0,va,'url(#'+id+')',16)
+    +lbl
     +'<line x1="'+cx+'" y1="'+cy+'" x2="'+nd[0].toFixed(1)+'" y2="'+nd[1].toFixed(1)+'" stroke="#665b93" stroke-width="4" stroke-linecap="round"/>'
     +'<circle cx="'+cx+'" cy="'+cy+'" r="8" fill="#fff" stroke="#665b93" stroke-width="3"/></svg>';
 }
@@ -240,5 +256,6 @@ renderGauge(20);
 /* NOTE: live-data init (renderFc/loadIndices) runs at the very end of the script;
    it depends on `var API` which is assigned further down. */
 
-function renderGauge(v){document.getElementById('gaugeWrap').innerHTML=gaugeChart(v/100);}
+/* level word matches onRisk()'s tip thresholds (07-tools-api.js) — keep in sync */
+function renderGauge(v){document.getElementById('gaugeWrap').innerHTML=gaugeChart(v/100,v<33?'Low':(v<70?'Medium':'High'));}
 
