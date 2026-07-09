@@ -466,10 +466,15 @@ header.hidden{display:none}
 /* Net-worth row: keep the tall Net Worth card on the left (fixed, narrower) and pack
    the five snapshot tiles into a 3×2 grid on the right that fills the same height */
 .nw-row{display:flex;gap:16px;align-items:stretch;margin-bottom:16px}
-.nw-row #tileNetworth{flex:0 0 320px}
+.nw-row #tileNetworth{flex:0 0 420px}
 .nw-row #acctSummary{flex:1;min-width:0}
 .nw-row .acct-sum{grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;height:100%;margin-bottom:0}
 .nw-row .sum-tile{display:flex;flex-direction:column;justify-content:center}
+/* "I don't have a bank account" CTA: same tile footprint, but a filled brown button
+   so it reads as an action, not a stat */
+.sum-cta{flex-direction:row!important;align-items:center;gap:10px;background:var(--taupe);color:#fff;border:none;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700;line-height:1.25;text-align:left;transition:filter .15s}
+.sum-cta:hover{filter:brightness(1.06)}
+.sum-cta svg{width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:900px){.nw-row{flex-direction:column}.nw-row #tileNetworth{flex:0 0 auto}}
 @media(max-width:560px){.nw-row .acct-sum{grid-template-columns:repeat(2,1fr)}}
 .logrow{display:flex;gap:8px;align-items:center}

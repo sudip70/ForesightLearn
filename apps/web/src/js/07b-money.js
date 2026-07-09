@@ -446,6 +446,10 @@ function renderAcctSummary(){
     +tile(mIcon('bolt',14),'Buying power',money0(bp),'')
     +tile(mIcon('trendDown',14),'Owed',money0(owe),'down-soft')
     +tile(mIcon('receipt',14),'Spent this month',money0(monthTotal()),'')
+    /* 6th cell fills the grid's empty slot with the "no bank account yet" CTA */
+    +'<button class="sum-tile sum-cta" onclick="'+acctHelp("I don't have a bank account yet","No problem, that's exactly who this is for. A bank account is just a safe place a bank holds your money. Most Canadian banks let you open a free chequing + savings account online in about 10 minutes with photo ID and a SIN. Start with one bank's free everyday account, you can always add more later.")+'">'
+    +'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>'
+    +'<span>I don\'t have a bank account</span></button>'
     +'</div>';
 }
 
@@ -658,10 +662,10 @@ function renderAccounts(){
   /* skeleton: Mia intro + section containers. #acctSummary lives up in .nw-row
      (beside the Net Worth tile); the per-section content is filled by the render*
      calls below so each can refresh independently. */
+  /* the "I don't have a bank account" CTA now lives in the summary grid (renderAcctSummary) */
   var h='<div class="mia" style="margin:2px 0 16px"><div class="face">'+avatar()+'</div><div>'
     +'<div class="bubble">Track what you actually have here, balances, loans, savings and buying power. Tap <b>?</b> on anything to learn what it is.</div>'
-    +'<button class="whats" onclick="'+acctHelp("I don't have a bank account yet","No problem, that's exactly who this is for. A bank account is just a safe place a bank holds your money. Most Canadian banks let you open a free chequing + savings account online in about 10 minutes with photo ID and a SIN. Start with one bank's free everyday account, you can always add more later.")+'">'
-    +'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>I don\'t have a bank account</button></div></div>';
+    +'</div></div>';
 
   h+='<div class="grid-2"><div class="stack">';
   /* ── Spending ── */
