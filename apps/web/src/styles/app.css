@@ -97,8 +97,13 @@ header.hidden{display:none}
 .nav-btn.active svg{stroke:var(--purple-strong)}
 .nav-btn .fab{display:flex;align-items:center;justify-content:center}
 .sb-foot{margin-top:auto;padding-top:12px}
-.sb-safe{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;color:var(--purple-strong);background:var(--purple-soft);border-radius:12px;padding:8px 12px;line-height:1.35}
-.sb-safe .dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:0 0 auto;box-shadow:0 0 0 3px var(--green-soft)}
+/* white hex badge (brand mark shape) with the money-tree illustration inside,
+   centered at the sidebar foot per the design files — soft shadow lifts the
+   white shape off the white surface */
+.sb-hexwrap{position:relative;width:156px;margin:0 auto 14px}
+.sb-hex{display:block;width:100%;height:auto;filter:drop-shadow(0 12px 26px rgba(62,57,48,.2))}
+.sb-tree{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.sb-tree img{width:106px;height:auto;display:block}
 
 /* ── Cards & primitives ─────────────────────── */
 .card{background:var(--surface);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-bottom:12px}

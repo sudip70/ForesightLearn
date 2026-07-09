@@ -48,7 +48,7 @@ async function main() {
   // 3) Inline back into the shell
   // Use function replacers so `$` sequences in CSS/JS (e.g. money formatting "'$'+x")
   // are inserted literally and never treated as String.replace special patterns.
-  const out = html
+  let out = html
     .replace(
       /<!--BUILD:STYLES-->[\s\S]*?<!--\/BUILD:STYLES-->/,
       () => `<style>\n${css}\n</style>`
@@ -57,6 +57,12 @@ async function main() {
       /<!--BUILD:SCRIPTS-->[\s\S]*?<!--\/BUILD:SCRIPTS-->/,
       () => `<script>\n${js}\n</script>`
     );
+
+  // 4) Inline local images (images/*.png) as data URIs so dist stays single-file
+  for (const [, src] of out.matchAll(/src="(images\/[^"]+\.png)"/g)) {
+    const b64 = (await readFile(resolve(ROOT, src))).toString("base64");
+    out = out.replaceAll(`src="${src}"`, () => `src="data:image/png;base64,${b64}"`);
+  }
 
   await mkdir(resolve(ROOT, "dist"), { recursive: true });
   const outPath = resolve(ROOT, "dist/fiscally-web.html");
