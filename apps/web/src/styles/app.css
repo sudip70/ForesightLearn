@@ -373,7 +373,9 @@ header.hidden{display:none}
 .lp-soon-banner{display:flex;align-items:center;gap:12px;background:var(--pc-soft);border-left:5px solid var(--pc);border-radius:var(--r);padding:16px 20px;font-size:14px;font-weight:600;color:rgba(0,0,0,.55);min-height:56px}
 .lp-lock{width:18px;height:18px;flex:0 0 auto;stroke:rgba(0,0,0,.45);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:1000px){.learn-top{grid-template-columns:1fr}}
-@media(max-width:760px){.lp-cols{grid-template-columns:1fr}.learn-start{flex-direction:column}}
+/* stacking .learn-start turns its children's 230px flex-basis (a column width on
+   desktop) into a min height — reset to content-sized so the card doesn't gap out */
+@media(max-width:760px){.lp-cols{grid-template-columns:1fr}.learn-start{flex-direction:column}.ls-left,.ls-course{flex:0 0 auto}}
 
 /* ── In-screen tabs ─────────────────────────── */
 .subtabs{display:flex;background:var(--purple-soft);border-radius:12px;padding:4px;margin-bottom:12px}
@@ -1356,7 +1358,9 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%;overflow:
 #toast{bottom:32px}
 
 /* ════ responsive: tablet ════ */
-@media(max-width:960px){.grid-2{grid-template-columns:1fr;gap:0}}
+/* #page-budget .grid-2 is 3fr/2fr via an ID selector, which out-specifies the plain
+   .grid-2 collapse below — so it needs the same ID specificity to fold to 1 column */
+@media(max-width:960px){.grid-2,#page-budget .grid-2{grid-template-columns:1fr;gap:0}}
 @media(max-width:760px){.qa-row,.invest-lesson-row,.grid2{grid-template-columns:1fr}}
 /* onboarding on narrow screens: top-align so the tall budget step scrolls instead of
    clipping its heading against the top edge, and clear the fixed footer arrows */
