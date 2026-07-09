@@ -307,6 +307,16 @@ header.hidden{display:none}
 /* top headroom so peaks don't kiss the panel edge; bleeds only to the right + bottom */
 .hi-chart{flex:1;min-width:0;align-self:stretch;position:relative;z-index:1;margin:0 -28px -24px 0;pointer-events:none}
 .hi-chart svg{width:100%;height:100%;display:block;opacity:.9}
+/* Phones/tablets: three wide money values won't sit side-by-side, so stack the stats
+   as label-left / value-right rows and drop the decorative chart. */
+@media(max-width:760px){
+  .hi-panel{padding:20px 22px}
+  .hi-stats{flex-direction:column;gap:14px}
+  .hi-stat{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+  .hi-k{margin-bottom:0}
+  .hi-v{font-size:22px}
+  .hi-chart{display:none}
+}
 @media(max-width:1000px){.home-top{grid-template-columns:1fr}.home-mid{grid-template-columns:1fr}}
 
 /* Dark summary card (Budget "Goals Reached"): standalone charcoal card, formerly
