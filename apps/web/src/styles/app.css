@@ -399,11 +399,25 @@ header.hidden{display:none}
 
 /* ── My Accounts hub ── */
 .acct-sec{border-radius:var(--r);padding:16px;margin-bottom:16px}
-.acct-sec.spend{background:linear-gradient(135deg,#fbe7e0,#f6d6ca)}
-.acct-sec.save{background:linear-gradient(135deg,#f7f4d9,#eee8b8)}
-.acct-sec.loan{background:linear-gradient(135deg,#f5ddc9,#ecc4a0)}
-.acct-sec.invest{background:linear-gradient(135deg,#edeaf6,#ddd6ee);--purple:var(--invest);--purple-strong:var(--invest-strong);--purple-deep:var(--invest-deep);--purple-soft:var(--invest-soft);--purple-soft2:var(--invest-soft2);--purple-line:var(--invest-line);--grad-a:var(--grad-invest-a);--grad-b:var(--grad-invest-b)}
-.acct-sec.invest .btn-pur,.acct-sec.invest .lpa-btn.lpa-go{box-shadow:0 8px 20px -6px rgba(111,101,154,.5)}
+/* Each account section themes its whole feature colour onto the --purple family (the
+   pattern Investing already used) so panel + buttons + help dots + chips all re-colour
+   to the brand feature hue — Spending=spend red, Saving=save yellow, Loan=loan orange,
+   Investing=invest purple. --purple-strong maps to the deep shade so white-on-colour
+   controls (e.g. selected toggles) stay legible. */
+.acct-sec.spend{background:linear-gradient(135deg,var(--spend-soft),#f4d2c5);
+  --purple:var(--spend);--purple-strong:var(--spend-deep);--purple-deep:var(--spend-deep);
+  --purple-soft:var(--spend-soft);--purple-soft2:#f2cdc0;--purple-line:#f0cabb;
+  --grad-a:#e58a63;--grad-b:var(--spend)}
+.acct-sec.save{background:linear-gradient(135deg,var(--save-soft),#efe9bd);
+  --purple:var(--save);--purple-strong:var(--save-deep);--purple-deep:var(--save-deep);
+  --purple-soft:var(--save-soft);--purple-soft2:#eee8b8;--purple-line:#e6dea8;
+  --grad-a:#d9cd6a;--grad-b:var(--save-deep)}
+.acct-sec.loan{background:linear-gradient(135deg,var(--loan-soft),#ecc4a0);
+  --purple:var(--loan);--purple-strong:var(--loan-deep);--purple-deep:var(--loan-deep);
+  --purple-soft:var(--loan-soft);--purple-soft2:#ecc4a0;--purple-line:#e8cbb0;
+  --grad-a:#dd8552;--grad-b:var(--loan)}
+.acct-sec.invest{background:linear-gradient(135deg,var(--invest-soft),var(--invest-soft2));--purple:var(--invest);--purple-strong:var(--invest-strong);--purple-deep:var(--invest-deep);--purple-soft:var(--invest-soft);--purple-soft2:var(--invest-soft2);--purple-line:var(--invest-line);--grad-a:var(--grad-invest-a);--grad-b:var(--grad-invest-b)}
+.acct-sec .btn-pur,.acct-sec .lpa-btn.lpa-go{box-shadow:0 8px 20px -6px rgba(62,57,48,.34)}
 .acct-sec-t{font-size:16px;font-weight:800;letter-spacing:-.2px;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .acct-card{background:var(--surface);border-radius:14px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
 .acct-card .ac-graphic{flex-shrink:0}
