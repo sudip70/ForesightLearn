@@ -651,13 +651,14 @@ function renderLearnHub(){
       +'<div class="lp-col"><div class="lp-col-head"><span class="lp-col-t">Product</span></div><button class="lp-btn" onclick="'+productGo+'">'+productLbl+'</button></div>'
       +'</div></div>';
   }
-  /* upcoming pathway: keeps the title + feature colour but shows an honest single
-     "coming soon" banner instead of buttons that go nowhere */
-  function pathwaySoon(title,cls,blurb){
-    return '<div class="card learn-path '+cls+' is-soon"><div class="lp-head"><h3 class="lp-title">'+title+'</h3>'
-      +'<span class="lp-soon-pill">Coming soon</span></div>'
-      +'<div class="lp-soon-banner"><svg viewBox="0 0 24 24" class="lp-lock"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>'
-      +'<span>'+blurb+'</span></div></div>';
+  /* upcoming pathway: same three colour-coded columns as a live pathway, but the
+     buttons are inert "Coming soon" so the layout matches while nothing dead-ends */
+  function pathwaySoon(title,cls){
+    var col=function(t){return '<div class="lp-col"><div class="lp-col-head"><span class="lp-col-t">'+t+'</span></div>'
+      +'<button class="lp-btn is-soon" disabled>Coming soon</button></div>';};
+    return '<div class="card learn-path '+cls+' is-soon">'
+      +'<div class="lp-head"><h3 class="lp-title">'+title+'</h3><span class="lp-soon-pill">Coming soon</span></div>'
+      +'<div class="lp-cols">'+col('Learn')+col('Practice')+col('Product')+'</div></div>';
   }
   el.innerHTML=
     '<div class="learn-top">'
@@ -671,8 +672,8 @@ function renderLearnHub(){
     +'<div id="learnAdvisor"></div>'
     +'</div>'
     +pathway('Grow my money through Investing','lp-invest',learnLessonCount()+' lessons',"push('lessons')","goTab('journey')","goTab('accounts')",'Start Investing')
-    +pathwaySoon('Build and improve my credit','lp-credit','Lessons and a practice sim for building credit are on the way.')
-    +pathwaySoon('Buy or refinance a home','lp-home','Lessons on mortgages, down payments and refinancing are on the way.');
+    +pathwaySoon('Build and improve my credit','lp-credit')
+    +pathwaySoon('Buy or refinance a home','lp-home');
   if(typeof renderAdvisorCard==='function')renderAdvisorCard('learnAdvisor');
 }
 /* Small inline illustration for the Start-Learning course card: an open book with a

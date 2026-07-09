@@ -364,14 +364,14 @@ header.hidden{display:none}
 .lp-col-meta{font-size:13px;font-weight:600;color:rgba(0,0,0,.62)}
 .lp-btn{margin-top:auto;border:none;border-radius:12px;background:var(--taupe);color:#fff;font-family:var(--font);font-size:14px;font-weight:600;padding:12px 16px;cursor:pointer;transition:filter .15s}
 .lp-btn:hover{filter:brightness(1.06)}
+/* inert "Coming soon" button: frosted fill that reads as disabled on any feature colour */
+.lp-btn.is-soon{background:rgba(255,255,255,.5);color:rgba(0,0,0,.5);cursor:default}
+.lp-btn.is-soon:hover{filter:none}
 .lp-invest{--pc:var(--invest);--pc-soft:var(--invest-soft)}
 .lp-credit{--pc:var(--loan);--pc-soft:var(--loan-soft)}
 .lp-home{--pc:var(--save);--pc-soft:var(--save-soft)}
-/* upcoming pathway: honest single banner, no dead-end buttons — muted soft fill
-   with a feature-color left edge, so what's unavailable never out-shouts what is */
+/* upcoming pathway keeps the "Coming soon" header pill; its columns reuse .lp-col */
 .lp-soon-pill{font-size:12px;font-weight:600;color:var(--muted);background:var(--surface-soft);padding:5px 12px;border-radius:20px;white-space:nowrap}
-.lp-soon-banner{display:flex;align-items:center;gap:12px;background:var(--pc-soft);border-left:5px solid var(--pc);border-radius:var(--r);padding:16px 20px;font-size:14px;font-weight:600;color:rgba(0,0,0,.55);min-height:56px}
-.lp-lock{width:18px;height:18px;flex:0 0 auto;stroke:rgba(0,0,0,.45);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:1000px){.learn-top{grid-template-columns:1fr}}
 /* stacking .learn-start turns its children's 230px flex-basis (a column width on
    desktop) into a min height — reset to content-sized so the card doesn't gap out */
