@@ -144,7 +144,7 @@ function renderBudgetDonutCard(){
   var spent=monthTotal(),left=income-spent;
   var pctBudg=income>0?Math.round(planned/income*100):0;
   var cats=BUDGET.categories.slice().sort(function(a,b){return numVal(b.limit)-numVal(a.limit);});
-  var segs=cats.slice(0,6).map(function(c,i){return {v:planned>0?numVal(c.limit)/planned:0,c:MONEY_PALETTE[i%MONEY_PALETTE.length]};});
+  var segs=cats.slice(0,6).map(function(c,i){return {v:income>0?numVal(c.limit)/income:0,c:MONEY_PALETTE[i%MONEY_PALETTE.length]};});
   var rows=cats.slice(0,6).map(function(c,i){
     var pct=planned>0?Math.min(100,Math.round(numVal(c.limit)/planned*100)):0;
     return '<div style="margin-bottom:8px"><div class="row" style="margin-bottom:3px"><span style="font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:'+MONEY_PALETTE[i%MONEY_PALETTE.length]+'"></span>'+escHtml(c.name)+'</span><span class="tnum" style="font-size:12px;color:var(--muted)">'+money0(c.limit)+'</span></div>'
@@ -155,7 +155,7 @@ function renderBudgetDonutCard(){
     +'<div class="subtabs" style="margin:0"><div class="subtab active" onclick="budgetTab(\'month\')">This month</div><div class="subtab" onclick="budgetTab(\'today\')">Today</div><div class="subtab" onclick="budgetTab(\'last\')">Last month</div></div>'
     +'</div>'
     +'<div class="row" style="margin-bottom:12px"><span class="pill '+(left>=0?'pill-grn':'pill-red')+'">'+money0(left)+' left</span><span class="tnum" style="font-size:12px;color:var(--muted)">'+money0(spent)+' spent of '+money0(income)+'</span></div>'
-    +'<div style="display:flex;gap:24px;align-items:center"><div style="flex:0 0 auto">'+miniDonut(segs,168,pctBudg+'%','budgeted',20)+'</div>'
+    +'<div style="display:flex;gap:24px;align-items:center"><div style="flex:0 0 auto">'+miniSplitDonut(segs,168,pctBudg+'%','budgeted',20)+'</div>'
     +'<div style="flex:1;min-width:0">'+rows+'</div></div></div>';
 }
 /* ── Budget tab: read-only preview of the 5 most recent expenses (full editing
@@ -683,22 +683,22 @@ function renderAccounts(){
     +'<div class="acct-sec save"><div class="acct-sec-t">'+mIcon('sprout',17)+' Savings Accounts</div>'
     +'<div id="acctSaveBox"></div>'
     +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 8px">'
-    +'<button class="lpa-btn" style="flex:1" onclick="goTab(\'learn\')"><span class="lpa-e">💡</span>Learn</button>'
-    +'<div style="flex:0 0 auto;display:flex">'+acctChat('Help me set up a savings account',acctHelp('Open a savings account','Almost every bank offers a free high-interest savings account, open one online in minutes. Then automate it: set a small auto-transfer (even $25) from chequing each payday. Aim to build a starter emergency fund of about one month of expenses first.'))+'</div>'
+    +'<button class="lpa-btn" style="flex:0 0 auto" onclick="goTab(\'learn\')"><span class="lpa-e">💡</span>Learn</button>'
+    +'<div style="flex:1;min-width:0;display:flex">'+acctChat('Help me set up a savings account',acctHelp('Open a savings account','Almost every bank offers a free high-interest savings account, open one online in minutes. Then automate it: set a small auto-transfer (even $25) from chequing each payday. Aim to build a starter emergency fund of about one month of expenses first.'))+'</div>'
     +'</div>'
     +'</div>'
     +'<div class="acct-sec invest"><div class="acct-sec-t">'+mIcon('trendUp',17)+' Investing Accounts</div>'
     +'<div id="acctInvestBox"></div>'
     +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 8px">'
-    +'<button class="lpa-btn" style="flex:1" onclick="openTip(\'tfsa\')"><span class="lpa-e">💡</span>Learn</button>'
-    +'<div style="flex:0 0 auto;display:flex">'+acctChat('Help me set up an investing account',acctHelp('Open a real investing account','When you\'re ready, most banks and brokerages let you open a TFSA online for free. Start with a TFSA (growth is tax-free), pick a low-cost broad ETF, and contribute a small amount regularly. Everything you practise here, buying, holding, diversifying, applies the same way with real money.'))+'</div>'
+    +'<button class="lpa-btn" style="flex:0 0 auto" onclick="openTip(\'tfsa\')"><span class="lpa-e">💡</span>Learn</button>'
+    +'<div style="flex:1;min-width:0;display:flex">'+acctChat('Help me set up an investing account',acctHelp('Open a real investing account','When you\'re ready, most banks and brokerages let you open a TFSA online for free. Start with a TFSA (growth is tax-free), pick a low-cost broad ETF, and contribute a small amount regularly. Everything you practise here, buying, holding, diversifying, applies the same way with real money.'))+'</div>'
     +'</div>'
     +'</div>'
     +'<div class="acct-sec loan"><div class="acct-sec-t">'+mIcon('bank',17)+' Loan Accounts</div>'
     +'<div id="acctLoansBox"></div>'
     +'<div style="display:flex;align-items:stretch;gap:8px;margin:2px 0 8px">'
-    +'<button class="lpa-btn" style="flex:1" onclick="push(\'loan-calc\')"><span class="lpa-e">💡</span>Learn</button>'
-    +'<div style="flex:0 0 auto;display:flex">'+acctChat('Help me pay off debt faster',acctHelp('Paying off debt faster','List your debts by interest rate. Send any extra money to the highest-rate debt first (the "avalanche" method) — it saves the most interest overall. Prefer quick wins to stay motivated? Pay off the smallest balance first (the "snowball" method) instead. Either way, keep paying at least the minimum on everything else.'))+'</div>'
+    +'<button class="lpa-btn" style="flex:0 0 auto" onclick="push(\'loan-calc\')"><span class="lpa-e">💡</span>Learn</button>'
+    +'<div style="flex:1;min-width:0;display:flex">'+acctChat('Help me pay off debt faster',acctHelp('Paying off debt faster','List your debts by interest rate. Send any extra money to the highest-rate debt first (the "avalanche" method) — it saves the most interest overall. Prefer quick wins to stay motivated? Pay off the smallest balance first (the "snowball" method) instead. Either way, keep paying at least the minimum on everything else.'))+'</div>'
     +'</div>'
     +'</div></div>';
 
@@ -721,6 +721,27 @@ function miniDonut(segs,size,centerTop,centerSub,sw){
     s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+g.c+'" stroke-width="'+sw+'" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
     off+=len;});
   return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" style="display:block">'+s
+    +'<text x="'+cx+'" y="'+(cy-1)+'" text-anchor="middle" font-size="'+ftop+'" font-weight="800" fill="#665b93">'+centerTop+'</text>'
+    +'<text x="'+cx+'" y="'+(cy+ftop*0.82)+'" text-anchor="middle" font-size="'+fsub+'" font-weight="700" fill="#a19b91">'+(centerSub||'')+'</text></svg>';
+}
+/* Split variant of miniDonut (same shape as the onboarding split donut): top half is
+   one solid earnings/income arc, bottom half is the allocation (segs are fractions of
+   income, so an under-budgeted month leaves grey track showing). A horizontal band is
+   clipped through the centre so both halves get a straight, level edge. */
+function miniSplitDonut(segs,size,centerTop,centerSub,sw,topColor){
+  size=size||168;sw=sw||20;topColor=topColor||'#619f88';
+  var r=size/2-sw/2-1,cx=size/2,cy=size/2,gap=Math.max(10,sw*0.55),RAD=Math.PI/180;
+  var ftop=Math.max(14,Math.round(size*0.145)),fsub=Math.max(8,Math.round(size*0.068));
+  function P(d){return [cx+r*Math.cos(d*RAD),cy+r*Math.sin(d*RAD)];}
+  function arc(a0,a1,col){var p0=P(a0),p1=P(a1),lg=(a1-a0)>180?1:0;
+    return '<path d="M'+p0[0].toFixed(2)+' '+p0[1].toFixed(2)+' A'+r+' '+r+' 0 '+lg+' 1 '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+'" fill="none" stroke="'+col+'" stroke-width="'+sw+'"/>';}
+  var s=arc(0,180,'#f2efe4')+arc(180,360,topColor); /* bottom track + full income top */
+  var a=0;segs.forEach(function(g){var v=Math.max(0,Math.min(1,g.v));if(v<=0)return;var a1=Math.min(180,a+180*v);if(a1-a>0.01)s+=arc(a,a1,g.c);a=a1;});
+  var top=cy-gap/2,bot=cy+gap/2,cid='msd'+Math.round(size)+Math.round(sw);
+  return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" style="display:block">'
+    +'<defs><clipPath id="'+cid+'"><rect x="0" y="0" width="'+size+'" height="'+top+'"/>'
+    +'<rect x="0" y="'+bot+'" width="'+size+'" height="'+(size-bot)+'"/></clipPath></defs>'
+    +'<g clip-path="url(#'+cid+')">'+s+'</g>'
     +'<text x="'+cx+'" y="'+(cy-1)+'" text-anchor="middle" font-size="'+ftop+'" font-weight="800" fill="#665b93">'+centerTop+'</text>'
     +'<text x="'+cx+'" y="'+(cy+ftop*0.82)+'" text-anchor="middle" font-size="'+fsub+'" font-weight="700" fill="#a19b91">'+(centerSub||'')+'</text></svg>';
 }
@@ -787,7 +808,7 @@ function renderHomeBudgetBig(){
   var pctBudg=income>0?Math.round(planned/income*100):0;
   var m=thisMonth(),byCat={};SPENDING.forEach(function(s){if((s.date||'').slice(0,7)===m)byCat[s.category]=(byCat[s.category]||0)+numVal(s.amount);});
   var cats=BUDGET.categories.slice().sort(function(a,b){return numVal(b.limit)-numVal(a.limit);});
-  var segs=cats.slice(0,6).map(function(c,i){return {v:planned>0?numVal(c.limit)/planned:0,c:MONEY_PALETTE[i%MONEY_PALETTE.length]};});
+  var segs=cats.slice(0,6).map(function(c,i){return {v:income>0?numVal(c.limit)/income:0,c:MONEY_PALETTE[i%MONEY_PALETTE.length]};});
   var rows=cats.slice(0,5).map(function(c,i){
     var lim=numVal(c.limit),spent=byCat[c.name]||0,pct=lim>0?Math.min(100,Math.round(spent/lim*100)):0,col=MONEY_PALETTE[i%MONEY_PALETTE.length];
     return '<div class="hb-row"><div class="hb-row-head"><span class="hb-lbl">'+escHtml(c.name)+'</span>'
@@ -796,7 +817,7 @@ function renderHomeBudgetBig(){
   }).join('')||'<div class="muted-note">No categories yet.</div>';
   el.innerHTML='<div class="card" style="margin:0">'
     +'<div class="hc-head"><span class="hc-title">Your Monthly Budget</span><button class="hc-btn" onclick="goTab(\'budget\')">View Full</button></div>'
-    +'<div class="hb-body"><div class="hb-donut">'+miniDonut(segs,220,pctBudg+'%','budgeted',40)+'</div>'
+    +'<div class="hb-body"><div class="hb-donut">'+miniSplitDonut(segs,220,pctBudg+'%','budgeted',40)+'</div>'
     +'<div class="hb-legend">'+rows+'</div></div></div>';
 }
 /* ── "Investing" summary card (target redesign): left copy + View Investments button,

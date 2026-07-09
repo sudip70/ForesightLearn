@@ -115,6 +115,24 @@ function onObIncome(v){
   });});
   renderObSplitDonut();
 }
+/* Onboarding split donut: top half is one solid earnings arc, bottom half is the
+   budget breakdown, with a gap at each side so the two halves read as separate. */
+function obSplitDonut(segs,size){
+  var sw=26,r=size/2-16,cx=size/2,cy=size/2,gap=10,RAD=Math.PI/180;
+  function P(d){return [cx+r*Math.cos(d*RAD),cy+r*Math.sin(d*RAD)];}
+  function arc(a0,a1,col){var p0=P(a0),p1=P(a1),lg=(a1-a0)>180?1:0;
+    return '<path d="M'+p0[0].toFixed(2)+' '+p0[1].toFixed(2)+' A'+r+' '+r+' 0 '+lg+' 1 '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+'" fill="none" stroke="'+col+'" stroke-width="'+sw+'"/>';}
+  var s=arc(180,360,OBB_C.left); /* top: full earnings, full semicircle */
+  var a=0;                        /* bottom: allocation across the lower semicircle */
+  segs.forEach(function(seg){var a1=a+180*seg.v;if(a1-a>0.01)s+=arc(a,a1,seg.c);a=a1;});
+  /* clip away a horizontal band through the centre so both halves get a straight,
+     level edge (a stroke's own end-cap follows the arc tangent, i.e. slanted). */
+  var top=cy-gap/2,bot=cy+gap/2;
+  return '<svg viewBox="0 0 '+size+' '+size+'" width="190" height="190">'
+    +'<defs><clipPath id="obDonutClip"><rect x="0" y="0" width="'+size+'" height="'+top+'"/>'
+    +'<rect x="0" y="'+bot+'" width="'+size+'" height="'+(size-bot)+'"/></clipPath></defs>'
+    +'<g clip-path="url(#obDonutClip)">'+s+'</g></svg>';
+}
 /* paint every slider + the donut from state — called when the step opens */
 function initOBBudget(){
   onObIncome(obIncome);
@@ -124,7 +142,7 @@ function renderObSplitDonut(){
   var left=Math.max(0,obIncome-obGoal.save-obGoal.spend-obGoal.invest);
   var pc=function(v){return Math.round(v/total*100);};
   var segs=[{v:obGoal.spend/total,c:OBB_C.spend},{v:obGoal.save/total,c:OBB_C.save},{v:obGoal.invest/total,c:OBB_C.invest},{v:left/total,c:OBB_C.left}];
-  var el=document.getElementById('obSplitDonut');if(el)el.innerHTML=donutChart(segs,150,'');
+  var el=document.getElementById('obSplitDonut');if(el)el.innerHTML=obSplitDonut(segs,150);
   var leg=document.getElementById('obSplitLegend');
   if(leg)leg.innerHTML='<span class="ob-split-dot" style="background:'+OBB_C.spend+'"></span>'+pc(obGoal.spend)+'%'
     +'<span class="ob-split-dot" style="background:'+OBB_C.save+'"></span>'+pc(obGoal.save)+'%'
