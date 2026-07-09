@@ -655,10 +655,10 @@ function addInvestCash(){
 function renderAccounts(){
   var el=document.getElementById('acctBody');if(!el)return;
 
-  /* skeleton: summary + Mia intro + section containers. The per-section content
-     is filled by the render* calls below so each can refresh independently. */
-  var h='<div id="acctSummary"></div>'
-    +'<div class="mia" style="margin:2px 0 16px"><div class="face">'+avatar()+'</div><div>'
+  /* skeleton: Mia intro + section containers. #acctSummary lives up in .nw-row
+     (beside the Net Worth tile); the per-section content is filled by the render*
+     calls below so each can refresh independently. */
+  var h='<div class="mia" style="margin:2px 0 16px"><div class="face">'+avatar()+'</div><div>'
     +'<div class="bubble">Track what you actually have here, balances, loans, savings and buying power. Tap <b>?</b> on anything to learn what it is.</div>'
     +'<button class="whats" onclick="'+acctHelp("I don't have a bank account yet","No problem, that's exactly who this is for. A bank account is just a safe place a bank holds your money. Most Canadian banks let you open a free chequing + savings account online in about 10 minutes with photo ID and a SIN. Start with one bank's free everyday account, you can always add more later.")+'">'
     +'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.4c-.8.3-1 .9-1 1.6"/><line x1="12" y1="17" x2="12" y2="17"/></svg>I don\'t have a bank account</button></div></div>';

@@ -463,6 +463,15 @@ header.hidden{display:none}
 .sum-tile{background:var(--surface);border-radius:14px;padding:12px 16px;box-shadow:var(--shadow)}
 .sum-tile .st-l{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sum-tile .st-v{font-size:20px;font-weight:800;letter-spacing:-.4px;margin-top:4px;color:var(--ink)}
+/* Net-worth row: keep the tall Net Worth card on the left (fixed, narrower) and pack
+   the five snapshot tiles into a 3×2 grid on the right that fills the same height */
+.nw-row{display:flex;gap:16px;align-items:stretch;margin-bottom:16px}
+.nw-row #tileNetworth{flex:0 0 320px}
+.nw-row #acctSummary{flex:1;min-width:0}
+.nw-row .acct-sum{grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;height:100%;margin-bottom:0}
+.nw-row .sum-tile{display:flex;flex-direction:column;justify-content:center}
+@media(max-width:900px){.nw-row{flex-direction:column}.nw-row #tileNetworth{flex:0 0 auto}}
+@media(max-width:560px){.nw-row .acct-sum{grid-template-columns:repeat(2,1fr)}}
 .logrow{display:flex;gap:8px;align-items:center}
 .logrow .f-in{flex:1;min-width:0}
 .logrow #axCat,.logrow #axPay{flex:1.15}
