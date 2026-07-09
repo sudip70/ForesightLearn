@@ -737,11 +737,11 @@ function miniSplitDonut(segs,size,centerTop,centerSub,sw,topColor){
     return '<path d="M'+p0[0].toFixed(2)+' '+p0[1].toFixed(2)+' A'+r+' '+r+' 0 '+lg+' 1 '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+'" fill="none" stroke="'+col+'" stroke-width="'+sw+'"/>';}
   var s=arc(0,180,'#f2efe4')+arc(180,360,topColor); /* bottom track + full income top */
   var a=0;segs.forEach(function(g){var v=Math.max(0,Math.min(1,g.v));if(v<=0)return;var a1=Math.min(180,a+180*v);if(a1-a>0.01)s+=arc(a,a1,g.c);a=a1;});
-  var top=cy-gap/2,bot=cy+gap/2,cid='msd'+Math.round(size)+Math.round(sw);
-  return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" style="display:block">'
-    +'<defs><clipPath id="'+cid+'"><rect x="0" y="0" width="'+size+'" height="'+top+'"/>'
-    +'<rect x="0" y="'+bot+'" width="'+size+'" height="'+(size-bot)+'"/></clipPath></defs>'
-    +'<g clip-path="url(#'+cid+')">'+s+'</g>'
+  return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" style="display:block">'+s
+    /* straight gap via a surface-coloured band (cards are --surface #fff) — a clipPath
+       here renders as an octagon in Safari/WebKit; a rect is cross-browser and
+       scale-safe. Drawn before the centre text so the % label sits on top. */
+    +'<rect x="0" y="'+(cy-gap/2)+'" width="'+size+'" height="'+gap+'" fill="#fff"/>'
     +'<text x="'+cx+'" y="'+(cy-1)+'" text-anchor="middle" font-size="'+ftop+'" font-weight="800" fill="#665b93">'+centerTop+'</text>'
     +'<text x="'+cx+'" y="'+(cy+ftop*0.82)+'" text-anchor="middle" font-size="'+fsub+'" font-weight="700" fill="#a19b91">'+(centerSub||'')+'</text></svg>';
 }

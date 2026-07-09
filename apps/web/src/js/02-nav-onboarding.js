@@ -125,13 +125,11 @@ function obSplitDonut(segs,size){
   var s=arc(180,360,OBB_C.left); /* top: full earnings, full semicircle */
   var a=0;                        /* bottom: allocation across the lower semicircle */
   segs.forEach(function(seg){var a1=a+180*seg.v;if(a1-a>0.01)s+=arc(a,a1,seg.c);a=a1;});
-  /* clip away a horizontal band through the centre so both halves get a straight,
-     level edge (a stroke's own end-cap follows the arc tangent, i.e. slanted). */
-  var top=cy-gap/2,bot=cy+gap/2;
-  return '<svg viewBox="0 0 '+size+' '+size+'" width="190" height="190">'
-    +'<defs><clipPath id="obDonutClip"><rect x="0" y="0" width="'+size+'" height="'+top+'"/>'
-    +'<rect x="0" y="'+bot+'" width="'+size+'" height="'+(size-bot)+'"/></clipPath></defs>'
-    +'<g clip-path="url(#obDonutClip)">'+s+'</g></svg>';
+  /* straight, level split via a surface-coloured band over the centre (card is
+     --surface #fff). A stroke's own end-cap follows the arc tangent (slanted), and a
+     clipPath renders as an octagon in Safari/WebKit — a rect is cross-browser. */
+  return '<svg viewBox="0 0 '+size+' '+size+'" width="190" height="190">'+s
+    +'<rect x="0" y="'+(cy-gap/2)+'" width="'+size+'" height="'+gap+'" fill="#fff"/></svg>';
 }
 /* paint every slider + the donut from state — called when the step opens */
 function initOBBudget(){
