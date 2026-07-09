@@ -508,6 +508,12 @@ header.hidden{display:none}
 .donut-empty .de-t{font-size:13px;font-weight:800;color:var(--ink);margin-top:8px}
 .donut-empty .de-d{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.45}
 @media(max-width:560px){.donut-wrap{flex-direction:column;gap:12px}}
+/* Budget donut card: donut + legend side-by-side. On phones the fixed 168px donut
+   crowded the legend into ~130px, so shrink the donut and tighten the gap to give
+   the labels/bars/amounts room. */
+.bdc-row{display:flex;gap:24px;align-items:center}
+.bdc-donut{flex:0 0 auto}
+@media(max-width:560px){.bdc-row{gap:14px}.bdc-donut{width:128px}.bdc-donut svg{width:100%;height:auto;display:block}}
 
 /* ── Invest Game ── */
 .ig-char-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}

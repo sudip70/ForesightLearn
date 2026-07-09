@@ -155,7 +155,7 @@ function renderBudgetDonutCard(){
     +'<div class="subtabs" style="margin:0"><div class="subtab active" onclick="budgetTab(\'month\')">This month</div><div class="subtab" onclick="budgetTab(\'today\')">Today</div><div class="subtab" onclick="budgetTab(\'last\')">Last month</div></div>'
     +'</div>'
     +'<div class="row" style="margin-bottom:12px"><span class="pill '+(left>=0?'pill-grn':'pill-red')+'">'+money0(left)+' left</span><span class="tnum" style="font-size:12px;color:var(--muted)">'+money0(spent)+' spent of '+money0(income)+'</span></div>'
-    +'<div style="display:flex;gap:24px;align-items:center"><div style="flex:0 0 auto">'+miniSplitDonut(segs,168,pctBudg+'%','budgeted',20)+'</div>'
+    +'<div class="bdc-row"><div class="bdc-donut">'+miniSplitDonut(segs,168,pctBudg+'%','budgeted',20)+'</div>'
     +'<div style="flex:1;min-width:0">'+rows+'</div></div></div>';
 }
 /* ── Budget tab: read-only preview of the 5 most recent expenses (full editing
